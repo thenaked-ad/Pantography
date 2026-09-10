@@ -6,6 +6,17 @@
 %}
 
 {% if search_collection != blank %}
+  {%- comment -%}
+    Matches the z-index the live theme gives the old search section, so the
+    collection list below (pulled up 80px, opaque overlay) cannot cover the field.
+  {%- endcomment -%}
+  <style>
+    #shopify-section-{{ section.id }} {
+      position: relative;
+      z-index: 25;
+    }
+  </style>
+
   <collection-product-search
     class="collection-search"
     style="
