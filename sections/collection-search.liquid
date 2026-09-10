@@ -44,6 +44,7 @@
     data-index-view="{{ section.settings.index_view | escape }}"
     data-index-max="{{ section.settings.index_max }}"
     data-index-text="{{ section.settings.index_results_text | escape }}"
+    data-submit-to-search="{{ section.settings.submit_to_search }}"
   >
     <div class="collection-search__inner">
       {% if section.settings.heading != blank %}
@@ -261,6 +262,13 @@
       "id": "placeholder",
       "label": "Placeholder",
       "default": "Enter a product name, SKU or keyword"
+    },
+    {
+      "type": "checkbox",
+      "id": "submit_to_search",
+      "label": "Go to search results on Enter",
+      "info": "Typing filters this collection in place. Pressing Enter loads /search, which is the only thing that records the term in Shopify's top-searches report, GA4 site search and Meta's Search event.",
+      "default": true
     },
     {
       "type": "checkbox",

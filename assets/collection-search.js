@@ -9,11 +9,29 @@ if (!customElements.get('collection-product-search')) {
       this.indexFallback = this.dataset.indexFallback === 'true';
       this.indexView = this.dataset.indexView || 'rank';
       this.indexMax = Number(this.dataset.indexMax) || 48;
+      this.submitToSearch = this.dataset.submitToSearch === 'true';
       this.products = [];
       this.searchRequest = 0;
 
       this.form.addEventListener('submit', (event) => {
         event.preventDefault();
+
+        /* Enter goes to the search results page. Loading /search is the only
+           thing that registers the term with Shopify, GA4 and Meta; the live
+           filtering above never navigates, so nothing else would record it. */
+        const term = this.input.value.trim();
+        if (this.submitToSearch && term.length >= this.minimumCharacters) {
+          const url = new URL('/search', window.location.origin);
+          url.searchParams.set('q', term);
+          url.searchParams.set('type', 'product');
+
+          const segment = (this.dataset.collectionUrl || '').split('/').filter(Boolean).pop();
+          if (segment) url.searchParams.set('from', segment);
+
+          window.location.assign(url.toString());
+          return;
+        }
+
         this.runSearch();
       });
 
