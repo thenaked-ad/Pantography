@@ -442,11 +442,13 @@
   function catalogPromiseFor(root) {
     /* collection products arrive in pages of 250 via the `map` alternate
        collection view — avoids Liquid's per-render product cap.
-       SPEED: first three pages fetch in PARALLEL (covers 750 products). */
+       SPEED: page 1 reports paginate.pages, so every remaining page is
+       fetched in ONE parallel wave instead of chaining one at a time. */
     var inline = inlineData(root);
     var collUrl = root.getAttribute('data-collection-url');
     if (!collUrl) return Promise.resolve(inline);
     var sep = collUrl.indexOf('?') > -1 ? '&' : '?';
+    var MAX_PAGES = 12;
     function page(n) {
       return fetch(collUrl + sep + 'view=map&page=' + n)
         .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
@@ -454,16 +456,33 @@
     }
     return Promise.all([page(1), page(2), page(3)]).then(function (js) {
       var all = inline.concat(js[0].items || [], js[1].items || [], js[2].items || []);
+
+      /* page 1 now reports the true page count, so pages 4..N all start
+         at once. Falls back to the old sequential probe if an older
+         cached copy of the map view is served without "pages". */
+      var total = parseInt(js[0].pages, 10);
+      if (isFinite(total) && total > 0) {
+        if (total > MAX_PAGES) total = MAX_PAGES;
+        if (total <= 3) return all;
+        var rest = [];
+        for (var n = 4; n <= total; n++) rest.push(page(n));
+        return Promise.all(rest).then(function (pages) {
+          for (var i = 0; i < pages.length; i++) all = all.concat(pages[i].items || []);
+          return all;
+        });
+      }
+
       if (!js[2].next) return all;
       function more(n) {
         return page(n).then(function (j) {
           all = all.concat(j.items || []);
-          return (j.next && n < 12) ? more(n + 1) : all;
+          return (j.next && n < MAX_PAGES) ? more(n + 1) : all;
         });
       }
       return more(4);
     });
   }
+
   function prefetch(el) {
     if (!el._saPrefetch) {
       el._saPrefetch = { world: worldPromiseFor(el), catalog: catalogPromiseFor(el) };
