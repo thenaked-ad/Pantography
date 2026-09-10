@@ -36,9 +36,6 @@
       {% endif %}
 
       <form class="collection-search__form" role="search">
-        <label class="collection-search__label" for="CollectionSearch-{{ section.id }}">
-          {{ section.settings.search_label | escape }}
-        </label>
         <div class="collection-search__input-wrap">
           <svg class="collection-search__icon" aria-hidden="true" viewBox="0 0 24 24" width="20" height="20">
             <path d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"/>
@@ -49,6 +46,7 @@
             type="search"
             inputmode="search"
             autocomplete="off"
+            aria-label="{{ section.settings.placeholder | escape }}"
             placeholder="{{ section.settings.placeholder | escape }}"
           >
         </div>
@@ -96,7 +94,7 @@
     display: block;
     background: var(--collection-search-background);
     color: var(--collection-search-text);
-    padding: 40px 20px;
+    padding: 0;
   }
 
   .collection-search__inner {
@@ -116,12 +114,6 @@
   .collection-search__form {
     max-width: 720px;
     margin: 0 auto;
-  }
-
-  .collection-search__label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
   }
 
   .collection-search__input-wrap {
@@ -164,6 +156,7 @@
     display: grid;
     grid-template-columns: repeat(var(--collection-search-columns), minmax(0, 1fr));
     gap: 24px;
+    margin-bottom: 40px;
   }
 
   .collection-search__card {
@@ -231,7 +224,7 @@
 
   @media (max-width: 749px) {
     .collection-search {
-      padding: 28px 16px;
+      padding: 0;
     }
 
     .collection-search__grid {
@@ -484,12 +477,6 @@
       "id": "heading",
       "label": "Heading",
       "default": "Search this collection"
-    },
-    {
-      "type": "text",
-      "id": "search_label",
-      "label": "Search label",
-      "default": "Search products"
     },
     {
       "type": "text",
