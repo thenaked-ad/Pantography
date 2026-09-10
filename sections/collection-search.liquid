@@ -40,6 +40,10 @@
     data-show-price="{{ section.settings.show_price }}"
     data-replace-original-grid="{{ section.settings.replace_original_grid }}"
     data-original-grid-selector="{{ section.settings.original_grid_selector | escape }}"
+    data-index-fallback="{{ section.settings.index_fallback }}"
+    data-index-view="{{ section.settings.index_view | escape }}"
+    data-index-max="{{ section.settings.index_max }}"
+    data-index-text="{{ section.settings.index_results_text | escape }}"
   >
     <div class="collection-search__inner">
       {% if section.settings.heading != blank %}
@@ -241,6 +245,9 @@
         this.status = this.querySelector('[data-search-status]');
         this.results = this.querySelector('[data-search-results]');
         this.minimumCharacters = Number(this.dataset.minCharacters) || 2;
+        this.indexFallback = this.dataset.indexFallback === 'true';
+        this.indexView = this.dataset.indexView || 'rank';
+        this.indexMax = Number(this.dataset.indexMax) || 48;
         this.products = [];
         this.searchRequest = 0;
 
@@ -335,6 +342,46 @@
         return this.loadingPromise;
       }
 
+      /* Shopify's own ranking for the term, narrowed to this collection.
+         Used only when the term matches nothing in the collection's text. */
+      async rankedMatches(query) {
+        const productsById = new Map(this.products.map((product) => [String(product.id), product]));
+        const picked = [];
+        const seen = new Set();
+
+        for (let page = 1; page <= 3; page += 1) {
+          const url = new URL('/search', window.location.origin);
+          url.searchParams.set('q', query);
+          url.searchParams.set('type', 'product');
+          url.searchParams.set('view', this.indexView);
+          url.searchParams.set('page', String(page));
+
+          const response = await fetch(url.toString(), { credentials: 'same-origin' });
+          if (!response.ok) break;
+
+          let data;
+          try {
+            data = JSON.parse(await response.text());
+          } catch (error) {
+            console.error('Collection search: relevance feed did not return JSON.', error);
+            break;
+          }
+
+          (data.ids || []).forEach((id) => {
+            const key = String(id);
+            if (seen.has(key)) return;
+            seen.add(key);
+            const product = productsById.get(key);
+            if (product) picked.push(product);
+          });
+
+          if (picked.length >= this.indexMax) break;
+          if (data.pages && page >= data.pages) break;
+        }
+
+        return picked.slice(0, this.indexMax);
+      }
+
       async runSearch() {
         const requestId = ++this.searchRequest;
         const query = this.normalize(this.input.value);
@@ -372,7 +419,17 @@
               return scoreA - scoreB || titleA.localeCompare(titleB);
             });
 
-          this.renderResults(matches);
+          if (matches.length > 0 || !this.indexFallback) {
+            this.renderResults(matches);
+            return;
+          }
+
+          const ranked = await this.rankedMatches(this.input.value.trim());
+          if (requestId !== this.searchRequest) return;
+
+          const rankedStatus = this.message(this.dataset.indexText, ranked.length)
+            .replace('[term]', this.input.value.trim());
+          this.renderResults(ranked, rankedStatus);
         } catch (error) {
           if (requestId !== this.searchRequest) return;
           this.results.replaceChildren();
@@ -383,7 +440,7 @@
         }
       }
 
-      renderResults(products) {
+      renderResults(products, statusOverride) {
         this.results.replaceChildren();
 
         if (products.length === 0) {
@@ -397,9 +454,11 @@
         this.results.append(fragment);
         this.results.hidden = false;
         this.setStatus(
-          products.length === 1
-            ? this.dataset.oneResultText
-            : this.message(this.dataset.manyResultsText, products.length)
+          statusOverride
+            ? statusOverride
+            : products.length === 1
+              ? this.dataset.oneResultText
+              : this.message(this.dataset.manyResultsText, products.length)
         );
       }
 
@@ -481,6 +540,35 @@
       "id": "placeholder",
       "label": "Placeholder",
       "default": "Enter a product name, SKU or keyword"
+    },
+    {
+      "type": "checkbox",
+      "id": "index_fallback",
+      "label": "Fall back to Shopify search",
+      "info": "When a term matches nothing in this collection's own text, use Shopify's search ranking and keep only the products in this collection. Covers visual terms such as colours.",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "index_view",
+      "label": "Relevance feed view",
+      "info": "Alternate search template used for the fallback. Leave as rank unless the template is renamed.",
+      "default": "rank"
+    },
+    {
+      "type": "range",
+      "id": "index_max",
+      "label": "Maximum fallback results",
+      "min": 12,
+      "max": 96,
+      "step": 12,
+      "default": 48
+    },
+    {
+      "type": "text",
+      "id": "index_results_text",
+      "label": "Fallback results message",
+      "default": "Closest matches for [term]"
     },
     {
       "type": "range",

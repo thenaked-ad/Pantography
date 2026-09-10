@@ -1,0 +1,24 @@
+{% layout none %}
+{%- comment -%}
+  Relevance feed for the in-collection search (?q=TERM&type=product&view=rank&page=N).
+
+  Returns Shopify's own search ranking for a term as a bare list of product ids.
+  The collection-search section intersects that order with the products in its
+  own segment, so a visual term such as "blue" — which exists nowhere in the
+  product data — still resolves, while staying inside FLOATING or FLAT.
+{%- endcomment -%}
+{%- paginate search.results by 250 -%}
+{
+  "ids": [
+    {%- assign first = true -%}
+    {%- for item in search.results -%}
+      {%- if item.object_type == 'product' -%}
+        {%- unless first -%},{%- endunless -%}
+        {%- assign first = false -%}
+        {{ item.id }}
+      {%- endif -%}
+    {%- endfor -%}
+  ],
+  "pages": {{ paginate.pages }}
+}
+{%- endpaginate -%}
