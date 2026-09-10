@@ -1,0 +1,66 @@
+.bv_atual { display: block; position: relative; z-index: 2; background-position: -3000em -3000em; text-decoration: none; text-overflow: ellipsis; white-space: nowrap; --pd: calc(var(--input_height) * 0.3); }
+.bv_atual .img { 
+  display: block; max-width: 45px; height: 45px; margin-right: var(--pd); margin-left: calc(0px - var(--input_padding) + var(--pd));
+  flex-shrink: 0;
+}
+  .bv_atual .img img { display: block; max-height: 100% !important; border-radius: var(--b2i); object-fit: contain; object-position: center center; }
+  [dir="rtl"] .bv_atual .img { margin-left: var(--pd); margin-right: calc(0px - var(--input_padding) + var(--pd)); }
+.bv_atual .text { 
+  display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  flex-grow: 3;
+}
+.bv_atual .sl_inner { display: block; overflow: hidden; width: 100%; text-overflow: ellipsis; white-space: nowrap; }
+.bv_mainselect .bv_ul_inner { display: none; overflow-x: hidden; overflow-y: auto; position: absolute; left: var(--l0ra); right: var(--lar0); top: 100%; list-style: none; width: auto !important; min-width: 100%; max-height: 40vh; margin: 0; padding: 0 /*calc(var(--cols_spacing) * 0.25) 0 calc(var(--cols_spacing) * 0.25 - 1px)*/; opacity: 1 !important; box-shadow: 0 20px 60px rgba(0,0,0,.08); border-radius: 0 0 var(--b2i) var(--b2i); background: var(--input_bg); --cols_spacing: var(--rpp); --pd: calc(var(--input_height) * 0.3); }	
+.bv_mainselect .bv_ul_inner .li { display: block; position: relative; z-index: 2; width: auto; max-width: none; margin: 0; padding: 0; border-width: 0; cursor: pointer; }
+  .bv_mainselect .bv_ul_inner .li.bv_disabled, .bv_mainselect .bv_ul_inner .li.disabled { color: var(--input_fg); opacity: .4; }
+  .bv_mainselect .bv_ul_inner .li.bv_disabled { pointer-events: none; }
+  .bv_mainselect .bv_ul_inner .li.bv_disabled a, .bv_.bv_mainselect .bv_ul_inner .li amainselect .bv_ul_inner .li.disabled a { color: inherit; }
+  .bv_mainselect .bv_ul_inner .li a { display: block; position: relative; z-index: 2; min-height: var(--input_height); padding: 8px var(--input_padding); color: var(--input_fg); font-weight: var(--main_fw); text-decoration: none; }
+  /*.bv_mainselect .bv_ul_inner .li.bv_disabled .text, .bv_mainselect .bv_ul_inner .li.disabled .text, .bv_mainselect .bv_ul_inner .li.bv_disabled img, .bv_mainselect .bv_ul_inner .li.disabled img, .bv_mainselect .bv_ul_inner .li.bv_disabled i:not(.icon-circle), .bv_mainselect .bv_ul_inner .li.disabled i:not(.icon-circle) { opacity: .53; }*/
+  /*.bv_mainselect .bv_ul_inner .li a:before { content: ""; display: block; overflow: hidden; position: absolute; left: 0; top: 0; right: 0; bottom: 0; z-index: -1; text-align: left; text-indent: -3000em; direction: ltr; }
+  .bv_mainselect .bv_ul_inner .li a i { display: inline-block; position: relative; margin-right: 8px; font-size: var(--size_18_f); line-height: 1px; }
+  .bv_mainselect .bv_ul_inner .li a i.icon-circle { display: block; overflow: hidden; position: relative; top: 10px; width: var(--size_22_f); height: var(--size_22_f); margin-right: 12px; margin-top: -20px; border-radius: 99px; box-shadow: inset 0 1px 2px rgba(0,0,0,.2); text-align: left; text-indent: -3000em; direction: ltr; }*/
+.bv_mainselect .bv_ul_inner .img { 
+  display: block; width: 40px; /*height: 38px; margin: 0 20px 0 0;*/ margin-right: var(--pd); 
+  flex-shrink: 0; 
+}
+  [dir="rtl"] .bv_mainselect .bv_ul_inner .img, [dir="rtl"] .bv_mainselect .bv_ul_inner .icon-circle, [dir="rtl"] .bv_atual .icon-circle { margin-right: 0; margin-left: var(--pd); }
+  .bv_mainselect .bv_ul_inner .img img { display: block; width: 100% !important; object-fit: contain; object-position: center center; }
+.bv_mainselect .bv_ul_inner .icon-circle, .bv_atual .icon-circle { 
+  display: none;
+  /*display: block; margin-right: var(--pd); background: none !important; font-size: var(--size_24); line-height: 1; text-shadow: 0 1px 2px rgba(0,0,0,.16);
+  flex-shrink: 0; */
+}
+.bv_mainselect .bv_atual.up ~ .bv_ul_inner { display: block !important; }
+.bv_atual.up:before { content: "\e968"; }
+/*.bv_mainselect .innerinput { }*/
+#root .bv_mainselect input { width: calc(100% - 20px); margin: calc(0px - var(--cols_spacing) * 0.5 + 10px) 10px 10px 10px; }
+/*
+.bv_mainselect :focus::placeholder { opacity: .75; }
+#root .bv_atual, #root .bv_mainselect .bv_atual.done[data-class*="disabled"] { color: var(--input_pl); }		
+.bv_mainselect .bv_atual.up { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+  .bv_atual.up:before { transform: rotate(180deg); }
+#root .bv_mainselect .bv_atual.done, #root .select-wrapper.done .bv_mainselect .bv_atual, #root .done > .select-wrapper .bv_mainselect .bv_atual { color: var(--input_fg); }*/
+
+.has-select.select-open, li.select-open { z-index: 200 !important; }
+
+
+.bv_mainselect .bv_ul_inner .bv_disabled { opacity: .3; pointer-events: none; }
+.bv_mainselect .bv_ul_inner { scrollbar-width: thin; }
+.bv_mainselect .bv_ul_inner::-webkit-scrollbar { width: 6px; height: 6px; }
+.bv_mainselect .bv_ul_inner::-webkit-scrollbar-track { background: none; }
+.bv_mainselect .bv_ul_inner::-webkit-scrollbar-thumb { background: var(--alto); }
+
+#root .bv_mainselect li.nofocus, .bv_mainselect .innerinput, .bv_mainselect .bv_ul_inner .li.bv_disabled.bv_selected, .bv_ul_b { display: none; }
+[data-search-placeholder] ~ .bv_mainselect li.nofocus:first-child + .bv_disabled.bv_selected, .bv_mainselect .bv_ul_inner .li.bv_disabled.bv_selected { display: none !important; }
+[data-search-placeholder] ~ .bv_mainselect .innerinput, #root [data-search-placeholder] ~ .bv_mainselect li.nofocus { display: block; }
+
+.bv_mainselect .bv_ul_inner .img, .bv_mainselect .bv_ul_inner .li a, .bv_atual, .bv_atual .img { display: flex; flex-wrap: wrap; }
+.bv_mainselect .bv_ul_inner .li a, .bv_atual, .bv_atual .img { flex-wrap: nowrap; }
+.bv_mainselect .bv_ul_inner .img, .bv_atual .img { justify-content: center; }
+.bv_mainselect .bv_ul_inner .img, .bv_mainselect .bv_ul_inner .li a, .bv_atual, .bv_atual .img { align-items: center; }
+
+
+/*[data-whatin="mouse"] .bv_mainselect .bv_ul_inner .li a:hover:before, .bv_mainselect .bv_ul_inner .li.active a:before { background: var(--input_fg); opacity: .05; }	*/
+[data-whatin="mouse"] #root /*.f8sr*/ .bv_mainselect .bv_ul_inner a:hover, #root /*.f8sr*/ .bv_mainselect .bv_ul_inner .bv_selected > a { background: var(--input_bg_dark); /*color: var(--theme_bg);*/ }
+#root .f8sr .bv_mainselect .bv_ul_inner .bv_selected > a, #root .f8sr .bv_mainselect .bv_ul_inner .bv_selected { pointer-events: none; cursor: default; }

@@ -1,0 +1,51 @@
+.shopify-section-announcement-bar:before { content: ""; display: block; position: absolute; left: 50%; top: 0; bottom: 0; z-index: -1; width: 100vw; margin: 0 0 0 -50vw; }
+.shopify-section-announcement-bar a.close:before { display: block; position: absolute; left: 0; right: 0; top: 50%; margin: -10px 0 0; font-weight: 400; font-family: i; line-height: 20px; text-align: center; text-indent: 0; letter-spacing: normal; }
+
+.shopify-section-announcement-bar-container .size-m, .shopify-section-announcement-bar.size-m, .shopify-section-announcement-bar .size-m { --pd: 19px; }
+.shopify-section-announcement-bar-container .size-l, .shopify-section-announcement-bar.size-l, .shopify-section-announcement-bar .size-l { --pd: 24px; }
+
+.shopify-section-announcement-bar p.size-s { --pd_p: 2px; }
+.shopify-section-announcement-bar p.size-m { --pd_p: 5px; }
+.shopify-section-announcement-bar p.size-l { --pd_p: 10px; }
+
+.shopify-section-announcement-bar-container { display: block; position: relative; z-index: 9; }
+	.shopify-section-header ~ .shopify-section-announcement-bar-container { z-index: 8; }
+	.shopify-section-announcement-bar-container .shopify-section-announcement-bar { max-width: var(--glw); margin-left: auto; margin-right: auto; }
+.shopify-section-announcement-bar { display: block; position: relative; z-index: 2; padding: 0 var(--rpp); color: var(--alert_fg); --dist: 32px; --pd: 14px; --pd_p: 0px; --x: 54px; --glw: var(--ghw); }
+	.shopify-section-announcement-bar > div { display: block; position: relative; z-index: 2; width: 100%; max-width: var(--glw); margin-left: auto; margin-right: auto; padding-right: var(--dist); }
+		.shopify-section-announcement-bar > div.text-center { padding-left: var(--dist); padding-right: var(--dist); }
+		.shopify-section-announcement-bar > div:not(.swiper-outer), .shopify-section-announcement-bar .swiper-slide { padding-top: var(--pd); padding-bottom: var(--pd); }
+		.shopify-section-announcement-bar:before { background: var(--alert_bg); }
+	.shopify-section-announcement-bar p { margin: 0; padding-bottom: var(--pd_p); }
+		.shopify-section-announcement-bar p:first-child { padding-top: var(--pd_p); }
+	.shopify-section-announcement-bar a.close { display: block; position: absolute; left: var(--lar0); right: var(--l0ra); top: 0; bottom: 0; width: 14px; /*max-height: var(--x);*/ color: inherit; font-size: var(--size_16_f); text-decoration: none; text-align: left; text-indent: -3000em; direction: ltr; }
+		.shopify-section-announcement-bar a.close:before { content: "\e972"; text-align: var(--text_align_end); }
+	.shopify-section-announcement-bar:not(.no-arrows) > div.swiper-outer { padding-left: var(--dist); padding-right: var(--dist); }
+	.shopify-section-announcement-bar:not(.no-arrows) > div.swiper-outer a.close { display: none; }
+	#root .shopify-section-announcement-bar { padding-left: 0; padding-right: 0; }
+	.shopify-section-announcement-bar .swiper-button-prev, .shopify-section-announcement-bar .swiper-button-next { overflow: visible; width: 8px; --sw_ar_text: var(--alert_fg); }
+		.shopify-section-announcement-bar .swiper-button-prev:before { text-align: var(--text_align_start); }
+		.shopify-section-announcement-bar .swiper-button-next:before { text-align: var(--text_align_end); }
+		.shopify-section-announcement-bar > div.s4wi.no-arrows .swiper-button-nav { display: none; }
+	#root > .shopify-section-announcement-bar { z-index: 8; }
+	#content > .shopify-section-announcement-bar:first-child, #content > .shopify-section-announcement-bar-container:first-child { margin-top: calc(0px - var(--content_padding_top)); }
+	#content .shopify-section-announcement-bar:not([class*="margin-"]) + *, #content .shopify-section-announcement-bar-container:not([class*="margin-"]) + * { margin-top: var(--main_mr); }
+	#content .shopify-section-announcement-bar-container + .m6fr, #content .shopify-section-announcement-bar-container + .m6bx, #content .shopify-section-announcement-bar-container + .shopify-section > .m6fr:first-child, #content .shopify-section-announcement-bar-container + .shopify-section > .m6bx:first-child { margin-top: calc(0px - var(--main_mr)); }
+	.shopify-section-announcement-bar .swiper-outer { overflow: visible; }
+	.shopify-section-announcement-bar p a { color: var(--alert_fg_hover); } /* a link in the announcement bar should get a separate color so it works with color schemes */
+/*#root > .shopify-section-announcement-bar, body > .shopify-section-announcement-bar { overflow: hidden; }*/
+
+#root .shopify-section-announcement-bar .overlay-close { left: 50%; right: auto; width: 100vw; margin-left: -50vw; }
+	
+.shopify-section-announcement-bar .swiper-custom-pagination { display: none; }
+
+.shopify-section-announcement-bar.animated:before { background-size: 400% 400%; }
+/*.shopify-section-announcement-bar.animated:before { --alert_bg: linear-gradient(99deg, #0d7d88, #708090, #add8e6); }*/
+.shopify-section-announcement-bar.animated:before { animation: announcement 6s ease infinite; }
+	
+@keyframes announcement { 0% { background-position: 0% 49% } 50% { background-position: 100% 52% } 100% { background-position: 0% 49% } }
+
+@media only screen and (max-width: 760px) {
+.shopify-section-announcement-bar { font-size: var(--size_14_f); --pd: 16px; --x: 54px; }
+.shopify-section-announcement-bar .swiper-button-prev:after, .shopify-section-announcement-bar .swiper-button-next:after { min-width: 50px; }
+}

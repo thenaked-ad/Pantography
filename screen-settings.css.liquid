@@ -1,0 +1,691 @@
+{%- liquid
+  assign body_font_bold = settings.body_font | font_modify: 'weight', 'bold'
+  assign body_font_italic = settings.body_font | font_modify: 'style', 'italic'
+  assign body_font_bold_italic = body_font_bold | font_modify: 'style', 'italic'
+%}
+{% if settings.custom_primary_font_file != blank and settings.custom_primary_font_name %}
+  {%- liquid
+    assign custom_primary_font = settings.custom_primary_font_file
+    if custom_primary_font contains 'woff2'
+        assign custom_primary_font_type = 'woff2'
+    elsif custom_primary_font contains 'woff'
+        assign custom_primary_font_type = 'woff'
+    elsif custom_primary_font contains "ttf"
+        assign custom_primary_font_type = 'truetype'
+    elsif custom_primary_font contains "otf"
+        assign custom_primary_font_type = 'opentype'
+    else
+        assign custom_primary_font = false
+    endif
+  -%}
+  {%- if custom_primary_font -%}
+    @font-face { font-family: '{{ settings.custom_primary_font_name | downcase }}'; src: url({{ custom_primary_font }}) format({{ custom_primary_font_type }}); font-display: swap; }
+  {% endif %}
+{% elsif settings.custom_primary_font_snippet != empty and settings.custom_primary_font_name %}
+  {%- assign custom_primary_font = true -%}
+{% endif %}
+{% if settings.custom_secondary_font_file != blank and settings.custom_secondary_font_name %}
+  {%- liquid
+    assign custom_secondary_font = settings.custom_secondary_font_file
+    if custom_secondary_font contains 'woff2'
+        assign custom_secondary_font_type = 'woff2'
+    elsif custom_secondary_font contains 'woff'
+        assign custom_secondary_font_type = 'woff'
+    elsif custom_secondary_font contains "ttf"
+        assign custom_secondary_font_type = 'truetype'
+    elsif custom_secondary_font contains "otf"
+        assign custom_secondary_font_type = 'opentype'
+    else
+        assign custom_secondary_font = false
+    endif
+  -%} 
+  {%- if custom_secondary_font -%}
+    @font-face { font-family: '{{ settings.custom_secondary_font_name }}'; src: url({{ custom_secondary_font }}) format({{ custom_secondary_font_type }}); font-display: swap; }
+  {% endif %}
+{% elsif settings.custom_secondary_font_snippet != empty and settings.custom_secondary_font_name %}
+  {%- assign custom_secondary_font = true -%}
+{% endif %}
+
+{%- liquid
+  assign primary_font_100 = settings.primary_font | font_modify: 'weight', '100'
+  assign primary_font_200 = settings.primary_font | font_modify: 'weight', '200'
+  assign primary_font_300 = settings.primary_font | font_modify: 'weight', '300'
+  assign primary_font_400 = settings.primary_font | font_modify: 'weight', '400'
+  assign primary_font_500 = settings.primary_font | font_modify: 'weight', '500'
+  assign primary_font_600 = settings.primary_font | font_modify: 'weight', '600'
+  assign primary_font_700 = settings.primary_font | font_modify: 'weight', '700'
+  assign primary_font_800 = settings.primary_font | font_modify: 'weight', '800'
+  assign primary_font_900 = settings.primary_font | font_modify: 'weight', '900'
+  assign secondary_font_100 = settings.secondary_font | font_modify: 'weight', '100'
+  assign secondary_font_200 = settings.secondary_font | font_modify: 'weight', '200'
+  assign secondary_font_300 = settings.secondary_font | font_modify: 'weight', '300'
+  assign secondary_font_400 = settings.secondary_font | font_modify: 'weight', '400'
+  assign secondary_font_500 = settings.secondary_font | font_modify: 'weight', '500'
+  assign secondary_font_600 = settings.secondary_font | font_modify: 'weight', '600'
+  assign secondary_font_700 = settings.secondary_font | font_modify: 'weight', '700'
+  assign secondary_font_800 = settings.secondary_font | font_modify: 'weight', '800'
+  assign secondary_font_900 = settings.secondary_font | font_modify: 'weight', '900'
+  assign secondary_font_italic = settings.secondary_font | font_modify: 'style', 'italic'
+  assign secondary_font_bold_italic = secondary_font_700 | font_modify: 'style', 'italic'
+%}
+
+{{ settings.primary_font | font_face: font_display: 'swap' }}
+{{ settings.secondary_font | font_face: font_display: 'swap' }}
+{{ primary_font_100 | font_face: font_display: 'swap' }}
+{{ primary_font_200 | font_face: font_display: 'swap' }}
+{{ primary_font_300 | font_face: font_display: 'swap' }}
+{{ primary_font_400 | font_face: font_display: 'swap' }}
+{{ primary_font_500 | font_face: font_display: 'swap' }}
+{{ primary_font_600 | font_face: font_display: 'swap' }}
+{{ primary_font_700 | font_face: font_display: 'swap' }}
+{{ primary_font_800 | font_face: font_display: 'swap' }}
+{{ primary_font_900 | font_face: font_display: 'swap' }}
+{{ secondary_font_100 | font_face: font_display: 'swap' }}
+{{ secondary_font_200 | font_face: font_display: 'swap' }}
+{{ secondary_font_300 | font_face: font_display: 'swap' }}
+{{ secondary_font_400 | font_face: font_display: 'swap' }}
+{{ secondary_font_500 | font_face: font_display: 'swap' }}
+{{ secondary_font_600 | font_face: font_display: 'swap' }}
+{{ secondary_font_700 | font_face: font_display: 'swap' }}
+{{ secondary_font_800 | font_face: font_display: 'swap' }}
+{{ secondary_font_900 | font_face: font_display: 'swap' }}
+{{ secondary_font_italic | font_face: font_display: 'swap' }}
+{{ secondary_font_bold_italic | font_face: font_display: 'swap' }}
+@font-face { font-family: 'i'; src: url({{ 'icomoon.woff' | asset_url }}) format('woff'); font-display: swap; }
+
+:root {
+  --theme_text:     var(--white);
+
+  --theme_btn_text:    var(--primary_btn_fg);
+  --theme_bg_btn:      var(--primary_btn_bg);
+  --theme_bg_btn_dark: var(--primary_btn_bg_dark);
+  --theme_bg_btn_fade: var(--primary_btn_bg_dark);
+
+  --buy_btn_fg:      {{ settings.buy_button_text_color }};
+  --buy_btn_bg:        {{ settings.buy_button_color }};
+  --buy_btn_bg_dark:   {{ settings.buy_button_color | color_darken: 5 }};
+
+  --dynamic_buy_btn_fg:    {{ settings.dynamic_buy_button_text_color }};
+  --dynamic_buy_btn_bg:      {{ settings.dynamic_buy_button_color }};
+  --dynamic_buy_btn_bg_dark: {{ settings.dynamic_buy_button_color | color_darken: 5 }};
+
+  --unavailable_buy_btn_fg:    {{ settings.unavailable_button_text_color }};
+  --unavailable_buy_btn_bg:      {{ settings.unavailable_button_color }};
+  --unavailable_buy_btn_bg_dark: {{ settings.unavailable_button_color | color_darken: 5 }};
+
+  --top_search_bg:var(--body_bg);
+  --input_fg:    var(--dark);
+  --rt_fill: var(--accent);
+  --theme_bg_light: var(--bg_secondary);
+
+  --alert_error:        {{ settings.negative_vibes }};
+  --alert_error_bg:     {{ settings.negative_vibes | color_lighten: 50 }};
+  --alert_valid:        {{ settings.positive_vibes }};
+  --lime:               {{ settings.positive_vibes }};
+
+  --product_label_bg:   {{ settings.product_label_color }};
+  --product_label_bg_dark:{{ settings.product_label_color | color_darken: 5 }};
+  --product_label_text: {{ settings.product_label_text_color }};
+  --sale_label_bg:      {{ settings.sale_label_color }};
+  --sale_label_bg_dark: {{ settings.sale_label_color | color_darken: 5 }};
+  --sale_label_text:    {{ settings.sale_label_text_color }};
+
+  --positive_bg:        {{ settings.positive_vibes }};
+  --positive_bg_dark:   {{ settings.positive_vibes | color_darken: 5 }};
+  --positive_fg:	      var(--white);
+
+  --ar_op: 0.4;
+  --ar_op_h: 1;
+  --ar_bg:              var(--{{ settings.arrows_color }}_btn_bg);
+  --ar_bg_h:            var(--ar_bg);
+  --ar_fg:              var(--{{ settings.arrows_color }}_btn_fg);
+  --ar_fg_h:            var(--ar_fg);
+
+  --price_color:        {{ settings.price_color }};
+  --price_color_old:    {{ settings.compare_at_price_color }};
+
+  --multiply_bg_product:  var(--{{ settings.multiply_product_images_color_palette }});
+  --multiply_bg_collection: var(--{{ settings.multiply_collection_images_color_palette }});
+
+  --primary_text:       var(--{{ settings.text_color }});
+  --primary_text_h:     var(--{{ settings.title_color }});
+
+  --breadcrumbs_fz:  {{ settings.breadcrumbs_font_size }};
+
+  --main_ff_h:          {% if custom_primary_font %}'{{ settings.custom_primary_font_name }}', {% endif %}{{ settings.primary_font.family | remove: '"' }}, {{ settings.primary_font.fallback_families }};
+  --main_fw_h:          {{ settings.primary_font.weight }};
+  --main_fw_h_strong:   {{ settings.primary_font.weight | plus: 300 | at_most: 700 }};
+  --main_fs_h:          {{ settings.primary_font.style }};
+  --main_ls_h:          {% if settings.primary_letter_spacing == '0' %}normal{% else %}{{ settings.primary_letter_spacing | divided_by: 100.0 }}em{% endif %};
+  --main_tt_h:          {{ settings.primary_case }};
+  --main_lh_h:          {{ settings.heading_line_height | divided_by: 100.0 }};
+
+{% if settings.body_font == 'primary' %}
+  --main_ff:            var(--main_ff_h);
+  --main_fs:            var(--main_fs_h);
+  --main_tt:            var(--main_tt_h);
+{% else %}
+  --main_ff:            {% if custom_secondary_font %}'{{ settings.custom_secondary_font_name }}', {% endif %}{{ settings.secondary_font.family | remove: '"' }}, {{ settings.secondary_font.fallback_families }};
+  --main_fs:            {{ settings.secondary_font.style }};
+  --main_tt:            {{ settings.secondary_case }};
+{% endif %}
+  --main_fw:            {{ settings.body_font_weight }};
+  --main_fw_strong:     {{ settings.body_font_weight | plus: 300 | at_most: 700 }};
+
+  --main_ls:            {% if settings.body_letter_spacing == '0' %}normal{% else %}{{ settings.body_letter_spacing | divided_by: 100.0 }}em{% endif %};
+  --main_lh:            {{ settings.body_line_height | divided_by: 100.0 }};
+  --main_fz:            {{ settings.body_font_size }};
+
+  --main_h1:            {{ 40 | times: settings.h1_size | divided_by: 100 }}px;
+  --main_h2:            {{ 36 | times: settings.h2_size | divided_by: 100 }}px;
+  --main_h3:            {{ 26 | times: settings.h3_size | divided_by: 100 }}px;
+  --main_h4:            {{ 18 | times: settings.h4_size | divided_by: 100 }}px;
+  --main_h5:            {{ 14 | times: settings.h5_size | divided_by: 100 }}px;
+  --main_h6:            {{ 14 | times: settings.h6_size | divided_by: 100 }}px;
+  --main_h_small:       var(--main_h6);
+
+  --mob_h1:             {{ 28 | times: settings.h1_size_mobile | divided_by: 100 }}px;
+  --mob_h2:             {{ 24 | times: settings.h2_size_mobile | divided_by: 100 }}px;
+  --mob_h3:             {{ 20 | times: settings.h3_size_mobile | divided_by: 100 }}px;
+  --mob_h4:             {{ 16 | times: settings.h4_size_mobile | divided_by: 100 }}px;
+  --mob_h5:             {{ 14 | times: settings.h5_size_mobile | divided_by: 100 }}px;
+  --mob_h6:             {{ 12 | times: settings.h6_size_mobile | divided_by: 100 }}px;
+  --mob_h_small:        {{ 14 | times: settings.h5_size_mobile | divided_by: 100 }}px;
+  --mob_fz:             {{ settings.body_font_size_mobile }};
+  --theme_btn_fz_mob:   {{ settings.button_fontsize_mobile }};
+
+{% if settings.button_font == 'primary' %}
+  --theme_btn_ff:            var(--main_ff_h);
+  --theme_btn_fs:            var(--main_fs_h);
+{% else %}
+  --theme_btn_ff:            {{ settings.secondary_font.family | remove: '"' }}, {{ settings.secondary_font.fallback_families }};
+  --theme_btn_fs:            {{ settings.secondary_font.style }};
+{% endif %}
+  --theme_btn_fw:            {{ settings.button_font_weight }};
+  --theme_btn_fz:          {{ settings.button_fontsize }};
+  --theme_btn_tt:          {{ settings.button_case }};
+  --theme_btn_ls:          {% if settings.button_letter_spacing == '0' %}normal{% else %}{{ settings.button_letter_spacing | divided_by: 100.0 }}em{% endif %};
+  --button_bw: {{ settings.button_border }}px;
+  --button_corners: {{ settings.button_radius }}px;
+  --button_height: {{ settings.button_height }}px;
+
+{% if settings.prices_font == 'primary' %}
+  --price_ff:            var(--main_ff_h);
+  --price_fs:            var(--main_fs_h);
+{% else %}
+  --price_ff:            {{ settings.secondary_font.family | remove: '"' }}, {{ settings.secondary_font.fallback_families }};
+  --price_fs:            {{ settings.secondary_font.style }};
+{% endif %}
+  --price_fw:            {{ settings.prices_font_weight }};
+  --l4cl_h_small: {{ settings.productcard_vendor_size }};
+
+{% unless settings.everything_rounded %}
+  --b2r: 0;
+{% endunless %}
+  --b2p: {{ settings.images_corner_radius }}px;
+
+  --glw: {% if settings.width == 2000 %}10000{% else %}{{ settings.width }}{% endif %}px;
+  --ratio: {{ settings.custom_product_image_ratio | divided_by: 100.0 }};
+  --theme_bg_gradient: var(--accent_gradient);
+  --circle_size: 55px;
+  /* --gutter: {{ settings.gutter }}; */
+}
+@media only screen and (max-width: 760px) {
+  :root {
+    --main_mr: 20px;
+    --size_70_f: 12vw;
+    --main_fz: var(--mob_fz);
+    --theme_btn_fz: var(--theme_btn_fz_mob);
+    --main_h1: var(--mob_h1);
+    --main_h2: var(--mob_h2);
+    --main_h3: var(--mob_h3);
+    --main_h4: var(--mob_h4);
+    --main_h5: var(--mob_h5);
+    --main_h6: var(--mob_h6);
+    --main_lead: var(--mob_lead);
+  {% if settings.button_wide_mobile %}
+    /*--btn_ph: calc(18px);*/
+  {% endif %}
+    --header_height_static: 70px; /* the header height is always 70px on mobile */
+  }
+}
+
+
+[class*="palette-"], [data-active-content*="palette-"] {
+--headings_text:      var(--primary_text);
+}
+
+.title-styling h1, .title-styling h2, .title-styling h3, .title-styling h4, .title-styling h5, .title-styling h6 {
+  margin-bottom: var(--main_mr);
+  margin-top: 0;
+}
+.title-styling.title-30 h1, .title-styling.title-30 h2, .title-styling.title-30 h3, .title-styling.title-30 h4, .title-styling.title-30 h5, .title-styling.title-30 h6 {
+  margin-bottom: 30px;
+}
+.title-styling.title-main-mr h1, .title-styling.title-main-mr h2, .title-styling.title-main-mr h3, .title-styling.title-main-mr h4, .title-styling.title-main-mr h5, .title-styling.title-main-mr h6 {
+  margin-bottom: calc(calc(var(--main_fz) * 1.5) * .55) !important;
+}
+@media only screen and (max-width: 760px) {
+  .title-styling.title-30 h1, .title-styling.title-30 h2, .title-styling.title-30 h3, .title-styling.title-30 h4, .title-styling.title-30 h5, .title-styling.title-30 h6 {
+    margin-bottom: 20px;
+  }
+}
+
+/* Typography */
+.title-underline-none :is(h1, h2, h3, h4, h5, h6) span[style*="text-decoration:underline"] { text-decoration: none!important; }
+.title-underline-accent :is(h1, h2, h3, h4, h5, h6) span[style*="text-decoration:underline"] { color: var(--accent); }
+.title-underline-gradient :is(h1, h2, h3, h4, h5, h6) span[style*="text-decoration:underline"] {
+  background: var(--accent_gradient);
+  background-clip: text; -webkit-background-clip: text;
+  text-fill-color: transparent; -webkit-text-fill-color: transparent;
+}
+.title-underline-secondary-font :is(h1, h2, h3, h4, h5, h6) span[style*="text-decoration:underline"] {
+  font-family: {% if custom_secondary_font %}'{{ settings.custom_secondary_font_name }}', {% endif %}{{ settings.secondary_font.family | remove: '"' }}, {{ settings.secondary_font.fallback_families }};
+  text-transform: {{ settings.secondary_case }};
+  font-style: {{ settings.secondary_font.style }};
+  font-weight: {{ settings.secondary_font.weight }};
+  letter-spacing: {% if settings.secondary_letter_spacing == '0' %}normal{% else %}{{ settings.secondary_letter_spacing | divided_by: 100.0 }}em{% endif %};
+}
+.title-underline-secondary-font :is(h1, h2, h3, h4, h5, h6) span[style*="text-decoration:underline"] strong, .title-underline-secondary-font :is(h1, h2, h3, h4, h5, h6) span[style*="text-decoration:underline"] b {
+  font-weight: {{ settings.secondary_font.weight | plus: 300 | at_most: 900 }};
+}
+
+#root [class*="button-palette-"] button[disabled]:before, #root [class*="button-palette-"] button.disabled:before {
+  --secondary_bg_fade:  var(--secondary_btn_bg_dark);
+}
+
+#root [class*="button-palette-"] button[disabled]:before, #root [class*="button-palette-"] button.disabled:before {
+  --theme_bg_fade:  var(--theme_bg_btn_dark);
+}
+
+.overlay-primary { 
+  --theme_btn_text: var(--secondary_btn_fg);
+  --theme_bg_btn: var(--secondary_btn_bg);
+  --theme_bg_btn_dark: var(--secondary_btn_bg_dark);
+  --theme_bg_btn_fade: var(--secondary_btn_bg_dark);
+}
+.overlay-secondary {--theme_btn_text: var(--secondary_btn_fg); --theme_bg_btn: var(--secondary_btn_bg); --theme_bg_btn_dark: var(--secondary_btn_bg_dark); --theme_bg_btn_fade: var(--secondary_btn_bg_dark); }
+.overlay-tertiary, .link-btn.overlay-tertiary a, .link-btn a.overlay-tertiary, button.overlay-tertiary, .overlay-tertiary button, .s1bx.overlay-tertiary {
+  --tertiary_bg: var(--tertiary_btn_bg);
+  --primary_bg: var(--tertiary_btn_bg);
+  --primary_text: var(--tertiary_btn_fg);
+  --secondary_btn_fg: var(--tertiary_btn_fg);
+  --secondary_bg: var(--tertiary_bg); 
+  --secondary_btn_bg: var(--primary_bg);
+  --theme_btn_text: var(--tertiary_btn_fg);
+  --theme_bg_btn_dark: var(--tertiary_btn_bg_dark);
+  --theme_bg_btn: var(--tertiary_btn_bg);
+}
+button:not([class*="overlay-"]), .link-btn:not([class*="overlay-"], .tabs) a:not([class*="overlay-"]), #nav-user > ul > li > a i span, #totop a, .overlay-primary, .link-btn.overlay-primary a, .link-btn a.overlay-primary, button.overlay-primary, .overlay-primary button, .s1bx.overlay-primary {
+  --secondary_btn_fg: var(--primary_btn_fg);
+  --secondary_bg: var(--primary_btn_bg);
+  --secondary_btn_bg: var(--primary_btn_bg);
+  --secondary_btn_bg_dark: var(--primary_btn_bg_dark);
+  --primary_text: var(--secondary_btn_fg);
+}
+.link-btn a.overlay-buy_button, button.overlay-buy_button, .overlay-buy_button button, .s1bx.overlay-buy_button { /* used to be overlay-tertiary, but this name has been taken over to be used for the tertiary button in the color schemes*/
+  --theme_bg_btn_dark: var(--buy_btn_bg_dark);
+  --theme_bg_btn: var(--buy_btn_bg);
+  --theme_btn_text: var(--buy_btn_fg);
+}
+.link-btn a.overlay-dynamic_buy_button, button.overlay-dynamic_buy_button, .overlay-dynamic_buy_button button, .s1bx.overlay-dynamic_buy_button { /* used to be overlay-quaternary, but this might conflict in the future when more button colors are added */  
+  --theme_bg_btn_dark: var(--dynamic_buy_btn_bg_dark);
+  --theme_bg_btn: var(--dynamic_buy_btn_bg);
+  --theme_btn_text: var(--dynamic_buy_btn_fg);
+  --theme_btn_text_static: var(--theme_btn_text);
+}
+.link-btn a.overlay-unavailable_buy_button, button.overlay-unavailable_buy_button, .overlay-unavailable_buy_button button, .s1bx.overlay-unavailable_buy_button { /* used to be overlay-quinary, but this might conflict in the future when more button colors are added */
+  --theme_bg_btn_dark: var(--unavailable_buy_btn_bg_dark);
+  --theme_bg_btn: var(--unavailable_buy_btn_bg);
+  --theme_btn_text: var(--unavailable_buy_btn_fg);
+}
+.link-btn a.overlay-secondary_bg, button.overlay-secondary_bg, .overlay-secondary_bg button, .s1bx.overlay-secondary_bg {
+  --secondary_btn_fg: var(--primary_text);
+  --secondary_bg: var(--bg_secondary);
+  --secondary_btn_bg: var(--secondary_bg);
+  --secondary_btn_bg_dark: var(--secondary_btn_bg);
+}
+.overlay-primary, .overlay-secondary, .overlay-tertiary, .overlay-buy_button, .overlay-dynamic_buy_button, .overlay-unavailable_buy_button { --link_underline_c: var(--secondary_bg); }
+
+.l4al > .overlay-primary { color: var(--primary_btn_fg); --primary_text: var(--primary_btn_fg); }
+#root .l4al > .overlay-primary:before { background: var(--primary_btn_bg); opacity: 1; }
+.l4al > .overlay-secondary { color: var(--secondary_btn_fg); --primary_text: var(--secondary_btn_fg); }
+#root .l4al > .overlay-primary:before { background: var(--secondary_btn_bg); opacity: 1; }
+.l4al > .overlay-tertiary { color: var(--tertiary_btn_fg); --primary_text: var(--tertiary_btn_fg); }
+#root .l4al > .overlay-tertiary:before { background: var(--tertiary_btn_bg); opacity: 1; }
+.l4al > .overlay-buy_button { color: var(--buy_btn_fg); --primary_text: var(--buy_btn_fg); }
+#root .l4al > .overlay-buy_button:before { background: var(--buy_btn_bg); opacity: 1; }
+.l4al > .overlay-dynamic_buy_button { color: var(--dynamic_buy_btn_fg); --primary_text: var(--dynamic_buy_btn_fg);}
+#root .l4al > .overlay-dynamic_buy_button:before { background: var(--dynamic_buy_btn_bg); opacity: 1; }
+.l4al.f8pr-shipping-timer:empty { display: none; }
+
+.module-color-palette[class*=palette-] .img-overlay, #background.module-color-palette[class*="palette-"] .img-overlay { background: var(--primary_bg); }
+.module-color-palette[class*="palette-"] h1, .module-color-palette[class*="palette-"] h2, .module-color-palette[class*="palette-"] h3, .module-color-palette[class*="palette-"] h4, .module-color-palette[class*="palette-"] h5, .module-color-palette[class*="palette-"] h6 { color: var(--headings_text); }
+.module-color-palette[class*="palette-"] { color: var(--primary_text); --price_color: var(--primary_text); --price_color_old: var(--primary_text); }
+.module-color-palette[class*=palette-] { color: var(--primary_text); --rt_fill: var(--primary_text); }
+.module-color-palette[class*='palette-']:before { background: var(--primary_bg); }
+[class*="palette-"] button:not(.loading), [class*="palette-"] input[type="button"], [class*="palette-"] input[type="reset"], [class*="palette-"] input[type="submit"], [class*="palette-"] .link-btn a:not(.loading) { color: var(--theme_btn_text); }
+[data-active-content*="palette-"] .swiper-custom-pagination, [data-active-content*="palette-"] .play-pause { color: var(--primary_text); }
+.m6bx[class*="palette-"] > p, .m6bx[class*="palette-"] > p, .m6bx[class*="palette-"] > h2, .m6bx[class*="palette-"] > strong, .m6bx[class*="palette-"] > em, .m6bx[class*="palette-"] > ul { color: var(--primary_text); }
+.m6bx[class*="palette-"]:before { background: var(--primary_bg); }
+.m6bx[class*="palette-"].overlay:before { border: none; }
+.m6as[class*="palette-"]:before { background: var(--primary_bg); }
+.m6wd[class*="palette-"] .l4ts.box li, .m6wd[class*="palette-"] .l4ts.box .li { color: var(--black); }
+.l4ft.hover-out li[class*="palette-"]:before { background: none; }
+.m6fr[class*="palette-"] article:before { background: var(--primary_bg)!important; }
+.l4al li[class*="palette-"]:before { background: var(--primary_bg); }
+.l4al li[class*="palette-"]:before { border-width: 0; }
+.m6bx.inline[class*="palette-"]:before { border-width: 0; }
+.l4sc.box a:hover { --theme_bg: var(--accent); }
+/* Other*/
+
+[id*="shopify-section-"] .placeholder-svg, .placeholder-svg { background-color: var(--sand); fill: #c4c4c4; }
+label span.text-end.hidden, #root span.f8pr-pickup.hidden { display: none; }
+.image-compare figure { width: 100%; }
+.no-before:before { content: none; }
+@media only screen and (max-width: 47.5em) {
+  .accordion-a.compact + .accordion-a { margin-top: -10px; }
+}
+@media only screen and (min-width: 47.5em) {
+  .l4ft.outer-radius { border-radius: var(--b2r); overflow: hidden; }
+  .l4ft.outer-radius li { --b2r: 0; }
+}
+
+/* Buttons */
+{% if settings.button_font == 'title' %}
+.link-btn a, button, .l4cn li, .spr-button { font-family: var(--main_ff_h); }
+{% endif %}
+{% if settings.button_style == 'plain' %}
+.link-btn:not(.solid) a:not(.solid), button:not(.solid), .link-btn:not(.solid) a:not(.solid):before, button:not(.solid):before { box-shadow: none; }
+{% endif %}
+
+{% comment %}Custom theme next{% endcomment %}
+.day-switched {
+  --coal:   	        #444749;
+  --price_color: inherit;
+  --price_color_old: inherit;
+  --primary_text:       var(--white);
+  --primary_text_h:     var(--white);
+  --input_fg: var(--primary_text);
+  --input_bg: var(--body_bg);
+  --input_bd: rgba(255, 255, 255, 0.2);
+
+  --top_search_bg:  var(--top_main_bg);
+
+  --theme_bg_btn_dark: var(--theme_bg_btn);
+  --theme_bg_btn_fade: var(--theme_bg_btn);
+  --sand: var(--body_bg);
+}
+.day-switched .link-btn a.overlay-buy_button, .day-switched button.overlay-buy_button, .day-switched .overlay-buy_button button, .day-switched .s1bx.overlay-buy_button { /* Darkmode buy button */
+    --theme_bg_btn:   var(--{{ settings.darkmode_buy_button_color_palette | remove: '_button' }}_btn_bg);
+    --theme_btn_text: var(--{{ settings.darkmode_buy_button_color_palette | remove: '_button' }}_btn_fg);
+    --theme_bg_btn_dark: var(--theme_bg_btn);
+}
+.day-switched .link-btn a.overlay-dynamic_buy_button, .day-switched button.overlay-dynamic_buy_button, .day-switched .overlay-dynamic_buy_button button, .day-switched .s1bx.overlay-dynamic_buy_button { /* Darkmode dynamic buy button */
+    --theme_bg_btn:   var(--{{ settings.darkmode_dynamic_buy_button_color_palette | remove: '_button' }}_btn_bg);
+    --theme_btn_text: var(--{{ settings.darkmode_dynamic_buy_button_color_palette | remove: '_button' }}_btn_fg);
+    --theme_bg_btn_dark: var(--theme_bg_btn);
+}
+.day-switched .overlay-gray {
+  color: var(--primary_text);
+}
+.day-switched .l4ca > li:before,
+.day-switched #nav li:before, .day-switched #nav:not([data-type])>ul.nav-user:before {
+  border-color: var(--white);
+  opacity: 0.4;
+}
+.day-switched[data-whatin="mouse"] .l4ca.compact li:hover:before {
+  background: var(--dark);
+  opacity: 0.4;
+}
+.day-switched [class*=text-palette-], .day-switched [data-active-content*=text-palette-] {
+  --primary_text:       var(--white);
+}
+.day-switched #root .check.switch label:after { --white: var(--black); }
+.day-switched[data-whatin=mouse] #root .link-btn.tabs>a:hover {
+    color: inherit;
+    --light_bg: var(--body_bg);
+}
+html.has-first-m6fr-wide[style*="--transparent_header_fg_brightness: 1"] #header-outer:not(.fixed) .dark-only { display: block; }
+html.has-first-m6fr-wide[style*="--transparent_header_fg_brightness: 1"] #header-outer:not(.fixed) .dark-hide { display: none; }
+
+html[data-whatin="mouse"] .l4ca.compact li:hover figure.img-multiply-bg:before { background: var(--multiply_bg_product); opacity: 1; }
+.l4cl .slider img~img, .l4cl picture~picture { background: var(--multiply_bg_product); }
+
+figure.img-multiply-bg:before, picture.img-multiply-bg:before, picture.img-multiply-bg.s4wi .swiper-slide a:before, .img.img-multiply-bg:before { --body_bg: var(--multiply_bg_product); --gallery: var(--multiply_bg_product); background: var(--multiply_bg_product); } /* Product/collection image multiply background custom color palette 1/2 */
+.catalog figure.img-multiply-bg:before, .catalog picture.img-multiply-bg:before, .catalog picture.img-multiply-bg.s4wi .swiper-slide a:before, #nav > ul > li > ul a .img:has(.img-multiply-bg) { --body_bg: var(--multiply_bg_collection); --gallery: var(--multiply_bg_collection); --drop_nav_bg: var(--multiply_bg_collection); background: var(--multiply_bg_collection); } /* Product/collection image multiply background custom color palette 2/2 */
+
+.m6fr:not([data-active-content*="plain"]) .swiper-custom-bullets { --primary_text: inherit; color: var(--primary_text); } /* the slider navigation should get the same color as the text */
+
+html.dm-ready.has-first-m6fr-wide:not(.fixed-sticky) .shopify-section-header #header-outer:not(.fixed),
+html.dm-ready.has-first-m6fr-wide:not(.fixed-sticky) .shopify-section-header #header-outer:not(.fixed) #nav-outer:not(.fixed) #nav {
+  --top_search_bd:     unset;
+  --top_main_bg:       var(--transparent_header_bg);
+  --top_main_fg:       var(--transparent_header_fg);
+  --top_main_fg_hover: var(--top_main_fg);
+  --menu_fg:           var(--top_main_fg);
+}
+
+#content > * { position: relative; z-index: 0; }
+#content > *:has(+.shopify-section-footer) { z-index: 1; }
+@media only screen and (min-width: 62.5em) {
+  html.dm-ready.has-first-m6fr-wide:not(.fixed-sticky) .shopify-section-header #header-outer:not(.fixed) #nav-outer:not(.fixed) #nav {
+    --top_nav_btn_bg:    var(--transparent_header_btn_bg);
+    --top_nav_btn_fg:    var(--transparent_header_btn_fg);
+    --top_nav_fg:        var(--top_main_fg);
+    --top_nav_fg_hover:  var(--top_main_fg);
+    color:               var(--top_main_fg);
+  }
+}
+@media only screen and (max-width: 47.5em) {
+  .shopify-section-footer > .l4pm > .follow-on-shop { width: 100%; text-align: center; }
+}
+.form-m-14 > p { margin-bottom: 14px; }
+.module-color-palette .swiper-button-next, .module-color-palette .swiper-button-prev { color: var(--primary_text); }
+
+.ff-primary, .ff-primary-digit .simply-amount, .l4ft li > .content .ff-primary {
+  font-family: {% if custom_primary_font %}'{{ settings.custom_primary_font_name }}', {% endif %}{{ settings.primary_font.family | remove: '"' }}, {{ settings.primary_font.fallback_families }};
+  text-transform: {{ settings.primary_case }};
+  font-weight: var(--main_fw_h);
+  font-style: {{ settings.primary_font.style }};
+  --main_fw_strong: var(--main_fw_h_strong);
+  letter-spacing: {% if settings.primary_letter_spacing == '0' %}normal{% else %}{{ settings.primary_letter_spacing | divided_by: 100.0 }}em{% endif %};
+  --main_ff: {% if custom_primary_font %}'{{ settings.custom_primary_font_name }}', {% endif %}{{ settings.primary_font.family | remove: '"' }}, {{ settings.primary_font.fallback_families }};
+}
+.ff-secondary, .ff-secondary-digit .simply-amount, .l4ft li > .content .ff-secondary  {
+  font-family: {% if custom_secondary_font %}'{{ settings.custom_secondary_font_name }}', {% endif %}{{ settings.secondary_font.family | remove: '"' }}, {{ settings.secondary_font.fallback_families }};
+  text-transform: {{ settings.secondary_case }};
+  font-style: {{ settings.secondary_font.style }};
+  font-weight: {{ settings.secondary_font.weight }};
+  --main_fw_strong: {{ settings.secondary_font.weight | plus: 300 | at_most: 700 }};
+  letter-spacing: {% if settings.secondary_letter_spacing == '0' %}normal{% else %}{{ settings.secondary_letter_spacing | divided_by: 100.0 }}em{% endif %};
+  --main_ff: {% if custom_secondary_font %}'{{ settings.custom_secondary_font_name }}', {% endif %}{{ settings.secondary_font.family | remove: '"' }}, {{ settings.secondary_font.fallback_families }};
+}
+.ff-primary p, .ff-secondary p, .ff-primary li, .ff-secondary li  {
+  font-weight: var(--main_fw);
+  letter-spacing: var(--main_ls);
+}
+.ff-primary.text-uppercase, .ff-secondary.text-uppercase { text-transform: uppercase; }
+.fw-100, .l4ft li > .content .fw-100, .ff-primary.fw-100 p, .ff-secondary.fw-100 p { font-weight: 100; }
+.fw-200, .l4ft li > .content .fw-200, .ff-primary.fw-200 p, .ff-secondary.fw-200 p { font-weight: 200; }
+.fw-300, .l4ft li > .content .fw-300, .ff-primary.fw-300 p, .ff-secondary.fw-300 p { font-weight: 300; }
+.fw-400, .l4ft li > .content .fw-400, .ff-primary.fw-400 p, .ff-secondary.fw-400 p { font-weight: 400; }
+.fw-500, .l4ft li > .content .fw-500, .ff-primary.fw-500 p, .ff-secondary.fw-500 p { font-weight: 500; }
+.fw-600, .l4ft li > .content .fw-600, .ff-primary.fw-600 p, .ff-secondary.fw-600 p { font-weight: 600; }
+.fw-700, .l4ft li > .content .fw-700, .ff-primary.fw-700 p, .ff-secondary.fw-700 p { font-weight: 700; }
+.fw-800, .l4ft li > .content .fw-800, .ff-primary.fw-800 p, .ff-secondary.fw-800 p { font-weight: 800; }
+.fw-900, .l4ft li > .content .fw-900, .ff-primary.fw-900 p, .ff-secondary.fw-900 p { font-weight: 900; }
+
+#filters.m6pn .sticky-in-panel.is-sticky:before { top: 0; } /* hotfix for in-drawer filters 1/2 */
+#filters form { margin-bottom: 2px; } /* hotfix for in-drawer filters 2/2 */
+#root .f8fl fieldset > *:not(h1, h2, h3, h4, h5, h6, header) + * { padding-top: 22px; }
+/* .dm-ready.has-first-m6fr-wide:not(.has-first-m6bx-wide) .shopify-section-header #header-outer:not(.fixed), .dm-ready.has-background .shopify-section-header #header-outer:not(.fixed) {
+  color: var(--top_main_fg);
+  --top_main_fg: var(--white);
+  --top_main_bg: var(--primary_text);
+  --menu_fg: var(--white);
+} */
+.dm-ready.has-first-m6fr-wide .shopify-section-header #header-outer:not(.fixed) {
+  color: var(--top_main_fg);
+}
+
+/* START Mobile quickshop fixes */
+@media only screen and (max-width: 47.5em) {
+  /* Fix space above image */
+  #quickshop, #quickshop .l4pr-container { margin-top: 0 !important; padding-top: 0; }
+
+  /* Fix order of block */
+  #quickshop .f8pr-container { display: flex; flex-direction: column; }
+  #quickshop .f8pr-container > * { order: 10; }
+  #quickshop .f8pr-container > .f8pr-variant-selection { order: 0; }
+  #quickshop .f8pr-container > .f8pr-price { order: 1; }
+  #quickshop .f8pr-container > .f8pr-vendor { order: 2; }
+  #quickshop .f8pr-container > header { order: 3; }
+  #quickshop .f8pr-container > .f8pr-stock { order: 4; }
+
+  /* Remove space above blocks */
+  #quickshop .l4pr-container + div { margin-top: 0 !important; }
+}
+/* END Mobile quickshop fixes */
+
+@media only screen and (max-width: 47.5em) {
+  html.theme-editor .m6fr.size-s-mobile, html.theme-editor .m6fr .size-s-mobile, html.theme-editor .m6fr figure.size-s-mobile { --mh: 15vh !important; --mhi: 15vh; }
+  html.theme-editor .m6fr.size-m-mobile, html.theme-editor .m6fr .size-m-mobile, html.theme-editor .m6fr figure.size-m-mobile { --mh: 25vh !important; --mhi: 25vh; }
+  html.theme-editor .m6fr.size-l-mobile, html.theme-editor .m6fr .size-l-mobile, html.theme-editor .m6fr figure.size-l-mobile { --mh: 37vh !important; --mhi: 37vh; }
+  .theme-editor.dm-ready.has-first-m6fr-wide #content > .shopify-section:first-child > .m6fr.wide.size-l-mobile { --mh: 37vh !important; --mhi: 37vh; }
+}
+
+.m6bx.richtext.size-xs { --mih_desktop: calc(var(--main_fz) * 20); }
+.m6bx.richtext.size-s { --mih_desktop: calc(var(--main_fz) * /*24.375*/31.25); }
+.m6bx.richtext.size-m { --mih_desktop: calc(var(--main_fz) * /*32.5*/48.125); }
+.m6bx.richtext.size-l { --mih_desktop: calc(var(--main_fz) * /*43.75*/60); }
+.m6bx.richtext { min-height: var(--mih_desktop); }
+@media only screen and (max-width: 760px) {
+  .m6bx.richtext.size-xs-mobile { --mih_mobile: 10vh; }
+  .m6bx.richtext.size-s-mobile { --mih_mobile: 15vh; }
+  .m6bx.richtext.size-m-mobile { --mih_mobile: 30vh; }
+  .m6bx.richtext.size-l-mobile { --mih_mobile: 45vh; }
+  .m6bx.richtext { --mih: var(--mih_mobile) !important; min-height: var(--mih_mobile); }
+}
+
+.s1pr [class*="overlay-"]:not(.s1bx) { font-size: inherit; }
+.f8pr.unavailable p.link-btn + .overlay-quaternary { display: none; }
+.f8pr-buy-button { --dist_ba: 10px; --dist_bb: var(--dist_ba); }
+[data-sal] { opacity: 0; }
+.product-card .s1pr .old { font-size: calc(var(--price_fz) - 2px); }
+.product-card .s1pr .small { font-size: calc(var(--price_fz) - 2px); }
+@media only screen and (max-width: 760px) {
+  .l4cl:not(.mobile-scroll) [data-sal], .l4ft:not(.mobile-scroll) [data-sal] { 
+    opacity: 1!important; 
+  }
+}
+
+.s1pr [class*="overlay-"]:not(.s1bx) { font-size: inherit; }
+
+.m6pn, .m6pn .l4ca li, .m6pn .l4ca li h2, .m6pn .l4ca li .s1pr, .m6pn .spr-reviews .spr-review-header-byline, .m6pn .spr-reviews .spr-review-footer a, .m6pn .spr-reviews .spr-review-header h3, .m6pn .invalid-feedback, .m6pn .l4ca .removed, .m6pn .r6rt, .m6pn .l4fl li * { font-size: {{ settings.drawers_font_size }}; }
+.m6pn fieldset ::placeholder { font-size: {{ settings.drawers_font_size }}; }
+.m6pn fieldset ::-webkit-input-placeholder { font-size: {{ settings.drawers_font_size }}; }
+.m6pn fieldset :-ms-input-placeholder { font-size: {{ settings.drawers_font_size }}; }
+.m6pn fieldset ::-ms-input-placeholder { font-size: {{ settings.drawers_font_size }}; }
+.m6pn li .small { font-size: calc({{ settings.drawers_font_size }} - 2px); }
+.m6pn#cart > header > * { display: flex; align-items: center; gap: 16px; }
+.shopify-section-group-overlay-group {
+  z-index: 999;
+}
+
+:root {
+  --img_padding: {{ settings.images_padding }}%;
+  --img_vertical_position: {{ settings.images_vertical_position }}%;
+}
+.l4pr li picture, #root .check.box label picture, .l4ca picture { overflow: hidden; }
+#root .l4cl .product-card img, .l4pr img, .l4ca figure picture img, .l4ca.compact img, #root .check.box label img{
+  padding: var(--img_padding);
+  top: var(--img_vertical_position);
+}
+.m6pn#cart > header .s1bx { border-left-width: 16px; }
+.check figure.size-xs { --size: 20px; }
+.check figure.size-s { --size: 35px; }
+.check figure.size-m { --size: 50px; }
+.check figure.size-l { --size: 65px; }
+#root .check input:checked ~ label figure { border-color: var(--theme_bg); }
+
+/* custom header icons */
+.icon-custom {
+  height: 100%;
+  display: flex!important;
+  align-items: center;
+}
+.icon-custom img {
+  border-radius: 0!important;
+}
+#search button:has(.icon-custom){
+  display: flex!important;
+  align-items: center;
+  justify-content: center;
+}
+#search:not(.processing) button:has(.icon-custom):after{
+  content: none!important;
+}
+#search.processing button:has(.icon-custom) .icon-custom {
+  opacity: 0;
+}
+
+#header-inner .icon-custom:not(button) img,
+#header-inner .icon-custom:not(button) {
+  position: relative;
+  top: 0;
+  margin: 0;
+  padding: 0;
+  max-height: unset;
+  z-index: 0;
+}
+
+#root #header-inner>.link-btn a:first-child:has(.icon-custom):after,
+#root #header-inner>.link-btn a:first-child:has(.icon-custom):before{
+  display: none!important;
+}
+@media only screen and (min-width: 1000px) {
+  .icon-custom.desktop-hide {
+    display: none!important;
+  }
+}
+@media only screen and (min-width: 760px) {
+  .icon-custom.mobile-only {
+    display: none!important;
+  }
+  #header-inner>.link-btn a:first-child:has(.icon-custom){
+    display: flex!important;
+  }
+}
+@media only screen and (max-width: 760px) {
+  #header-inner > .link-btn a:first-child .icon-custom {
+      top: 0!important;
+      position: absolute!important;
+  }
+  .m2a #header-inner>.link-btn a:first-child .icon-custom {
+    transform: none;
+  }
+  #search button .icon-custom img {
+      max-width: calc(var(--custom_top_search_h)* 0.75) !important;
+  }
+}
+/* END custom header icons */
+
+/* .l4ft .main, .l4ft li .main > div  { --main_mr: calc(var(--gutter) * 1rem); } */
+/* Dropdown color schemes */
+html[data-whatin=mouse] .check.box input:not(.disabled)~label:hover, html[data-whatin=mouse] #root .check.color li>a:hover {
+    --input_bg: var(--input_bg_dark);
+}
+html[data-whatin=mouse] #root .bv_mainselect .bv_ul_inner a:hover, html #root .bv_mainselect .bv_ul_inner .bv_selected>a {
+    background: var(--input_bg_dark);
+}
+/* Active tabs color schemes */
+html[data-whatin=mouse] #root .accordion-a.box:not(.compact) > details:not([open]):hover,
+.accordion-a.box details[open] summary,
+html[data-whatin=mouse] #root .link-btn.tabs > a:hover {
+  --primary_text: var(--{{ settings.active_tabs_color }}_btn_fg);
+}
+html[data-whatin=mouse] #root .accordion-a.box:not(.compact) > details:not([open]):hover:before,
+html[data-whatin=mouse] #root .link-btn.tabs > a:hover:before {
+  background: var(--{{ settings.active_tabs_color }}_btn_bg);
+}
