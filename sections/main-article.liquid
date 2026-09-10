@@ -1,0 +1,420 @@
+{% comment %}theme-check-disable ImgLazyLoading{% endcomment %}
+{%- liquid
+  assign words = article.content | split: ' '
+  if words.size < 360
+    assign minutes = 1
+  else
+    assign minutes =  words.size | divided_by: 180
+  endif
+-%}
+<div class="{% if section.settings.compact %}align-center{% endif %}" style="font-size:{{ section.settings.font_size }};--main_fz:{{ section.settings.font_size }};{% if section.settings.compact %} max-width: 940px;--glw: 940px{% endif %}">
+  {%- for block in section.blocks -%}
+    {%- case block.type -%}
+      {%- when '@app' -%}
+        {% render block %}
+      {%- when 'spacer' -%}
+        <div class="module-spacer" style="margin-bottom:{{ block.settings.height }}px;" {{ block.shopify_attributes }}></div>
+      {%- when 'title' -%}
+        {%- if block.settings.show_banner -%}
+          <div class="palette-{{ block.settings.color_palette }}
+              module-color-palette
+              m6fr
+              wide
+              mobile-text-center
+            " {{ block.shopify_attributes }}>
+            <article>
+              <figure>
+                <span class="img-overlay" style="opacity:{{ block.settings.overlay_opacity | divided_by: 100.0 }}"></span>
+                <picture>
+                  {%- if article.image -%}
+                    <img
+                      src="{{ article.image | image_url: width: 100, height: 100, width: 1400 }}"
+                      srcset="{% render 'image-srcset', image: article.image %}"
+                      sizes="
+                        100vw
+                      "
+                      width="1400"
+                      height="530"
+                      alt="{{ article.image.alt | default: article.title | escape }}"
+                    >
+                  {%- else -%}
+                    {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                  {%- endif -%}
+                </picture>
+              </figure>
+              <{{ block.settings.title_size }}>{{ article.title }}</{{ block.settings.title_size }}>
+              {%- if block.settings.show_author or block.settings.show_date or block.settings.show_article_reading_time -%}
+                <p>
+                  {%- if block.settings.show_date %}<i aria-hidden="true" class="icon-calendar"></i> {{ article.published_at | time_tag: format: 'month_day_year' -}}{%- endif -%}
+                  {%- if block.settings.show_author and block.settings.show_date -%}, {% endif -%}
+                  {%- if block.settings.show_author -%}{%- if block.settings.show_date -%}{{ 'blog.written_by' | t }}{%- else -%}{{ 'blog.written_by' | t | capitalize }}{%- endif %} {{ article.author }}{%- endif -%}
+                  {%- if block.settings.show_article_reading_time -%}
+                    {%- if block.settings.show_author or block.settings.show_date -%}, {% endif %}
+                    {{ 'blog.reading_time' | t: count: minutes, minutes: minutes }}</li>
+                  {%- endif -%}
+                </p>
+              {%- endif -%}
+            </article>
+          </div>
+        {%- else -%}
+          <header {{ block.shopify_attributes }}>
+            <{{ block.settings.title_size }}>{{ article.title }}</{{ block.settings.title_size }}>
+            {%- if block.settings.show_author or block.settings.show_date or block.settings.show_article_reading_time -%}
+              <ul class="l4in margin-x125" style="--dist_a: 12px;">
+                {%- if block.settings.show_date %}<li><i aria-hidden="true" class="icon-calendar"></i> {{ article.published_at | time_tag: format: 'month_day_year' }}</li>{%- endif -%}
+                {%- if block.settings.show_author -%}<li>{% if block.settings.show_date %}{{ 'blog.written_by' | t }}{% else %}{{ 'blog.written_by' | t | capitalize }}{% endif %} {{ article.author }}</li>{%- endif -%}
+                {%- if block.settings.show_article_reading_time -%}<li>{{ 'blog.reading_time' | t: count: minutes, minutes: minutes }}</li>{%- endif -%}
+              </ul>
+            {%- endif -%}
+          </header>
+        {%- endif -%}
+      {%- when 'featured_image' -%}
+      {%- if article.image -%}
+        <figure class="margin-double" {{ block.shopify_attributes }}>
+          <span class="img-overlay"></span>
+          <picture>
+            <img
+              src="{{ article.image | image_url: width: 100, height: 100, width: 1400 }}"
+              srcset="{% render 'image-srcset', image: article.image %}"
+              sizes="
+                {% if settings.width < 2000 %}
+                  (min-width: 1300px) {% if section.settings.compact %}940px{% else %}{{ settings.width }}px{% endif %},
+                  (min-width: 940px) {% if section.settings.compact %}940px{% else %}100vw{% endif %},
+                {% endif %}
+                100vw
+              "
+              width="1275"
+              height="500"
+              alt="{{ article.image.alt | default: article.title | escape }}"
+              {% unless section.index <= 2 %}loading="lazy"{% endunless %}
+            >
+          </picture>
+        </figure>
+      {%- endif -%}
+      {%- when 'excerpt' -%}
+      {%- if article.excerpt -%}
+        <p class="lead" {{ block.shopify_attributes }}>{{ article.excerpt | strip_html }}</p>
+      {%- endif -%}
+        {%- when 'content' -%}
+          {{ article.content }}
+      {%- when 'share_buttons'-%}
+        {%- liquid
+          assign share_whatsapp = block.settings.share_whatsapp
+          assign share_facebook = block.settings.share_facebook
+          assign share_twitter = block.settings.share_twitter
+          assign share_pinterest = block.settings.share_pinterest
+          assign share_messenger = block.settings.share_messenger
+          assign share_email = block.settings.share_email
+        -%}
+      {%- if share_whatsapp or share_facebook or share_twitter or share_pinterest or share_messenger or share_email -%}
+        <ul class="l4sc small overlay" {{ block.shopify_attributes }}>
+          <li class="title">{{ 'blog.share' | t }}</li>
+          {%- render 'social-share-buttons', share: article, share_whatsapp: share_whatsapp, share_facebook: share_facebook, share_twitter: share_twitter, share_pinterest: share_pinterest, share_messenger: share_messenger, share_email: share_email -%}
+        </ul>
+      {%- endif -%}
+      {%- when 'tags' -%}
+      {% if article.tags.size > 0 %}
+        <{{ settings.global_title_size }} class="margin-content" {{ block.shopify_attributes }}>{{ 'blog.tags' | t }}</{{ settings.global_title_size }}>
+        <p class="link-btn margin-x125 button-palette-{{ settings.active_tabs_color }} plain overlay-content">
+          {%- for tag in article.tags -%}
+            {%- if current_tags contains tag -%}
+              {{ tag | link_to_remove_tag: tag }}
+            {%- else -%}
+              {{ tag | link_to_add_tag: tag }}
+            {%- endif -%}
+          {%- endfor -%}
+        </p>
+      {% endif %}
+      {%- when 'comments' -%}
+        {%- if article.comments_count > 0 and blog.comments_enabled? -%}
+          <article class="margin-double">
+          <{{ settings.global_title_size }} {{ block.shopify_attributes }}>{{ 'blog.article.comment_form.title' | t }}</{{ settings.global_title_size }}>
+          {%- paginate article.comments by 2 -%}
+            <ul class="l4cm">
+              {%- for comment in article.comments -%}
+                <li>
+                  <div>
+                    <p>{{ comment.content | strip_html }}</p>
+                  </div>
+                  <footer>
+                    <h3>{{ comment.author | slice: 0, 2 | upcase }}</h3>
+                    <p>{{ comment.author }} <span class="small">{{ 'blog.article.comment_form.posted_on' | t }} {{ comment.created_at | time_tag: format: 'month_day_year' }}</span></p>
+                  </footer>
+                </li>
+              {%- endfor -%}
+            </ul>
+            {%- render 'pagination',
+              paginate: paginate,
+              show_amount: true
+            -%}
+          {%- endpaginate -%}
+          {%- endif %}
+          {%- if blog.comments_enabled? -%}
+            {%- liquid
+              capture posted_successfully_message
+                if blog.moderated?
+                  echo 'blog.article.comment_form.posted_successfully_moderated' | t
+                else
+                  echo 'blog.article.comment_form.posted_successfully_not_moderated' | t
+                endif
+              endcapture
+            -%}
+          {%- form 'new_comment', article, class: 'f8cm' -%}
+          {%- if form.errors -%}
+            <script>
+              document.addEventListener('DOMContentLoaded', function () {
+                var alertAttributes = { message: "{{ 'blog.article.comment_form.email' | t }} {{ form.errors.messages['email'] }}", type: "error", origin: "article" },
+                        showAlertEvent = new CustomEvent("showAlert", {detail: alertAttributes});
+                window.dispatchEvent(showAlertEvent);
+              });
+            </script>
+          {%- elsif form.posted_successfully? -%}
+            <script>
+              document.addEventListener('DOMContentLoaded', function () {
+                var alertAttributes = { message: "{{ posted_successfully_message }}", type: "success", origin: "article" },
+                        showAlertEvent = new CustomEvent("showAlert", {detail: alertAttributes});
+                window.dispatchEvent(showAlertEvent);
+              });
+            </script>
+          {%- endif -%}
+          <input type="hidden" name="key" value="{{ page.key }}">
+          <input type="hidden" name="url" value="" placeholder="URL" class="gui-hide">
+            <fieldset {{ block.shopify_attributes }}>
+              <legend>{{ 'blog.article.comment_form.form_title' | t }}</legend>
+              <{{ settings.global_title_size }} class="margin-x125">{{ 'blog.article.comment_form.form_title' | t }}</{{ settings.global_title_size }}>
+            </fieldset>
+            <div class="cols">
+              <p class="width-50">
+                <label for="name">{{ 'blog.article.comment_form.name' | t }}<span class="overlay-theme">*</span></label>
+                <input type="text" id="name" name="comment[author]" placeholder="{{ 'blog.article.comment_form.name' | t }}" required>
+              </p>
+              <p class="width-50">
+                <label for="email_address">{{ 'blog.article.comment_form.email' | t }}<span class="overlay-theme">*</span></label>
+                <input type="email" id="email_address" name="comment[email]" placeholder="{{ 'blog.article.comment_form.email' | t }}" required>
+              </p>
+            </div>
+            <p>
+              <label for="comment">{{ 'blog.article.comment_form.comment' | t }}<span class="overlay-theme">*</span></label>
+              <textarea id="comment" name="comment[body]" placeholder="{{ 'blog.article.comment_form.comment' | t }}" required>{{ form.body }}</textarea>
+            </p>
+            <p class="submit"><button type="submit"{% if settings.button_style == 'inv' %} class="inv"{% endif %}>{{ 'blog.article.comment_form.send' | t }}</button></p>
+          {%- endform -%}
+        </article>
+      {%- endif -%}
+    {%- endcase -%}
+  {%- endfor -%}
+</div>
+
+{% schema %}
+{
+  "name": "t:main.article.name",
+  "class": "margin-double",
+  "settings": [
+    {
+      "type": "select",
+      "id": "font_size",
+      "label": "t:global.typography.font_size.label",
+      "options": [
+        {
+          "value": "13px",
+          "label": "t:global.typography.font_size.13px.label"
+        },
+        {
+          "value": "14px",
+          "label": "t:global.typography.font_size.14px.label"
+        },
+        {
+          "value": "16px",
+          "label": "t:global.typography.font_size.16px.label"
+        },
+        {
+          "value": "18px",
+          "label": "t:global.typography.font_size.18px.label"
+        }
+      ],
+      "default": "16px"
+    },
+    {
+      "id": "compact",
+      "type": "checkbox",
+      "label": "t:main.article.settings.compact.label",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "@app"
+    },
+    {
+      "type": "spacer",
+      "name": "t:main.article.blocks.spacer.name",
+      "settings": [
+        {
+          "id": "height",
+          "type": "range",
+          "label": "t:main.article.blocks.spacer.settings.height.label",
+          "min": -100,
+          "max": 200,
+          "step": 5,
+          "unit": "px",
+          "default": 20
+        }
+      ]
+    },
+    {
+      "type": "featured_image",
+      "name": "t:main.article.blocks.featured_image.name",
+      "limit": 1,
+      "settings": [
+
+      ]
+    },
+    {
+      "type": "title",
+      "name": "t:main.article.blocks.title.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "select",
+          "id": "title_size",
+          "label": "t:global.typography.title_size.label",
+          "options": [
+            {
+              "value": "h4",
+              "label": "t:global.typography.title_size.h4.label"
+            },
+            {
+              "value": "h3",
+              "label": "t:global.typography.title_size.h3.label"
+            },
+            {
+              "value": "h2",
+              "label": "t:global.typography.title_size.h2.label"
+            },
+            {
+              "value": "h1",
+              "label": "t:global.typography.title_size.h1.label"
+            }
+          ],
+          "default": "h1"
+        },
+        {
+          "id": "show_banner",
+          "type": "checkbox",
+          "label": "t:main.article.blocks.title.settings.show_banner.label",
+          "info": "t:main.article.blocks.title.settings.show_banner.info"
+        },
+        {
+          "type": "color_scheme",
+          "id": "color_palette",
+          "label": "t:global.color_palette.label",
+          "default": "scheme-4"
+        },
+        {
+          "type": "range",
+          "id": "overlay_opacity",
+          "label": "t:main.article.blocks.title.settings.overlay_opacity.label",
+          "min": 0,
+          "max": 100,
+          "step": 5,
+          "unit": "%",
+          "default": 0
+        },
+        {
+          "id": "show_date",
+          "type": "checkbox",
+          "label": "t:main.article.blocks.title.settings.show_date.label",
+          "default": true
+        },
+        {
+          "id": "show_author",
+          "type": "checkbox",
+          "label": "t:main.article.blocks.title.settings.show_author.label",
+          "default": true
+        },
+        {
+          "id": "show_article_reading_time",
+          "type": "checkbox",
+          "label": "t:main.article.blocks.title.settings.show_article_reading_time.label",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "excerpt",
+      "name": "t:main.article.blocks.excerpt.name",
+      "limit": 1,
+      "settings": [
+
+      ]
+    },
+    {
+      "type": "content",
+      "name": "t:main.article.blocks.content.name",
+      "limit": 1,
+      "settings": [
+
+      ]
+    },
+    {
+      "type": "tags",
+      "name": "t:main.article.blocks.tags.name",
+      "limit": 1,
+      "settings": [
+
+      ]
+    },
+    {
+      "type": "comments",
+      "name": "t:main.article.blocks.comments.name",
+      "limit": 1,
+      "settings": [
+
+      ]
+    },
+    {
+      "type": "share_buttons",
+      "name": "t:main.article.blocks.share_buttons.name",
+      "limit": 1,
+      "settings": [
+        {
+          "id": "share_whatsapp",
+          "type": "checkbox",
+          "label": "t:main.article.blocks.share_buttons.settings.share_whatsapp.label",
+          "default": true
+        },
+        {
+          "id": "share_facebook",
+          "type": "checkbox",
+          "label": "t:main.article.blocks.share_buttons.settings.share_facebook.label",
+          "default": true
+        },
+        {
+          "id": "share_twitter",
+          "type": "checkbox",
+          "label": "t:main.article.blocks.share_buttons.settings.share_twitter.label",
+          "default": true
+        },
+        {
+          "id": "share_pinterest",
+          "type": "checkbox",
+          "label": "t:main.article.blocks.share_buttons.settings.share_pinterest.label",
+          "default": true
+        },
+        {
+          "id": "share_messenger",
+          "type": "checkbox",
+          "label": "t:main.article.blocks.share_buttons.settings.share_messenger.label",
+          "default": true
+        },
+        {
+          "id": "share_email",
+          "type": "checkbox",
+          "label": "t:main.article.blocks.share_buttons.settings.share_email.label",
+          "default": true
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

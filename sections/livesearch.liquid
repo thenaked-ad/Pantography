@@ -1,0 +1,111 @@
+{%- if predictive_search.performed -%}
+  {%- liquid
+    assign results_count = 0
+    if settings.search_drawer_enable_collections
+      assign results_count = results_count | plus: predictive_search.resources.collections.size
+    endif
+    if settings.search_drawer_enable_products
+      assign results_count = results_count | plus: predictive_search.resources.products.size
+    endif
+    if settings.search_drawer_enable_pages
+      assign results_count = results_count | plus: predictive_search.resources.pages.size
+    endif
+    if settings.search_drawer_enable_articles
+      assign results_count = results_count | plus: predictive_search.resources.articles.size
+    endif
+
+    if settings.search_drawer_enable_suggestions
+      assign all_suggestions = predictive_search.resources.queries
+    endif
+    if settings.search_drawer_enable_collections
+      if all_suggestions
+        assign all_suggestions = all_suggestions | concat: predictive_search.resources.collections
+      else
+        assign all_suggestions = predictive_search.resources.collections
+      endif
+    endif
+  -%}
+  <div>
+    <div class="cols">
+      <p>{{ 'search.amount_of_results_plus_term' | t: term: predictive_search.terms, count: results_count, amount: results_count }} </p>
+      {%- if results_count > 0 -%}
+        <p class="mobile-hide"><a href="{{ routes.search_url }}?q={{ predictive_search.terms }}" class="strong">{{ 'search.view_all_results' | t }}&nbsp;<i aria-hidden="true" class="icon-chevron-right"></i></a></p>
+      {%- endif -%}
+    </div>
+    {%- if all_suggestions.size > 0 and all_suggestions.first.text != predictive_search.terms -%}
+      {%- if settings.search_drawer_enable_suggestions -%}<p class="strong">{{ 'search.suggestions' | t }}</p>{%- endif -%}
+      <ul class="l4pl">
+        {%- for suggestion in all_suggestions limit: 5 -%}
+          {%- unless suggestion.text == predictive_search.terms %}
+            <li><a href="{{ suggestion.url }}"{% if suggestion.text %} data-search-suggestion="{{ suggestion.text }}"{% endif %}>{{ suggestion.title | highlight: predictive_search.terms }}{{ suggestion.text | highlight: predictive_search.terms }}</a></li>
+          {%- endunless -%}
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+    {%- if settings.search_drawer_enable_collections and predictive_search.resources.collections.size > 0 -%}
+      <ul class="l4pl">
+        {%- for collection in predictive_search.resources.collections limit: 5 -%}
+          <li><a href="{{ collection.url }}">{{ collection.title | highlight: predictive_search.terms }}</a></li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+    {%- if settings.search_drawer_enable_products and predictive_search.resources.products.size > 0 -%}
+      <ul class="l4ca compact">
+        {%- for product in predictive_search.resources.products limit: settings.search_drawer_products_qty -%}
+          <li class="{% if settings.fill_product_images %} img-cover{% endif %}{% if product.compare_at_price > product.price %} has-discount{% endif %}">
+            {%- if product.featured_media != blank -%}
+              <div class="header">
+                <figure{% if settings.multiply_product_images == 'multiply' %} class="img-multiply"{% elsif settings.multiply_product_images == 'multiply-bg' %} class="img-multiply-bg"{% endif %}>
+                  <picture class="orientation">
+                    <img src="{{ product.featured_media | image_url: width: 140 }}"
+                         srcset="{{ product.featured_media | image_url: width: 70 }} 1x,{{ product.featured_media | image_url: width: 140 }} 2x"
+                         alt="{{ product.featured_media.alt }}"
+                         width="70"
+                         height="71"
+                    >
+                  </picture>
+                </figure>
+              </div>
+            {%- endif -%}
+            <section>
+              <div class="header">
+                <h2>
+                  {%- if settings.search_drawer_show_vendor and product.vendor != "vendor-unknown" and product.vendor != shop.name -%}
+                    <span class="small">{{ product.vendor }}</span>
+                  {%- endif -%}
+                  <a href="{{ product.url }}">{{ product.title }}</a>
+                </h2>
+              </div>
+            </section>
+            {%- if settings.search_drawer_show_price -%}
+              <div class="footer">
+                <p class="s1pr">
+                  {{ product.price | money }}
+                  {%- if product.compare_at_price > product.price -%}<span class="old">{{ product.compare_at_price | money }}</span>{%- endif -%}
+                </p>
+              </div>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+    {%- liquid
+      assign all_articles = ''
+      if settings.search_drawer_enable_pages
+        assign all_articles = predictive_search.resources.pages
+      endif
+      if settings.search_drawer_enable_articles
+        assign all_articles = all_articles | concat: predictive_search.resources.articles
+      endif
+    -%}
+    {%- if all_articles.size > 0 -%}
+      <p class="strong">{{ 'search.questions_and_advice' | t }}</p>
+      <ul class="l4pl">
+        {%- for article in all_articles limit: 5 -%}
+          <li><a href="{{ article.url }}">{{ article.title | highlight: predictive_search.terms }}</a></li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+    <p class="mobile-only"><a href="{{ routes.search_url }}?q={{ predictive_search.terms }}" class="strong">{{ 'search.view_all_results' | t }}&nbsp;<i aria-hidden="true" class="icon-chevron-right"></i></a></p>
+  </div>
+{%- endif -%}

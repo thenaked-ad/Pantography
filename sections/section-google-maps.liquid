@@ -1,0 +1,58 @@
+{%- if section.settings.google_maps_iframe -%}
+  <figure class="image-map" {% if settings.enable_animations %}data-sal="fade" data-sal-duration="500"{% endif %}>
+    {{ section.settings.google_maps_iframe | replace: 'width="400"', 'width="100%"' | replace: 'width="600"', 'width="100%"' | replace: 'width="800"', 'width="100%"' | replace: 'height="300"', 'height="450"' | replace: 'height="600"', 'height="450"' }}
+  </figure>
+{%- endif %}
+
+<style>
+  #shopify-section-{{ section.id }} { margin-bottom: {{ section.settings.spacing_desktop | minus: 20 }}px; }
+  @media only screen and (max-width: 47.5em) {
+    #shopify-section-{{ section.id }} { margin-bottom: {{ section.settings.spacing_mobile | minus: 20 }}px; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "t:static_sections.google_maps.name",
+  "class": "shopify-section-google-maps",
+  "disabled_on": {
+    "groups": [
+      "header",
+      "footer",
+      "custom.overlay"
+    ]
+  },
+  "settings": [
+    {
+      "type": "html",
+      "id": "google_maps_iframe",
+      "label": "t:static_sections.google_maps.settings.google_maps_iframe.label",
+      "info": "t:static_sections.google_maps.settings.google_maps_iframe.info"
+    },
+    {
+      "type": "header",
+      "content": "t:global.spacing.header"
+    },
+    {
+      "id": "spacing_desktop",
+      "type": "range",
+      "label": "t:global.spacing.spacing_desktop.label",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "id": "spacing_mobile",
+      "type": "range",
+      "label": "t:global.spacing.spacing_mobile.label",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    }
+  ]
+}
+{% endschema %}

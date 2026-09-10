@@ -1,0 +1,134 @@
+{%- if section.blocks.size > 0 -%}
+  <div class="shopify-section-announcement-bar size-{{ section.settings.height }}{% if section.blocks.size > 1 and section.settings.enable_slider_arrows == false %} no-arrows{% endif %}"{% if section.blocks.size > 1 and section.settings.enable_slider_autoplay %} data-autoplay={{ section.settings.slider_autoplay_seconds | times: 1000 }}{% endif %} style="font-size:{{ section.settings.font_size }}">
+    {%- if section.blocks.size == 1 -%}<div>{%- endif -%}
+      {%- for block in section.blocks -%}
+        {%- if block.settings.text != empty -%}
+          <p class="text-center ff-{{ section.settings.font }}">
+            {{ block.settings.text }}
+          </p>
+        {%- endif -%}
+      {%- endfor -%}
+    {%- if section.blocks.size == 1 -%}</div>{%- endif -%}
+  </div>
+  <style>
+    :root {
+      --alert_bg: var(--{{ section.settings.color_palette }}_bg);
+      --alert_fg: var(--{{ section.settings.color_palette }}_fg);
+      --alert_fg_hover: --{{ section.settings.color_palette }}_btn_bg;
+    }
+  </style>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:static_sections.announcement_bar.name",
+  "class": "shopify-section-announcement-bar-container",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "t:static_sections.announcement_bar.settings.paragraph"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_palette",
+      "label": "t:global.color_palette.label",
+      "default": "scheme-5"
+    },
+    {
+      "id": "height",
+      "type": "select",
+      "label": "t:static_sections.announcement_bar.settings.height.label",
+      "options": [
+        {
+          "label": "t:static_sections.announcement_bar.settings.height.options__1.label",
+          "value": "s"
+        },
+        {
+          "label": "t:static_sections.announcement_bar.settings.height.options__2.label",
+          "value": "m"
+        },
+        {
+          "label": "t:static_sections.announcement_bar.settings.height.options__3.label",
+          "value": "l"
+        }
+      ],
+      "default": "s"
+    },
+    {
+      "type": "select",
+      "id": "font",
+      "label": "t:global.typography.font.label",
+      "options": [
+        {
+          "value": "primary",
+          "label": "t:global.typography.font.primary.label"
+        },
+        {
+          "value": "secondary",
+          "label": "t:global.typography.font.secondary.label"
+        }
+      ],
+      "default": "secondary"
+    },
+    {
+      "type": "select",
+      "id": "font_size",
+      "label": "t:static_sections.announcement_bar.settings.font_size.label",
+      "options": [
+        {
+          "value": "13px",
+          "label": "t:static_sections.announcement_bar.settings.font_size.options__1.label"
+        },
+        {
+          "value": "14px",
+          "label": "t:static_sections.announcement_bar.settings.font_size.options__2.label"
+        },
+        {
+          "value": "16px",
+          "label": "t:static_sections.announcement_bar.settings.font_size.options__3.label"
+        },
+        {
+          "value": "18px",
+          "label": "t:static_sections.announcement_bar.settings.font_size.options__4.label"
+        }
+      ],
+      "default": "14px"
+    },
+    {
+      "id": "enable_slider_arrows",
+      "type": "checkbox",
+      "label": "t:static_sections.announcement_bar.settings.enable_slider_arrows.label",
+      "default": true
+    },
+    {
+      "id": "enable_slider_autoplay",
+      "type": "checkbox",
+      "label": "t:static_sections.announcement_bar.settings.enable_slider_autoplay.label"
+    },
+    {
+      "id": "slider_autoplay_seconds",
+      "type": "range",
+      "label": "t:static_sections.announcement_bar.settings.slider_autoplay_seconds.label",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "default": 3
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "name": "t:static_sections.announcement_bar.blocks.text.name",
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "text",
+          "label": "t:static_sections.announcement_bar.blocks.text.settings.text.label",
+          "default": "Shout out your big announcement here!"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

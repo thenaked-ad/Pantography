@@ -1,0 +1,244 @@
+{%- paginate blog.articles by section.settings.pagination_qty -%}
+  <header
+    {% if settings.enable_animations %}
+      data-sal="fade" data-sal-duration="500"
+    {% endif %}
+    {% if section.settings.text_alignment == 'center' %}
+      class="text-center align-center"
+    {% endif %}
+  >
+    <{{ section.settings.title_size }}>
+      {%- if section.settings.title != empty -%}
+        {{ section.settings.title }}
+      {%- else -%}
+        {{ blog.title }}
+      {%- endif -%}
+    </{{ section.settings.title_size }}>
+  </header>
+  {% if section.settings.show_blog_tags and blog.tags.size > 0 %}
+    <p class="link-btn mobile-compact">
+      {%- liquid
+        assign button_class = ''
+        assign active_button_class = ''
+        if settings.button_style == 'inv'
+          assign button_class = 'inv'
+        else
+          assign active_button_class = 'inv'
+        endif
+        assign replacement = '<a class="' | append: button_class | append: '" '
+        assign active_replacement = '<a class="' | append: active_button_class | append: '" '
+      -%}
+      {%- for tag in blog.all_tags -%}
+        {%- if current_tags contains tag -%}
+          {{ tag | link_to_remove_tag: tag | replace: '<a ', active_replacement }}
+        {%- else -%}
+          {{ tag | link_to_tag: tag | replace: '<a ', replacement }}
+        {%- endif -%}
+      {%- endfor -%}
+    </p>
+  {% endif %}
+  <ul
+    class="l4cl width-33 size-content img-cover mobile-scroll w100-mobile"
+    style="--ratio:{{ section.settings.custom_image_ratio | divided_by: 100.0 }}"
+  >
+    {%- for article in blog.articles -%}
+      {%- render 'article-item',
+        article: article,
+        show_excerpt: section.settings.show_excerpt,
+        show_image: section.settings.show_image,
+        show_tags: section.settings.show_tags,
+        show_date: section.settings.show_date,
+        show_author: section.settings.show_author,
+        button_style: section.settings.button_style_post
+      -%}
+    {%- endfor -%}
+  </ul>
+  {% render 'pagination', paginate: paginate, show_amount: true %}
+{%- endpaginate -%}
+
+{% schema %}
+{
+  "name": "t:main.blog.name",
+  "tag": "article",
+  "class": "margin-double",
+  "settings": [
+    {
+      "id": "title_size",
+      "type": "select",
+      "label": "t:main.blog.settings.title_size.label",
+      "options": [
+        {
+          "value": "h5",
+          "label": "t:global.typography.title_size.h5.label"
+        },
+        {
+          "value": "h4",
+          "label": "t:global.typography.title_size.h4.label"
+        },
+        {
+          "value": "h3",
+          "label": "t:global.typography.title_size.h3.label"
+        },
+        {
+          "value": "h2",
+          "label": "t:global.typography.title_size.h2.label"
+        },
+        {
+          "value": "h1",
+          "label": "t:global.typography.title_size.h1.label"
+        }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:main.blog.settings.title.label",
+      "info": "t:main.blog.settings.title.info"
+    },
+    {
+      "id": "text_alignment",
+      "type": "select",
+      "label": "t:main.blog.settings.text_alignment.label",
+      "options": [
+        {
+          "value": "left",
+          "label": "t:main.blog.settings.text_alignment.options__1.label"
+        },
+        {
+          "value": "center",
+          "label": "t:main.blog.settings.text_alignment.options__2.label"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_blog_tags",
+      "label": "t:main.blog.settings.show_blog_tags.label"
+    },
+    {
+      "type": "range",
+      "id": "pagination_qty",
+      "label": "t:main.blog.settings.pagination_qty.label",
+      "min": 3,
+      "max": 15,
+      "step": 3,
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "t:main.blog.settings.blog_posts.header"
+    },
+    {
+      "id": "show_image",
+      "type": "checkbox",
+      "label": "t:main.blog.settings.blog_posts.show_image.label",
+      "default": true
+    },
+    {
+      "id": "custom_image_ratio",
+      "type": "range",
+      "label": "t:main.blog.settings.blog_posts.custom_image_ratio.label",
+      "info": "t:main.blog.settings.blog_posts.custom_image_ratio.info",
+      "min": 50,
+      "max": 175,
+      "step": 5,
+      "unit": "%",
+      "default": 75
+    },
+    {
+      "id": "show_tags",
+      "type": "checkbox",
+      "label": "t:main.blog.settings.blog_posts.show_tags.label",
+      "info": "t:main.blog.settings.blog_posts.show_tags.info",
+      "default": true
+    },
+    {
+      "id": "show_date",
+      "type": "checkbox",
+      "label": "t:main.blog.settings.blog_posts.show_date.label",
+      "default": true
+    },
+    {
+      "id": "show_author",
+      "type": "checkbox",
+      "label": "t:main.blog.settings.blog_posts.show_author.label",
+      "default": true
+    },
+    {
+      "id": "show_excerpt",
+      "type": "checkbox",
+      "label": "t:main.blog.settings.blog_posts.show_excerpt.label"
+    },
+    {
+      "type": "select",
+      "id": "button_style_post",
+      "label": "t:main.blog.settings.blog_posts.button_style_post.label",
+      "options": [
+        {
+          "value": "primary solid",
+          "label": "t:global.button.button_style.primary.label",
+          "group": "t:global.button.button_style.group.solid"
+        },
+        {
+          "value": "secondary solid",
+          "label": "t:global.button.button_style.secondary.label",
+          "group": "t:global.button.button_style.group.solid"
+        },
+        {
+          "value": "tertiary solid",
+          "label": "t:global.button.button_style.tertiary.label",
+          "group": "t:global.button.button_style.group.solid"
+        },
+        {
+          "value": "primary plain",
+          "label": "t:global.button.button_style.primary.label",
+          "group": "t:global.button.button_style.group.plain"
+        },
+        {
+          "value": "secondary plain",
+          "label": "t:global.button.button_style.secondary.label",
+          "group": "t:global.button.button_style.group.plain"
+        },
+        {
+          "value": "tertiary plain",
+          "label": "t:global.button.button_style.tertiary.label",
+          "group": "t:global.button.button_style.group.plain"
+        },
+        {
+          "value": "primary inv",
+          "label": "t:global.button.button_style.primary.label",
+          "group": "t:global.button.button_style.group.inv"
+        },
+        {
+          "value": "secondary inv",
+          "label": "t:global.button.button_style.secondary.label",
+          "group": "t:global.button.button_style.group.inv"
+        },
+        {
+          "value": "tertiary inv",
+          "label": "t:global.button.button_style.tertiary.label",
+          "group": "t:global.button.button_style.group.inv"
+        },
+        {
+          "value": "primary link",
+          "label": "t:global.button.button_style.primary.label",
+          "group": "t:global.button.button_style.group.link"
+        },
+        {
+          "value": "secondary link",
+          "label": "t:global.button.button_style.secondary.label",
+          "group": "t:global.button.button_style.group.link"
+        },
+        {
+          "value": "tertiary link",
+          "label": "t:global.button.button_style.tertiary.label",
+          "group": "t:global.button.button_style.group.link"
+        }
+      ],
+      "default": "primary plain"
+    },
+  ]
+}
+{% endschema %}

@@ -1,0 +1,453 @@
+<ul
+  class="
+    palette-{{ section.settings.color_palette }}
+    module-color-palette
+    l4us
+    wide
+    inline
+    text-center
+    {% if section.blocks.size > 1 %}{% if section.settings.layout == 'slider' %}slider{% else %}slider-mobile{% endif %}{% endif %}
+    {% unless section.settings.show_arrows %}no-arrows{% endunless %}
+  "
+  {% if section.settings.autoplay %}
+    data-autoplay="{{ section.settings.autoplay_seconds | times: 1000 }}"
+  {% endif %}
+  style="--mih: {{ section.settings.height }}; --main_fz: {{ section.settings.font_size }};"
+>
+  {%- for block in section.blocks -%}
+    {%- if block.settings.usp != empty -%}
+      <li
+        {% if block.settings.icon != 'check' or block.settings.image %}
+          class="{% if block.settings.icon == 'none' or block.settings.image %}no-checks{% elsif block.settings.icon != 'check' %}icon-{{ block.settings.icon }}{% endif %}"
+        {% endif %}
+        data-slide-index="{{ forloop.index }}"
+        {{ block.shopify_attributes }}
+      >
+        {%- if block.settings.image -%}
+          <img
+            srcset="{%- render 'image-srcset', image: block.settings.image, max_width: 400 -%}"
+            src="{{ block.settings.image | image_url: width: block.settings.image_width }}"
+            width="{{ block.settings.image_width }}"
+            height="40"
+            alt="{{ block.settings.image.alt | default: block.settings.usp | escape }}"
+            loading="lazy"
+          >
+        {%- endif -%}
+        <span
+          {% if block.settings.link_styling == 'inline' %}
+            class="inline-link"
+          {% endif %}
+        >
+          {{- block.settings.usp -}}
+        </span>
+      </li>
+    {%- endif -%}
+  {%- endfor -%}
+</ul>
+
+<style>
+  #shopify-section-{{ section.id }} .module-color-palette:before { opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }}; }
+  #shopify-section-{{ section.id }} { z-index: {{ section.settings.fix_zindex }}!important; }
+  @media only screen and (min-width: 47.5em) {
+    #shopify-section-{{ section.id }} .l4us { margin-bottom: {{ section.settings.spacing_desktop }}px; }
+  {% if section.settings.spacing_desktop < 0 %}
+    #shopify-section-{{ section.id }} + *.has-kinetic-text { pointer-events: none; }
+  {% endif %}
+  }
+  @media only screen and (max-width: 47.5em) {
+    #shopify-section-{{ section.id }} .l4us { margin-bottom: {{ section.settings.spacing_mobile }}px; }
+  {% if section.settings.spacing_mobile < 0 %}
+    #shopify-section-{{ section.id }} + *.has-kinetic-text { pointer-events: none; }
+  {% endif %}
+  }
+</style>
+
+{% schema %}
+{
+  "name": "t:sections.usp_bar.name",
+  "disabled_on": {
+    "groups": ["header", "custom.overlay"]
+  },
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_palette",
+      "label": "t:global.color_palette.label",
+      "default": "scheme-3"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "t:sections.usp_bar.settings.overlay_opacity.label",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "select",
+      "id": "height",
+      "label": "t:sections.usp_bar.settings.height.label",
+      "options": [
+        {
+          "label": "t:sections.usp_bar.settings.height.options__1.label",
+          "value": "55px"
+        },
+        {
+          "label": "t:sections.usp_bar.settings.height.options__2.label",
+          "value": "65px"
+        },
+        {
+          "label": "t:sections.usp_bar.settings.height.options__3.label",
+          "value": "75px"
+        }
+      ],
+      "default": "55px"
+    },
+    {
+      "type": "select",
+      "id": "font_size",
+      "label": "t:sections.usp_bar.settings.font_size.label",
+      "options": [
+        {
+          "value": "13px",
+          "label": "t:sections.usp_bar.settings.font_size.options__1.label"
+        },
+        {
+          "value": "14px",
+          "label": "t:sections.usp_bar.settings.font_size.options__2.label"
+        },
+        {
+          "value": "16px",
+          "label": "t:sections.usp_bar.settings.font_size.options__3.label"
+        },
+        {
+          "value": "18px",
+          "label": "t:sections.usp_bar.settings.font_size.options__4.label"
+        }
+      ],
+      "default": "16px"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "t:sections.usp_bar.settings.layout.label",
+      "options": [
+        {
+          "value": "slider",
+          "label": "t:sections.usp_bar.settings.layout.options__1.label"
+        },
+        {
+          "value": "rows",
+          "label": "t:sections.usp_bar.settings.layout.options__2.label"
+        }
+      ],
+      "default": "rows"
+    },
+    {
+      "id": "autoplay",
+      "type": "checkbox",
+      "label": "t:sections.usp_bar.settings.autoplay.label",
+      "info": "t:sections.usp_bar.settings.autoplay.info"
+    },
+    {
+      "id": "autoplay_seconds",
+      "type": "range",
+      "label": "t:sections.usp_bar.settings.autoplay_seconds.label",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "default": 3
+    },
+    {
+      "id": "show_arrows",
+      "type": "checkbox",
+      "label": "t:sections.usp_bar.settings.show_arrows.label",
+      "info": "t:sections.usp_bar.settings.show_arrows.info"
+    },
+    {
+      "type": "header",
+      "content": "t:global.spacing.header"
+    },
+    {
+      "id": "spacing_desktop",
+      "type": "range",
+      "label": "t:global.spacing.spacing_desktop.label",
+      "min": -300,
+      "max": 300,
+      "step": 10,
+      "unit": "px",
+      "default": 50
+    },
+    {
+      "id": "spacing_mobile",
+      "type": "range",
+      "label": "t:global.spacing.spacing_mobile.label",
+      "min": -300,
+      "max": 300,
+      "step": 10,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "id": "fix_zindex",
+      "type": "range",
+      "label": "t:global.fix_zindex.label",
+      "info": "t:global.fix_zindex.info",
+      "min": 0,
+      "max": 25,
+      "step": 1,
+      "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "type": "usp",
+      "name": "t:sections.usp_bar.blocks.usp.name",
+      "settings": [
+        {
+          "id": "icon",
+          "type": "select",
+          "label": "t:global.icons.header",
+          "options": [
+            {
+              "value": "none",
+              "label": "t:global.icons.options__44.label"
+            },
+            {
+              "value": "info-old",
+              "label": "t:global.icons.options__1.label"
+            },
+            {
+              "value": "cart-bag-wide",
+              "label": "t:global.icons.options__2.label"
+            },
+            {
+              "value": "basket",
+              "label": "t:global.icons.options__3.label"
+            },
+            {
+              "value": "box",
+              "label": "t:global.icons.options__4.label"
+            },
+            {
+              "value": "x-light-circle-outline",
+              "label": "t:global.icons.options__5.label"
+            },
+            {
+              "value": "cart",
+              "label": "t:global.icons.options__6.label"
+            },
+            {
+              "value": "calendar",
+              "label": "t:global.icons.options__7.label"
+            },
+            {
+              "value": "chat",
+              "label": "t:global.icons.options__8.label"
+            },
+            {
+              "value": "check",
+              "label": "t:global.icons.options__9.label"
+            },
+            {
+              "value": "clock",
+              "label": "t:global.icons.options__10.label"
+            },
+            {
+              "value": "coupon",
+              "label": "t:global.icons.options__11.label"
+            },
+            {
+              "value": "customer-support",
+              "label": "t:global.icons.options__12.label"
+            },
+            {
+              "value": "pencil",
+              "label": "t:global.icons.options__13.label"
+            },
+            {
+              "value": "earth",
+              "label": "t:global.icons.options__14.label"
+            },
+            {
+              "value": "alarm",
+              "label": "t:global.icons.options__15.label"
+            },
+            {
+              "value": "gift",
+              "label": "t:global.icons.options__16.label"
+            },
+            {
+              "value": "happy",
+              "label": "t:global.icons.options__17.label"
+            },
+            {
+              "value": "headphones",
+              "label": "t:global.icons.options__18.label"
+            },
+            {
+              "value": "heart-outline",
+              "label": "t:global.icons.options__19.label"
+            },
+            {
+              "value": "info",
+              "label": "t:global.icons.options__20.label"
+            },
+            {
+              "value": "edit",
+              "label": "t:global.icons.options__21.label"
+            },
+            {
+              "value": "order",
+              "label": "t:global.icons.options__22.label"
+            },
+            {
+              "value": "lock",
+              "label": "t:global.icons.options__23.label"
+            },
+            {
+              "value": "envelope",
+              "label": "t:global.icons.options__24.label"
+            },
+            {
+              "value": "archive",
+              "label": "t:global.icons.options__25.label"
+            },
+            {
+              "value": "bell",
+              "label": "t:global.icons.options__26.label"
+            },
+            {
+              "value": "minus-circle",
+              "label": "t:global.icons.options__27.label"
+            },
+            {
+              "value": "mobile",
+              "label": "t:global.icons.options__28.label"
+            },
+            {
+              "value": "credit-card",
+              "label": "t:global.icons.options__29.label"
+            },
+            {
+              "value": "phone",
+              "label": "t:global.icons.options__30.label"
+            },
+            {
+              "value": "pin",
+              "label": "t:global.icons.options__31.label"
+            },
+            {
+              "value": "plus-circle",
+              "label": "t:global.icons.options__32.label"
+            },
+            {
+              "value": "help",
+              "label": "t:global.icons.options__33.label"
+            },
+            {
+              "value": "refresh",
+              "label": "t:global.icons.options__34.label"
+            },
+            {
+              "value": "check-circle",
+              "label": "t:global.icons.options__35.label"
+            },
+            {
+              "value": "sad",
+              "label": "t:global.icons.options__36.label"
+            },
+            {
+              "value": "zoom",
+              "label": "t:global.icons.options__37.label"
+            },
+            {
+              "value": "shield-check",
+              "label": "t:global.icons.options__38.label"
+            },
+            {
+              "value": "cog",
+              "label": "t:global.icons.options__39.label"
+            },
+            {
+              "value": "shield",
+              "label": "t:global.icons.options__40.label"
+            },
+            {
+              "value": "star-outline",
+              "label": "t:global.icons.options__41.label"
+            },
+            {
+              "value": "shop",
+              "label": "t:global.icons.options__42.label"
+            },
+            {
+              "value": "thunder",
+              "label": "t:global.icons.options__43.label"
+            }
+          ],
+          "default": "check"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:sections.usp_bar.blocks.usp.settings.image.label",
+          "info": "t:sections.usp_bar.blocks.usp.settings.image.info"
+        },
+        {
+          "type": "range",
+          "id": "image_width",
+          "label": "t:sections.usp_bar.blocks.usp.settings.image_width.label",
+          "min": 20,
+          "max": 150,
+          "step": 5,
+          "unit": "px",
+          "default": 40
+        },
+        {
+          "type": "inline_richtext",
+          "id": "usp",
+          "label": "t:sections.usp_bar.blocks.usp.settings.usp.label",
+          "info": "t:sections.usp_bar.blocks.usp.settings.usp.info",
+          "default": "Give your customers more <a href=\"/\" title=\"details\">details</a> about your online store"
+        },
+        {
+          "type": "select",
+          "id": "link_styling",
+          "label": "t:sections.usp_bar.blocks.usp.settings.link_styling.label",
+          "options": [
+            {
+              "label": "t:sections.usp_bar.blocks.usp.settings.link_styling.options__1.label",
+              "value": "underline"
+            },
+            {
+              "label": "t:sections.usp_bar.blocks.usp.settings.link_styling.options__2.label",
+              "value": "inline"
+            }
+          ],
+          "default": "underline"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.usp_bar.presets.name",
+      "blocks": [
+        {
+          "type": "usp"
+        },
+        {
+          "type": "usp"
+        },
+        {
+          "type": "usp"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

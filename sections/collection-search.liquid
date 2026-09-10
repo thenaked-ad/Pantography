@@ -1,0 +1,644 @@
+{% liquid
+  assign search_collection = section.settings.collection
+  if search_collection == blank and collection != blank
+    assign search_collection = collection
+  endif
+%}
+
+{% if search_collection != blank %}
+  <collection-product-search
+    class="collection-search"
+    style="
+      --collection-search-background: {{ section.settings.background_color }};
+      --collection-search-text: {{ section.settings.text_color }};
+      --collection-search-accent: {{ section.settings.accent_color }};
+      --collection-search-card-background: {{ section.settings.card_background_color }};
+      --collection-search-columns: {{ section.settings.columns_desktop }};
+      --collection-search-max-width: {{ section.settings.max_width }}px;
+    "
+    data-section-id="{{ section.id }}"
+    data-collection-url="{{ search_collection.url }}"
+    data-min-characters="{{ section.settings.minimum_characters }}"
+    data-loading-text="{{ section.settings.loading_text | escape }}"
+    data-error-text="{{ section.settings.error_text | escape }}"
+    data-prompt-text="{{ section.settings.prompt_text | escape }}"
+    data-one-result-text="{{ section.settings.one_result_text | escape }}"
+    data-many-results-text="{{ section.settings.many_results_text | escape }}"
+    data-no-results-text="{{ section.settings.no_results_text | escape }}"
+    data-show-vendor="{{ section.settings.show_vendor }}"
+    data-show-price="{{ section.settings.show_price }}"
+    data-replace-original-grid="{{ section.settings.replace_original_grid }}"
+    data-original-grid-selector="{{ section.settings.original_grid_selector | escape }}"
+  >
+    <div class="collection-search__inner">
+      {% if section.settings.heading != blank %}
+        <h2 class="collection-search__heading">{{ section.settings.heading | escape }}</h2>
+      {% endif %}
+
+      <form class="collection-search__form" role="search">
+        <label class="collection-search__label" for="CollectionSearch-{{ section.id }}">
+          {{ section.settings.search_label | escape }}
+        </label>
+        <div class="collection-search__input-wrap">
+          <svg class="collection-search__icon" aria-hidden="true" viewBox="0 0 24 24" width="20" height="20">
+            <path d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"/>
+          </svg>
+          <input
+            id="CollectionSearch-{{ section.id }}"
+            class="collection-search__input"
+            type="search"
+            inputmode="search"
+            autocomplete="off"
+            placeholder="{{ section.settings.placeholder | escape }}"
+          >
+        </div>
+      </form>
+
+      <p class="collection-search__status" data-search-status aria-live="polite"></p>
+      <div class="collection-search__grid" data-search-results hidden></div>
+    </div>
+
+    {% paginate search_collection.products by 50 %}
+      <script type="application/json" data-collection-search-page>
+        {
+          "page": {{ paginate.current_page | json }},
+          "pages": {{ paginate.pages | json }},
+          "products": [
+            {% for product in search_collection.products %}
+              {% capture searchable_text %}
+                {{ product.title }} {{ product.vendor }} {{ product.type }}
+                {% for tag in product.tags %} {{ tag }}{% endfor %}
+                {% for variant in product.variants %} {{ variant.sku }} {{ variant.barcode }}{% endfor %}
+              {% endcapture %}
+              {% capture display_price %}
+                {% if product.price_varies %}{{ section.settings.from_text }} {% endif %}{{ product.price | money }}
+              {% endcapture %}
+              {
+                "id": {{ product.id | json }},
+                "title": {{ product.title | json }},
+                "url": {{ product.url | json }},
+                "vendor": {{ product.vendor | json }},
+                "price": {{ display_price | strip | json }},
+                "search": {{ searchable_text | strip_html | strip_newlines | json }},
+                "image": {% if product.featured_image %}{{ product.featured_image | image_url: width: 720 | json }}{% else %}null{% endif %},
+                "image_alt": {{ product.featured_image.alt | default: product.title | json }}
+              }{% unless forloop.last %},{% endunless %}
+            {% endfor %}
+          ]
+        }
+      </script>
+    {% endpaginate %}
+  </collection-product-search>
+{% endif %}
+
+{% stylesheet %}
+  .collection-search {
+    display: block;
+    background: var(--collection-search-background);
+    color: var(--collection-search-text);
+    padding: 40px 20px;
+  }
+
+  .collection-search__inner {
+    width: 100%;
+    max-width: var(--collection-search-max-width);
+    margin: 0 auto;
+  }
+
+  .collection-search__heading {
+    margin: 0 0 20px;
+    color: inherit;
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    line-height: 1.2;
+    text-align: center;
+  }
+
+  .collection-search__form {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .collection-search__label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .collection-search__input-wrap {
+    position: relative;
+  }
+
+  .collection-search__icon {
+    position: absolute;
+    top: 50%;
+    left: 16px;
+    pointer-events: none;
+    transform: translateY(-50%);
+  }
+
+  .collection-search__input {
+    width: 100%;
+    min-height: 52px;
+    padding: 12px 16px 12px 48px;
+    border: 1px solid color-mix(in srgb, var(--collection-search-text) 30%, transparent);
+    border-radius: 8px;
+    background: var(--collection-search-card-background);
+    color: var(--collection-search-text);
+    font: inherit;
+    font-size: 1rem;
+  }
+
+  .collection-search__input:focus {
+    border-color: var(--collection-search-accent);
+    outline: 2px solid var(--collection-search-accent);
+    outline-offset: 2px;
+  }
+
+  .collection-search__status {
+    min-height: 24px;
+    margin: 16px 0;
+    text-align: center;
+  }
+
+  .collection-search__grid {
+    display: grid;
+    grid-template-columns: repeat(var(--collection-search-columns), minmax(0, 1fr));
+    gap: 24px;
+  }
+
+  .collection-search__card {
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--collection-search-card-background);
+    color: var(--collection-search-text);
+  }
+
+  .collection-search__card-link {
+    display: block;
+    height: 100%;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .collection-search__image-wrap {
+    display: block;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--collection-search-text) 5%, transparent);
+  }
+
+  .collection-search__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 180ms ease;
+  }
+
+  .collection-search__card-link:hover .collection-search__image {
+    transform: scale(1.03);
+  }
+
+  .collection-search__card-body {
+    display: block;
+    padding: 16px;
+  }
+
+  .collection-search__vendor {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.8rem;
+    opacity: 0.7;
+  }
+
+  .collection-search__product-title {
+    display: block;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .collection-search__price {
+    display: block;
+    margin-top: 8px;
+  }
+
+  @media (max-width: 989px) {
+    .collection-search__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+  }
+
+  @media (max-width: 749px) {
+    .collection-search {
+      padding: 28px 16px;
+    }
+
+    .collection-search__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  if (!customElements.get('collection-product-search')) {
+    class CollectionProductSearch extends HTMLElement {
+      connectedCallback() {
+        this.input = this.querySelector('.collection-search__input');
+        this.form = this.querySelector('.collection-search__form');
+        this.status = this.querySelector('[data-search-status]');
+        this.results = this.querySelector('[data-search-results]');
+        this.minimumCharacters = Number(this.dataset.minCharacters) || 2;
+        this.products = [];
+        this.searchRequest = 0;
+
+        this.form.addEventListener('submit', (event) => {
+          event.preventDefault();
+          this.runSearch();
+        });
+
+        this.input.addEventListener('input', () => {
+          window.clearTimeout(this.searchTimer);
+          this.searchTimer = window.setTimeout(() => this.runSearch(), 180);
+        });
+      }
+
+      disconnectedCallback() {
+        this.toggleOriginalGrid(false);
+      }
+
+      normalize(value) {
+        return String(value || '')
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toLocaleLowerCase()
+          .trim();
+      }
+
+      message(template, count) {
+        return String(template || '').replace('[count]', count);
+      }
+
+      setStatus(message) {
+        this.status.textContent = message;
+      }
+
+      toggleOriginalGrid(shouldHide) {
+        if (this.dataset.replaceOriginalGrid !== 'true') return;
+
+        let elements = [];
+        try {
+          elements = document.querySelectorAll(this.dataset.originalGridSelector);
+        } catch (error) {
+          console.error('Collection search: invalid original grid selector.', error);
+          return;
+        }
+
+        elements.forEach((element) => {
+          if (shouldHide && !element.hasAttribute('data-collection-search-was-hidden')) {
+            element.setAttribute('data-collection-search-was-hidden', String(element.hidden));
+            element.hidden = true;
+          } else if (!shouldHide && element.hasAttribute('data-collection-search-was-hidden')) {
+            element.hidden = element.getAttribute('data-collection-search-was-hidden') === 'true';
+            element.removeAttribute('data-collection-search-was-hidden');
+          }
+        });
+      }
+
+      async loadProducts() {
+        if (this.loadingPromise) return this.loadingPromise;
+
+        this.loadingPromise = (async () => {
+          const seedNode = this.querySelector('[data-collection-search-page]');
+          const seed = JSON.parse(seedNode.textContent);
+          const productsById = new Map(seed.products.map((product) => [String(product.id), product]));
+          const requests = [];
+
+          for (let page = 1; page <= seed.pages; page += 1) {
+            if (page === seed.page) continue;
+
+            const url = new URL(this.dataset.collectionUrl, window.location.origin);
+            url.searchParams.set('section_id', this.dataset.sectionId);
+            url.searchParams.set('page', String(page));
+            requests.push(fetch(url.toString(), { credentials: 'same-origin' }));
+          }
+
+          const responses = await Promise.all(requests);
+          const failedResponse = responses.find((response) => !response.ok);
+          if (failedResponse) throw new Error(`Collection page request failed: ${failedResponse.status}`);
+
+          const pages = await Promise.all(responses.map((response) => response.text()));
+          pages.forEach((html) => {
+            const documentFragment = new DOMParser().parseFromString(html, 'text/html');
+            const dataNode = documentFragment.querySelector('[data-collection-search-page]');
+            if (!dataNode) throw new Error('Collection search data was not returned.');
+
+            const pageData = JSON.parse(dataNode.textContent);
+            pageData.products.forEach((product) => productsById.set(String(product.id), product));
+          });
+
+          this.products = Array.from(productsById.values());
+        })();
+
+        return this.loadingPromise;
+      }
+
+      async runSearch() {
+        const requestId = ++this.searchRequest;
+        const query = this.normalize(this.input.value);
+
+        if (query.length < this.minimumCharacters) {
+          this.toggleOriginalGrid(false);
+          this.results.replaceChildren();
+          this.results.hidden = true;
+          this.setStatus(
+            query.length === 0
+              ? ''
+              : this.message(this.dataset.promptText, this.minimumCharacters)
+          );
+          return;
+        }
+
+        this.toggleOriginalGrid(true);
+        this.setStatus(this.dataset.loadingText);
+
+        try {
+          await this.loadProducts();
+          if (requestId !== this.searchRequest) return;
+
+          const terms = query.split(/\s+/).filter(Boolean);
+          const matches = this.products
+            .filter((product) => {
+              const searchableText = this.normalize(product.search);
+              return terms.every((term) => searchableText.includes(term));
+            })
+            .sort((productA, productB) => {
+              const titleA = this.normalize(productA.title);
+              const titleB = this.normalize(productB.title);
+              const scoreA = titleA.startsWith(query) ? 0 : titleA.includes(query) ? 1 : 2;
+              const scoreB = titleB.startsWith(query) ? 0 : titleB.includes(query) ? 1 : 2;
+              return scoreA - scoreB || titleA.localeCompare(titleB);
+            });
+
+          this.renderResults(matches);
+        } catch (error) {
+          if (requestId !== this.searchRequest) return;
+          this.results.replaceChildren();
+          this.results.hidden = true;
+          this.toggleOriginalGrid(false);
+          this.setStatus(this.dataset.errorText);
+          console.error('Collection search:', error);
+        }
+      }
+
+      renderResults(products) {
+        this.results.replaceChildren();
+
+        if (products.length === 0) {
+          this.results.hidden = true;
+          this.setStatus(this.dataset.noResultsText);
+          return;
+        }
+
+        const fragment = document.createDocumentFragment();
+        products.forEach((product) => fragment.append(this.createCard(product)));
+        this.results.append(fragment);
+        this.results.hidden = false;
+        this.setStatus(
+          products.length === 1
+            ? this.dataset.oneResultText
+            : this.message(this.dataset.manyResultsText, products.length)
+        );
+      }
+
+      createCard(product) {
+        const article = document.createElement('article');
+        article.className = 'collection-search__card';
+
+        const link = document.createElement('a');
+        link.className = 'collection-search__card-link';
+        link.href = product.url;
+
+        if (product.image) {
+          const imageWrap = document.createElement('span');
+          imageWrap.className = 'collection-search__image-wrap';
+
+          const image = document.createElement('img');
+          image.className = 'collection-search__image';
+          image.src = product.image;
+          image.alt = product.image_alt || product.title;
+          image.loading = 'lazy';
+          image.width = 720;
+          image.height = 720;
+          imageWrap.append(image);
+          link.append(imageWrap);
+        }
+
+        const body = document.createElement('span');
+        body.className = 'collection-search__card-body';
+
+        if (this.dataset.showVendor === 'true' && product.vendor) {
+          const vendor = document.createElement('span');
+          vendor.className = 'collection-search__vendor';
+          vendor.textContent = product.vendor;
+          body.append(vendor);
+        }
+
+        const title = document.createElement('span');
+        title.className = 'collection-search__product-title';
+        title.textContent = product.title;
+        body.append(title);
+
+        if (this.dataset.showPrice === 'true' && product.price) {
+          const price = document.createElement('span');
+          price.className = 'collection-search__price';
+          price.textContent = product.price;
+          body.append(price);
+        }
+
+        link.append(body);
+        article.append(link);
+        return article;
+      }
+    }
+
+    customElements.define('collection-product-search', CollectionProductSearch);
+  }
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Collection search",
+  "tag": "section",
+  "class": "section-collection-search",
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection",
+      "info": "Leave blank to use the collection for the current page."
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Search this collection"
+    },
+    {
+      "type": "text",
+      "id": "search_label",
+      "label": "Search label",
+      "default": "Search products"
+    },
+    {
+      "type": "text",
+      "id": "placeholder",
+      "label": "Placeholder",
+      "default": "Enter a product name, SKU or keyword"
+    },
+    {
+      "type": "range",
+      "id": "minimum_characters",
+      "label": "Minimum search characters",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "header",
+      "content": "Messages"
+    },
+    {
+      "type": "text",
+      "id": "loading_text",
+      "label": "Loading message",
+      "default": "Searching the collection…"
+    },
+    {
+      "type": "text",
+      "id": "prompt_text",
+      "label": "Minimum characters message",
+      "info": "Use [count] where the number should appear.",
+      "default": "Enter at least [count] characters."
+    },
+    {
+      "type": "text",
+      "id": "one_result_text",
+      "label": "One result message",
+      "default": "1 result"
+    },
+    {
+      "type": "text",
+      "id": "many_results_text",
+      "label": "Multiple results message",
+      "info": "Use [count] where the number should appear.",
+      "default": "[count] results"
+    },
+    {
+      "type": "text",
+      "id": "no_results_text",
+      "label": "No results message",
+      "default": "No matching products found in this collection."
+    },
+    {
+      "type": "text",
+      "id": "error_text",
+      "label": "Error message",
+      "default": "The collection could not be searched. Please try again."
+    },
+    {
+      "type": "text",
+      "id": "from_text",
+      "label": "Variable price prefix",
+      "default": "From"
+    },
+    {
+      "type": "header",
+      "content": "Product cards"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show vendor",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_price",
+      "label": "Show price",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "Desktop columns",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Maximum width",
+      "min": 900,
+      "max": 1800,
+      "step": 50,
+      "unit": "px",
+      "default": 1200
+    },
+    {
+      "type": "header",
+      "content": "Existing collection grid"
+    },
+    {
+      "type": "checkbox",
+      "id": "replace_original_grid",
+      "label": "Hide original grid while searching",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "original_grid_selector",
+      "label": "Original grid CSS selector",
+      "info": "The default works with Dawn and many Dawn-based themes. Change it if your theme uses different grid classes.",
+      "default": "#product-grid, .pagination-wrapper"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "card_background_color",
+      "label": "Card background",
+      "default": "#f7f7f7"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#1f1f1f"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Focus accent",
+      "default": "#1f1f1f"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection search"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,347 @@
+{%- liquid
+  assign is_combined_listing = false
+  if product.options_with_values.first.values.first.product_url
+    assign is_combined_listing = true
+  endif
+
+  assign checkout_button_color = section.settings.button_color_style | split: ' ' | first
+  assign checkout_button_style = section.settings.button_color_style | split: ' ' | last
+-%}
+{%- if section.settings.enable and is_combined_listing == false and product.variants.size < 250 -%}
+  {% assign product_variants = false %}
+  {% if section.settings.show_variant_picker
+    and product.has_only_default_variant == false
+    and product.variants.size > 1
+  %}
+    {% assign product_variants = true %}
+  {% endif %}
+
+  {%- unless section.settings.hide_in_theme_editor and request.design_mode and product != empty -%}
+    {%- liquid
+      assign custom_height_ratio = settings.custom_product_image_ratio | divided_by: 100.0
+      assign image_width = 430
+      assign image_height = image_width | times: custom_height_ratio
+      assign current_variant = product.selected_or_first_available_variant
+    -%}
+    <ul
+      id="sticky-add-to-cart"
+      class="palette-{{ section.settings.color_palette }} module-color-palette l4cl product cart{% unless section.settings.show_mobile %} mobile-hide{% endunless %}{% if section.settings.position == 'top' %} position-top{% endif %}{% if current_variant == null%} unavailable{% endif %}"
+    >
+      <li style="font-size:{{ settings.product_text_size }};">
+        <form action="./" method="post">
+          <div class="row mobile-hide">
+            <figure class="{% if settings.fill_product_images %} img-cover{% endif %}{% if settings.multiply_product_images == 'multiply' %} img-multiply{% elsif settings.multiply_product_images == 'multiply-bg' %} img-multiply-bg{% endif %}">
+              <a href="#main-product-content">
+                <picture class="orientation">
+                  {%- liquid
+                    if current_variant.image
+                      assign image = current_variant.image
+                    elsif product.featured_media
+                      assign image = product.featured_media
+                    endif
+                  -%}
+                  {%- if image -%}
+                    <img
+                      src="
+                        {%- liquid
+                            if settings.fill_product_images
+                                echo image | image_url: width: image_width, height: image_height, crop: 'center'
+                            else
+                                echo image | image_url: width: image_width
+                            endif
+                        -%}
+                      "
+                      alt="{{ image.alt | default: product.title | escape }}"
+                      loading="lazy"
+                      width="{{ image_width }}"
+                      height="{{ image_height }}"
+                    >
+                  {% else %}
+                    {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                  {% endif %}
+                </picture>
+              </a>
+            </figure>
+            <div>
+              <h3>
+                <a href="#main-product-content">{{ product.title }}</a>
+              </h3>
+              <p class="s1pr" style="font-size:{{ settings.productcard_price_size }};">
+                {%- if current_variant.compare_at_price > current_variant.price -%}
+                  <span class="old">{{ current_variant.compare_at_price | money }}</span><br>
+                {%- endif -%}
+                {%- if current_variant.compare_at_price > current_variant.price
+                  and settings.productcard_sale_highlight
+                -%}
+                  <span class="s1bx overlay-sale strong">{{ current_variant.price | money }}</span>
+                {%- else -%}
+                  {{ current_variant.price | money }}
+                {%- endif -%}
+                {% if section.settings.show_tax %}
+                  <br>
+                  <span class="regular">
+                    {%- if cart.taxes_included -%}
+                      {{- 'product.including_tax' | t -}}
+                    {%- else -%}
+                      {{- 'product.excluding_tax' | t -}}
+                    {%- endif -%}
+                  </span>
+                {% endif %}
+                {%- if current_variant.unit_price_measurement -%}
+                  <br>
+                  <span class="strong">{{ 'product.unit_price_label' | t }}&nbsp;{{ current_variant.unit_price | unit_price_with_measurement: current_variant.unit_price_measurement }}</span>
+                {%- endif -%}
+              </p>
+            </div>
+            {% if product_variants %}
+              <p class="link-btn open-variants">
+                <button
+                  aria-label="{{ 'product.form.choose_option' | t }}"
+                  class="
+                    circle
+                    overlay-{{ checkout_button_color }} {{ checkout_button_style }}
+                  "
+                >
+                  <i
+                    aria-hidden="true"
+                    class="icon-{% if settings.cart_icon_no_text %}cart{% else %}plus-thin{% endif %}"
+                  ></i>
+                </button>
+              </p>
+            {% else %}
+              <p class="link-btn">
+                <button
+                  form="{{ 'main-product-form-' | append: product.id }}"
+                  type="submit"
+                  class="
+                    circle
+                    overlay-{{ checkout_button_color }} {{ checkout_button_style }}
+                    {% unless current_variant.available %} disabled{%- endunless -%}
+                  "
+                >
+                  <i
+                    aria-hidden="true"
+                    class="icon-{% if settings.cart_icon_no_text %}cart{% else %}plus-thin{% endif %}"
+                  ></i>
+                </button>
+              </p>
+            {% endif %}
+          </div>
+          {% if product_variants %}
+            <div>
+              <div class="variant-wrap cols align-middle margin-20 mobile-hide" style="display: none;">
+                {%- if product_variants -%}
+                  <div class="flex-grow">
+                    <p>
+                      <select name="product_id_sticky" id="product_id_sticky">
+                        {%- for variant in product.variants -%}
+                          {%- if section.settings.show_unavailable_variants == false and variant.available == false -%}
+                            {% continue %}
+                          {%- endif -%}
+                          <option
+                            value="{{ variant.id }}"
+                            {% unless variant.available %}
+                              disabled data-class="disabled"
+                            {% endunless %}
+                            {% if variant == current_variant %}
+                              selected
+                            {% endif %}
+                          >
+                            {{ variant.title }}
+                          </option>
+                        {%- endfor -%}
+                      </select>
+                    </p>
+                  </div>
+                {%- endif -%}
+                <div>
+                  <p class="link-btn">
+                    <button
+                      form="{{ 'main-product-form-' | append: product.id }}"
+                      type="submit"
+                      class="
+                        circle
+                        overlay-{{ checkout_button_color }} {{ checkout_button_style }}
+                        {% unless current_variant.available %} disabled{%- endunless -%}
+                      "
+                    >
+                      <span class="mobile-hide"
+                        ><i
+                          aria-hidden="true"
+                          class="icon-{% if settings.cart_icon_no_text %}cart{% else %}plus-thin{% endif %}"
+                        ></i
+                      ></span>
+                      <span class="mobile-only">
+                        {%- if current_variant == null -%}
+                          {{ 'product.form.unavailable' | t }}
+                        {%- elsif current_variant.available -%}
+                          {{ 'product.form.add_to_cart' | t }}
+                        {%- else -%}
+                          {{ 'product.form.not_in_stock' | t }}
+                        {%- endif -%}
+                      </span>
+                    </button>
+                  </p>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+          <p class="mobile-only link-btn">
+            <button
+              form="{{ 'main-product-form-' | append: product.id }}"
+              type="submit"
+              {% if current_variant == null %}
+                disabled
+              {% endif %}
+              class="
+                overlay-{{ checkout_button_color }} {{ checkout_button_style }}
+                {%- unless current_variant.available %} disabled{%- endunless -%}
+              "
+            >
+              {%- if current_variant == null -%}
+                {{ 'product.form.unavailable' | t }}
+              {%- elsif current_variant.available -%}
+                {{ 'product.form.add_to_cart' | t }}
+              {%- else -%}
+                {{ 'product.form.not_in_stock' | t }}
+              {%- endif -%}
+            </button>
+          </p>
+        </form>
+      </li>
+    </ul>
+  {%- endunless -%}
+{%- endif -%}
+
+<style>
+  #sticky-add-to-cart .link-btn {
+    z-index: 9999 !important;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Sticky add to cart",
+  "settings": [
+    {
+      "id": "enable",
+      "type": "checkbox",
+      "label": "t:static_sections.sticky_add_to_cart.settings.enable.label",
+      "info": "t:static_sections.sticky_add_to_cart.settings.enable.info"
+    },
+    {
+      "id": "position",
+      "type": "select",
+      "label": "t:static_sections.sticky_add_to_cart.settings.position.label",
+      "options": [
+        {
+          "value": "top",
+          "label": "t:static_sections.sticky_add_to_cart.settings.position.options__1.label"
+        },
+        {
+          "value": "bottom",
+          "label": "t:static_sections.sticky_add_to_cart.settings.position.options__2.label"
+        }
+      ],
+      "default": "bottom"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_palette",
+      "label": "t:global.color_palette.label",
+      "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "button_color_style",
+      "label": "t:global.button.button_style.label",
+      "options": [
+        {
+          "value": "primary plain",
+          "label": "t:global.button.button_style.primary.label",
+          "group": "t:global.button.button_style.group.plain"
+        },
+        {
+          "value": "secondary plain",
+          "label": "t:global.button.button_style.secondary.label",
+          "group": "t:global.button.button_style.group.plain"
+        },
+        {
+          "value": "tertiary plain",
+          "label": "t:global.button.button_style.tertiary.label",
+          "group": "t:global.button.button_style.group.plain"
+        },
+        {
+          "value": "buy_button plain",
+          "label": "t:global.button.button_style.buy_button.label",
+          "group": "t:global.button.button_style.group.plain"
+        },
+        {
+          "value": "dynamic_buy_button plain",
+          "label": "t:global.button.button_style.dynamic_buy_button.label",
+          "group": "t:global.button.button_style.group.plain"
+        },
+        {
+          "value": "primary inv",
+          "label": "t:global.button.button_style.primary.label",
+          "group": "t:global.button.button_style.group.inv"
+        },
+        {
+          "value": "secondary inv",
+          "label": "t:global.button.button_style.secondary.label",
+          "group": "t:global.button.button_style.group.inv"
+        },
+        {
+          "value": "tertiary inv",
+          "label": "t:global.button.button_style.tertiary.label",
+          "group": "t:global.button.button_style.group.inv"
+        },
+        {
+          "value": "buy_button inv",
+          "label": "t:global.button.button_style.buy_button.label",
+          "group": "t:global.button.button_style.group.inv"
+        },
+        {
+          "value": "dynamic_buy_button inv",
+          "label": "t:global.button.button_style.dynamic_buy_button.label",
+          "group": "t:global.button.button_style.group.inv"
+        }
+      ],
+      "default": "buy_button plain"
+    },
+    {
+      "id": "show_variant_picker",
+      "type": "checkbox",
+      "label": "t:static_sections.sticky_add_to_cart.settings.show_variant_picker.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_unavailable_variants",
+      "label": "t:static_sections.sticky_add_to_cart.settings.show_unavailable_variants.label",
+      "default": true
+    },
+    {
+      "id": "show_tax",
+      "type": "checkbox",
+      "label": "t:static_sections.sticky_add_to_cart.settings.show_tax.label",
+      "default": false
+    },
+    {
+      "id": "hide_in_theme_editor",
+      "type": "checkbox",
+      "label": "t:static_sections.sticky_add_to_cart.settings.hide_in_theme_editor.label"
+    },
+    {
+      "type": "header",
+      "content": "t:static_sections.sticky_add_to_cart.settings.mobile.header"
+    },
+    {
+      "id": "show_mobile",
+      "type": "checkbox",
+      "label": "t:static_sections.sticky_add_to_cart.settings.mobile.show_mobile.label",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

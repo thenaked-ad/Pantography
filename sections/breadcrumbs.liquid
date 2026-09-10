@@ -1,0 +1,23 @@
+{%- render 'breadcrumbs', hide_mobile: section.settings.hide_mobile, back_button: section.settings.back_button %}
+
+{% schema %}
+{
+  "name": "t:static_sections.breadcrumbs.name",
+  "class": "shopify-section-breadcrumbs",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "hide_mobile",
+      "label": "t:static_sections.breadcrumbs.settings.hide_mobile.label",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "back_button",
+      "label": "t:static_sections.breadcrumbs.settings.back_button.label",
+      "info": "t:static_sections.breadcrumbs.settings.back_button.info",
+      "default": false
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,1197 @@
+{% comment %}
+  Some notes about the code of the static section:
+  - The first list of variables is the same for all layouts, so it's not necessary to declare these inside the case statement.
+  If in the future, if more layouts are being added where these static variables are different; then it's necessary to move these variables inside the case statement.
+  - There is some logic for image_1, image_2 and image_3. This logic is not applied to the video because there are no layouts with multiple videos (yet).
+  If in the future, if more layouts are being added where multiple videos are possible, then it's necessary to add the same logic for videos.
+  In preparation for this, the video settings already have the _1 suffix so it can be easily extended to _2, _3, etc.
+{% endcomment %}
+{% liquid
+  assign background_position = 'left'
+  assign layout_mobile = 'slideshow'
+  assign slideshow_mobile_height = section.settings.slideshow_mobile_height
+  assign background_width_mobile = 100
+  assign background_height_mobile = 100
+  assign background_overlay_opacity = section.settings.background_overlay_opacity
+  assign height_mobile = 'xs'
+  assign content_enable_background = false
+  assign content_background_overlay_opacity = 0
+  assign content_background_radius = 0
+  assign content_opacity = 100
+  assign color_palette = section.settings.color_palette
+
+  case section.settings.layout
+    when 'layout_1'
+      assign elements = 'image_1,content' | split: ','
+      assign background_width = 100
+      assign background_height = 100
+      assign content_text_alignment = 'left'
+      assign content_width = 640
+      assign content_horizontal_position = 20
+      assign content_vertical_position = 60
+      assign image_1_horizontal_position = 100
+      assign image_1_vertical_position = 70
+      assign image_1_image_width = 47
+      assign image_1_image_height = 75
+      assign image_1_constrain = false
+      assign image_1_shape = 'none'
+    when 'layout_2'
+      assign elements = 'image_1,content' | split: ','
+      assign background_width = 100
+      assign background_height = 100
+      assign content_text_alignment = 'left'
+      assign content_width = 1060
+      assign content_horizontal_position = 20
+      assign content_vertical_position = 60
+      assign image_1_horizontal_position = 100
+      assign image_1_vertical_position = 70
+      assign image_1_image_width = 50
+      assign image_1_image_height = 75
+      assign image_1_constrain = false
+      assign image_1_shape = 'circle'
+    when 'layout_3'
+      assign elements = 'image_2,image_1,content' | split: ','
+      assign background_width = 50
+      assign background_height = 100
+      assign content_text_alignment = 'left'
+      assign content_width = 540
+      assign content_horizontal_position = 10
+      assign content_vertical_position = 50
+      assign image_1_horizontal_position = 75
+      assign image_1_vertical_position = 75
+      assign image_1_image_width = 35
+      assign image_1_constrain = true
+      assign image_1_shape = 'none'
+      assign image_2_horizontal_position = 100
+      assign image_2_vertical_position = 10
+      assign image_2_image_width = 30
+      assign image_2_constrain = false
+      assign image_2_image_height = 50
+      assign image_2_shape = 'none'
+    when 'layout_4'
+      assign elements = 'image_1,image_2,content' | split: ','
+      assign background_width = 100
+      assign background_height = 100
+      assign content_text_alignment = 'left'
+      assign content_width = 540
+      assign content_horizontal_position = 65
+      assign content_vertical_position = 50
+      assign image_1_horizontal_position = 0
+      assign image_1_vertical_position = 40
+      assign image_1_image_width = 35
+      assign image_1_image_height = 70
+      assign image_1_constrain = false
+      assign image_1_shape = 'none'
+      assign image_2_horizontal_position = 100
+      assign image_2_vertical_position = 65
+      assign image_2_image_width = 44
+      assign image_2_image_height = 70
+      assign image_2_constrain = false
+      assign image_2_shape = 'none'
+    when 'layout_5'
+      assign elements = 'image_1,image_2,content' | split: ','
+      assign background_width = 100
+      assign background_height = 100
+      assign content_text_alignment = 'left'
+      assign content_width = 720
+      assign content_horizontal_position = 20
+      assign content_vertical_position = 60
+      assign image_1_horizontal_position = 100
+      assign image_1_vertical_position = 35
+      assign image_1_image_width = 30
+      assign image_1_image_height = 55
+      assign image_1_constrain = false
+      assign image_1_shape = 'none'
+      assign image_2_horizontal_position = 80
+      assign image_2_vertical_position = 70
+      assign image_2_image_width = 30
+      assign image_2_image_height = 60
+      assign image_2_constrain = false
+      assign image_2_shape = 'none'
+    when 'layout_6'
+      assign elements = 'image_1,image_2,content' | split: ','
+      assign background_width = 100
+      assign background_height = 100
+      assign content_text_alignment = 'center'
+      assign content_width = 1420
+      assign content_horizontal_position = 50
+      assign content_vertical_position = 50
+      assign content_custom_title_size = 90
+      assign image_1_horizontal_position = 0
+      assign image_1_vertical_position = 50
+      assign image_1_image_width = 50
+      assign image_1_image_height = 75
+      assign image_1_constrain = false
+      assign image_1_shape = 'none'
+      assign image_2_horizontal_position = 100
+      assign image_2_vertical_position = 50
+      assign image_2_image_width = 50
+      assign image_2_image_height = 75
+      assign image_2_constrain = false
+      assign image_2_shape = 'none'
+    when 'layout_7'
+      assign elements = 'image_1,image_2,image_3,content' | split: ','
+      assign background_width = 50
+      assign background_height = 100
+      assign content_text_alignment = 'left'
+      assign content_width = 540
+      assign content_horizontal_position = 20
+      assign content_vertical_position = 30
+      assign image_1_horizontal_position = 75
+      assign image_1_vertical_position = 75
+      assign image_1_image_width = 35
+      assign image_1_image_height = 60
+      assign image_1_constrain = false
+      assign image_1_shape = 'none'
+      assign image_2_horizontal_position = 100
+      assign image_2_vertical_position = 10
+      assign image_2_image_width = 30
+      assign image_2_image_height = 50
+      assign image_2_constrain = false
+      assign image_2_shape = 'none'
+      assign image_3_horizontal_position = 0
+      assign image_3_vertical_position = 100
+      assign image_3_image_width = 27
+      assign image_3_image_height = 45
+      assign image_3_constrain = false
+      assign image_3_shape = 'none'
+    when 'layout_8'
+      assign elements = 'image_1,video,content' | split: ','
+      assign background_width = 100
+      assign background_height = 100
+      assign content_text_alignment = 'center'
+      assign content_width = 1420
+      assign content_horizontal_position = 50
+      assign content_vertical_position = 50
+      assign image_1_horizontal_position = 0
+      assign image_1_vertical_position = 50
+      assign image_1_image_width = 50
+      assign image_1_image_height = 75
+      assign image_1_constrain = false
+      assign image_1_shape = 'none'
+      assign video_horizontal_position = 100
+      assign video_vertical_position = 50
+      assign video_width = 50
+      assign video_height = 100
+      assign video_constrain = false
+    when 'layout_9'
+      assign elements = 'image_1,image_2,video,content' | split: ','
+      assign background_width = 100
+      assign background_height = 100
+      assign content_text_alignment = 'center'
+      assign content_width = 1220
+      assign content_horizontal_position = 50
+      assign content_vertical_position = 50
+      assign image_1_horizontal_position = 0
+      assign image_1_vertical_position = 50
+      assign image_1_image_width = 50
+      assign image_1_image_height = 75
+      assign image_1_constrain = false
+      assign image_1_shape = 'none'
+      assign image_2_horizontal_position = 100
+      assign image_2_vertical_position = 50
+      assign image_2_image_width = 50
+      assign image_2_image_height = 75
+      assign image_2_constrain = false
+      assign image_2_shape = 'none'
+      assign video_horizontal_position = 50
+      assign video_vertical_position = 50
+      assign video_width = 50
+      assign video_height = 75
+      assign video_constrain = false
+    when 'layout_10'
+      assign elements = 'image_1,image_2,video,content' | split: ','
+      assign background_width = 100
+      assign background_height = 100
+      assign content_text_alignment = 'center'
+      assign content_width = 1420
+      assign content_horizontal_position = 50
+      assign content_vertical_position = 50
+      assign content_custom_title_size = 90
+      assign image_1_horizontal_position = 0
+      assign image_1_vertical_position = 50
+      assign image_1_image_width = 33
+      assign image_1_image_height = 60
+      assign image_1_constrain = false
+      assign image_1_shape = 'none'
+      assign image_2_horizontal_position = 100
+      assign image_2_vertical_position = 50
+      assign image_2_image_width = 33
+      assign image_2_image_height = 60
+      assign image_2_constrain = false
+      assign image_2_shape = 'none'
+      assign video_horizontal_position = 50
+      assign video_vertical_position = 50
+      assign video_width = 35
+      assign video_height = 75
+      assign video_constrain = false
+    when 'layout_11'
+      assign elements = 'image_1,image_2,image_3,video,content' | split: ','
+      assign background_width = 100
+      assign background_height = 60
+      assign content_text_alignment = 'left'
+      assign content_width = 680
+      assign content_horizontal_position = 100
+      assign content_vertical_position = 10
+      assign content_custom_title_size = 35
+      assign image_1_horizontal_position = 100
+      assign image_1_vertical_position = 42
+      assign image_1_image_width = 25
+      assign image_1_image_height = 50
+      assign image_1_constrain = false
+      assign image_1_shape = 'none'
+      assign image_2_horizontal_position = 44
+      assign image_2_vertical_position = 0
+      assign image_2_image_width = 33
+      assign image_2_image_height = 50
+      assign image_2_constrain = true
+      assign image_2_shape = 'none'
+      assign image_3_horizontal_position = 0
+      assign image_3_vertical_position = 0
+      assign image_3_image_width = 30
+      assign image_3_image_height = 60
+      assign image_3_constrain = true
+      assign image_3_shape = 'none'
+      assign video_horizontal_position = 25
+      assign video_vertical_position = 30
+      assign video_width = 35
+      assign video_height = 50
+      assign video_constrain = false
+  endcase
+
+  assign background = true
+  assign background_class = ''
+  if background_overlay_opacity == 0
+    assign background = false
+    assign background_class = 'no-padding'
+  else
+    if background_overlay_opacity == 0 or background_height == 0 or background_width == 0
+      assign background = false
+      assign background_class = 'no-padding-desktop'
+    endif
+    if background_overlay_opacity == 0 or background_height_mobile == 0 or background_width_mobile == 0
+      assign background_class = 'no-padding-mobile'
+    endif
+  endif
+
+  assign media = false
+  if elements contains 'image_1' or elements contains 'video'
+    assign media = true
+  endif
+-%}
+
+<article
+  class="
+    m6bx
+    {{ background_class }}
+    {{ section.settings.width }}
+    {% if section.settings.width == 'wide' and section.settings.transparent %}wide-transparent{% endif %}
+    flexible-section
+  "
+  data-color-palette="{{ color_palette }}"
+  data-active-content="palette-{{ color_palette }}"
+>
+  <div
+    class="
+      palette-{{ color_palette }}
+      module-color-palette
+      img-overlay
+      overlay-theme
+      {% if background_width < 100 %}{% if background_position == 'right' %} text-end{% endif %}{% endif %}
+    "
+    style="
+      --mih_desktop: {{ background_height }}%;
+      --dist_half: {{ 100 | minus: background_width }}%;
+      --mih_mobile: {{ background_height_mobile }}%;
+      --dist_half_mobile: {{ 100 | minus: background_width_mobile }}%;
+      opacity:{{ background_overlay_opacity | divided_by: 100.0 }}
+    "
+  ></div>
+  <div>
+    <div
+      class="
+        m6fr{% if background == false and section.settings.width == 'wide' %} wide{% endif %}
+        size-{{ height_mobile }}-mobile
+        richtext
+      "
+      data-active-content="palette-{{ color_palette }}"
+    >
+      <article
+        class="no-padding{% if layout_mobile == 'grid' %} mobile-static flexible-stack{% elsif layout_mobile == 'slideshow' and media %} mobile-static{% endif %}"
+        style="--gutter: {{ settings.gutter }};"
+      >
+        {%- if media -%}
+          <div class="media-flexible">
+            {%- for element in elements -%}
+              {%- if element contains 'image' -%}
+                {%- liquid
+                  if element == 'image_1'
+                    assign image = section.settings.image_1
+                    if section.settings.image_1_mobile
+                      assign image_mobile = section.settings.image_1_mobile
+                    else
+                      assign image_mobile = section.settings.image_1
+                    endif
+                    assign image_overlay_opacity = section.settings.image_1_overlay_opacity
+                    assign image_horizontal_position = image_1_horizontal_position
+                    assign image_vertical_position = image_1_vertical_position
+                    assign image_width = image_1_image_width
+                    assign image_height = image_1_image_height
+                    assign image_constrain = image_1_constrain
+                    assign image_shape = image_1_shape
+                  elsif element == 'image_2'
+                    assign image = section.settings.image_2
+                    if section.settings.image_2_mobile
+                      assign image_mobile = section.settings.image_2_mobile
+                    else
+                      assign image_mobile = section.settings.image_2
+                    endif
+                    assign image_overlay_opacity = section.settings.image_2_overlay_opacity
+                    assign image_horizontal_position = image_2_horizontal_position
+                    assign image_vertical_position = image_2_vertical_position
+                    assign image_width = image_2_image_width
+                    assign image_height = image_2_image_height
+                    assign image_constrain = image_2_constrain
+                    assign image_shape = image_2_shape
+                  elsif element == 'image_3'
+                    assign image = section.settings.image_3
+                    if section.settings.image_3_mobile
+                      assign image_mobile = section.settings.image_3_mobile
+                    else
+                      assign image_mobile = section.settings.image_3
+                    endif
+                    assign image_overlay_opacity = section.settings.image_3_overlay_opacity
+                    assign image_horizontal_position = image_3_horizontal_position
+                    assign image_vertical_position = image_3_vertical_position
+                    assign image_width = image_3_image_width
+                    assign image_height = image_3_image_height
+                    assign image_constrain = image_3_constrain
+                    assign image_shape = image_3_shape
+                  endif
+                -%}
+                <figure
+                  {% if settings.enable_animations %}
+                    data-sal="fade"
+                  {% endif %}
+                  class="palette-{{ color_palette }} {{ slideshow_mobile_height }}-mobile {% if image_constrain %} constrain{% endif %}"
+                  data-color-palette="palette-{{ color_palette }}"
+                  data-slide-index="{{ forloop.index }}"
+                  style="
+                    top: {{ image_vertical_position }}%;
+                    left: {{ image_horizontal_position }}%;
+                    width: {{ image_width }}%;
+                    transform: translate(-{{ image_horizontal_position }}%, -{{ image_vertical_position }}%);
+                    height: {% if image_constrain %}auto{% else %}{{ image_height }}%{% endif %};
+                    {% if image_constrain %}bottom: unset;{% endif %}
+                    position: absolute;
+                    z-index:-{{ forloop.length | minus: forloop.index0 }};
+                  "
+                >
+                  {%- if image -%}
+                    <picture
+                      {% if image_shape != 'none' %}
+                        class="img-mask img-mask-{{ image_shape }}"
+                      {% endif %}
+                    >
+                      <span
+                        class="palette-{{ color_palette }} module-color-palette img-overlay"
+                        style="--overlay_opacity:{{ image_overlay_opacity | divided_by: 100.0 }}"
+                      ></span>
+                      {% assign percentage = image_width | divided_by: 100.0 %}
+                      <img
+                        src="{{ image_mobile | image_url: width: 768 }}"
+                        srcset="{% render 'image-srcset', image: image_mobile %}"
+                        sizes="
+                          (min-width: 760px) 0,
+                          100vw
+                        "
+                        alt="{{ image_mobile.alt | default: image.title | escape }}"
+                        width="640"
+                        height="640"
+                        style="object-position: {{ image_mobile.presentation.focal_point }};"
+                        {% unless section.index == 1 %}
+                          loading="lazy"
+                        {% endunless %}
+                        class="mobile-only"
+                      >
+                      <img
+                        src="{{ image | image_url: width: 768 }}"
+                        srcset="{% render 'image-srcset', image: image %}"
+                        sizes="
+                          {% if settings.width < 2000 %}(min-width: {{ settings.width }}px) calc({{ settings.width }}px * {{ percentage }}),{% endif %}
+                          (min-width: 760px) {% if settings.width < 2000 %}{{ image_width }}vw{% else %}calc(100vw * {{ percentage }}){% endif %},
+                          {% if image %}0{% elsif layout_mobile == 'slideshow' %}0{% else %}100vw{% endif %}
+                        "
+                        alt="{{ image.alt | default: image.title | escape }}"
+                        width="640"
+                        height="640"
+                        style="object-position: {{ image.presentation.focal_point }}; height: 100%!important;"
+                        class="                                                mobile-hide"
+                        {% unless section.index == 1 %}
+                          loading="lazy"
+                        {% endunless %}
+                      >
+                    </picture>
+                  {% else %}
+                    <picture style="{% if image_constrain %}aspect-ratio: 1.5 / 1;{% endif %};">
+                      {{ 'lifestyle-' | append: 1 | placeholder_svg_tag: 'placeholder-svg' }}
+                    </picture>
+                  {% endif %}
+                </figure>
+              {%- elsif element == 'video' -%}
+                {%- liquid
+                  assign video = section.settings.video_1
+                  assign video_overlay_opacity = section.settings.video_1_overlay_opacity
+                  assign video_enable_controls = section.settings.video_1_enable_controls
+                  assign video_mute = section.settings.video_1_mute
+                  assign image = section.settings.image_3
+                  assign image_overlay_opacity = section.settings.image_3_overlay_opacity
+                -%}
+                <figure
+                  {% if settings.enable_animations %}
+                    data-sal="fade"
+                  {% endif %}
+                  class="{{ slideshow_mobile_height }}-mobile"
+                  data-slide-index="{{ forloop.index }}"
+                  style="
+                    {% if video_constrain %}bottom: unset;{% endif %}
+                    left: {{ video_horizontal_position }}%;
+                    top: {{ video_vertical_position }}%;
+                    height: {% if video_constrain %}auto{% else %}{{ video_height }}%{% endif %};
+                    width: {{ video_width }}%;
+                    transform: translate(-{{ video_horizontal_position }}%, -{{ video_vertical_position }}%);
+                    position: absolute;
+                    z-index:-{{ forloop.length | minus: forloop.index0 }};
+                  "
+                >
+                  {% if video %}
+                    <picture>
+                      <span
+                        class="palette-{{ color_palette }} module-color-palette img-overlay"
+                        style="opacity:{{ video_overlay_opacity | divided_by: 100.0 }}"
+                      ></span>
+                      {% if video_enable_controls %}<a href="./" class="link-overlay"></a>{% endif %}
+                      {%- liquid
+                        assign source = video.sources | where: 'height', 1080 | where: 'format', 'mp4' | first
+                        if source == null
+                          assign source = video.sources | where: 'format', 'mp4' | first
+                        endif
+                        if source == null
+                          assign source = video.sources | where: 'format', 'mov' | first
+                        endif
+                        if source == null
+                          assign source = video.sources.first
+                        endif
+                      -%}
+                      <video
+                        class="lazy next-video"
+                        {% if video_enable_controls %}
+                          {%- if video_mute %} muted{% endif -%}
+                        {% else %}
+                          autoplay muted
+                        {% endif %}
+                        loop
+                        playsinline
+                        poster="{{ video.preview_image | image_url }}"
+                      >
+                        <source data-src="{{ source.url }}" type="video/mp4">
+                      </video>
+                      {% if video_enable_controls %}
+                        <i aria-hidden="true" class="icon-play"></i>
+                      {% endif %}
+                    </picture>
+                  {% elsif image %}
+                    {%- liquid
+                      if section.settings.image_3_mobile
+                        assign image_mobile = section.settings.image_3_mobile
+                      else
+                        assign image_mobile = section.settings.image_3
+                      endif
+                      assign image_width = video_width
+                      assign image_height = video_height
+                      assign image_constrain = video_constrain
+                    -%}
+                    <picture
+                      {% if image_shape != 'none' %}
+                        class="img-mask img-mask-{{ image_shape }}"
+                      {% endif %}
+                    >
+                      <span
+                        class="palette-{{ color_palette }} module-color-palette img-overlay"
+                        style="--overlay_opacity:{{ image_overlay_opacity | divided_by: 100.0 }}"
+                      ></span>
+                      {% assign percentage = image_width | divided_by: 100.0 %}
+                      <img
+                        src="{{ image_mobile | image_url: width: 768 }}"
+                        srcset="{% render 'image-srcset', image: image_mobile %}"
+                        sizes="
+                          (min-width: 760px) 0,
+                          100vw
+                        "
+                        alt="{{ image_mobile.alt | default: image.title | escape }}"
+                        width="640"
+                        height="640"
+                        style="object-position: {{ image_mobile.presentation.focal_point }};"
+                        {% unless section.index == 1 %}
+                          loading="lazy"
+                        {% endunless %}
+                        class="mobile-only"
+                      >
+                      <img
+                        src="{{ image | image_url: width: 768 }}"
+                        srcset="{% render 'image-srcset', image: image %}"
+                        sizes="
+                          {% if settings.width < 2000 %}(min-width: {{ settings.width }}px) calc({{ settings.width }}px * {{ percentage }}),{% endif %}
+                          (min-width: 760px) {% if settings.width < 2000 %}{{ image_width }}vw{% else %}calc(100vw * {{ percentage }}){% endif %},
+                          {% if image %}0{% elsif layout_mobile == 'slideshow' %}0{% else %}100vw{% endif %}
+                        "
+                        alt="{{ image.alt | default: image.title | escape }}"
+                        width="640"
+                        height="640"
+                        style="object-position: {{ image.presentation.focal_point }}; height: 100%!important;"
+                        class="                                              mobile-hide"
+                        {% unless section.index == 1 %}
+                          loading="lazy"
+                        {% endunless %}
+                      >
+                    </picture>
+                  {% else %}
+                    <picture style="{% if video_constrain %}aspect-ratio: 1.5 / 1;{% endif %}; ">
+                      {{ 'lifestyle-' | append: 1 | placeholder_svg_tag: 'placeholder-svg' }}
+                    </picture>
+                  {% endif %}
+                </figure>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+        {%- for element in elements -%}
+          {%- if element == 'content' -%}
+            <div
+              {% if settings.enable_animations %}
+                data-sal="fade"
+              {% endif %}
+              class="
+                palette-{{ color_palette }}
+                module-color-palette
+                {% unless background %}text-palette-{{ settings.text_color }}-mobile{% endunless %}
+                item-{{ forloop.index }}
+                text-{{ content_text_alignment }}
+                {% if content_background_overlay_opacity == 0 or content_enable_background == false %}no-padding{% endif %}
+                m6bx margin-0
+              "
+              style="
+                --width: {% if content_width == 2000 %}100%{% else %}{{ content_width }}px{% endif %};
+                position: absolute;
+                left: {{ content_horizontal_position }}%;
+                top: {{ content_vertical_position }}%;
+                transform: translate(-{{ content_horizontal_position }}%, -{{ content_vertical_position }}%);
+                z-index:-{{ forloop.length | minus: forloop.index0 }};
+                margin-top: 0!important;
+              "
+            >
+              {% if content_enable_background %}
+                <span
+                  class="img-overlay"
+                  style="
+                    opacity: {{ content_background_overlay_opacity | divided_by: 100.0 }};
+                    border-radius: {{ content_background_radius }}px;
+                  "
+                >
+                </span>
+              {% endif %}
+              <div>
+                {%- if section.settings.title != empty -%}
+                  <div
+                    id="shopify-section-{{ section.id }}-title"
+                    class="
+                      {% if section.settings.title_underline_style != 'none' %}
+                        title-underline-none
+                        {% if section.settings.title_underline_style contains 'accent' %}
+                          title-underline-accent
+                        {% elsif section.settings.title_underline_style contains 'gradient' %}
+                          title-underline-gradient
+                        {% endif %}
+                        {% if section.settings.title_underline_style contains 'secondary_font' %}
+                          title-underline-secondary-font
+                        {% endif %}
+                      {% endif %}
+                      heading
+                    "
+                  >
+                    {{ section.settings.title }}
+                  </div>
+                {%- endif -%}
+                {%- if section.settings.text != empty -%}
+                  <div style="opacity: {{ content_opacity | divided_by: 100.0 }};">
+                    {{ section.settings.text }}
+                  </div>
+                {%- endif -%}
+                {%- if section.settings.show_link
+                  and section.settings.link_text != empty
+                  and section.settings.link_url != blank
+                -%}
+                  {%- liquid
+                    assign button_color = section.settings.button_style | split: ' ' | first
+                    assign button_style = section.settings.button_style | split: ' ' | last
+                    assign is_link = false
+                    if button_style == 'link'
+                      assign is_link = true
+                    endif
+                  -%}
+                  <p class="link-btn">
+                    <a
+                      href="{{ section.settings.link_url }}"
+                      class="overlay-{{ button_color }} {% if is_link %}strong inline{% else %}{{ button_style }}{% endif %}"
+                    >
+                      <span>
+                        {{- section.settings.link_text -}}
+                        &nbsp;{% if is_link %}&nbsp;<i aria-hidden="true" class="icon-arrow-right"></i>{% endif %}
+                      </span>
+                    </a>
+                  </p>
+                {%- endif %}
+                {%- if section.settings.recommended_heading_size -%}
+                  <style>
+                    #shopify-section-{{ section.id }}-title h1,
+                    #shopify-section-{{ section.id }}-title:not(:has(h1)) h2,
+                    #shopify-section-{{ section.id }}-title:not(:has(h1, h2)) h3,
+                    #shopify-section-{{ section.id }}-title:not(:has(h1, h2, h3)) h4,
+                    #shopify-section-{{ section.id }}-title:not(:has(h1, h2, h3, h4)) h5,
+                    #shopify-section-{{ section.id }}-title:not(:has(h1, h2, h3, h4, h5)) h6 {
+                      font-size: {% if content_custom_title_size %}{{ content_custom_title_size | divided_by: 6 }}cqw{% else %}var(--main_h1){% endif %};
+                    }
+                  </style>
+                {%- endif -%}
+              </div>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </article>
+    </div>
+  </div>
+</article>
+
+<style>
+  {%- if section.settings.width == 'wide' and section.settings.transparent -%}
+  html.no-js .shopify-section-header:has(#header-outer.transparent):has(+ #content > div:first-child[id$="{{ section.id }}"] > .flexible-section) {
+      --top_main_bg: var(--{{ color_palette }}_bg) !important;
+      --top_main_fg: var(--{{ color_palette | replace: '_gradient', '' }}_fg) !important;
+      --menu_fg: var(--top_main_fg) !important;
+      padding-top: 0!important;
+  }
+  #content div:first-child[id$="{{ section.id }}"] > .flexible-section {
+    padding-top: 0!important;
+  }
+  {% endif %}
+
+  #shopify-section-{{ section.id }} .m6fr { --mh: {{ section.settings.custom_height }}dvw; }
+  #shopify-section-{{ section.id }} { z-index: {{ section.settings.fix_zindex }}!important; }
+  @media only screen and (min-width: 47.5em) {
+      #shopify-section-{{ section.id }} .m6fr { --mh: {{ section.settings.custom_height }}dvw; }
+      #shopify-section-{{ section.id }} > .m6bx { margin-bottom: {{ section.settings.spacing_desktop }}px; }
+  }
+  @media only screen and (max-width: 47.5em) {
+      #shopify-section-{{ section.id }} > .m6bx { margin-bottom: {{ section.settings.spacing_mobile }}px; }
+  }
+</style>
+
+{%- if section.settings.width == 'wide' and section.settings.transparent -%}
+  <script>
+    var html_tag = document.documentElement,
+      root_styles = document.querySelector(':root'),
+      content_id = document.getElementById('content'),
+      header_outer = document.getElementById('header-outer'),
+      ffa = content_id.children[0],
+      ffc,
+      ffd = false;
+    if (ffa !== undefined) {
+      ffc = ffa.children[0];
+      if (
+        ffa.classList.contains('shopify-section') &&
+        header_outer.hasAttribute('data-transparent') &&
+        ffa.id == 'shopify-section-' + '{{ section.id }}'
+      ) {
+        ffd = true;
+      }
+      if (
+        (ffc !== undefined && ffc.classList.contains('m6bx') && ffc.classList.contains('wide')) ||
+        (ffc !== undefined && ffc.classList.contains('m6fr') && ffc.classList.contains('wide'))
+      ) {
+        ffe = true;
+      }
+      if (document.querySelectorAll('.shopify-section-header ~ [class*="shopify-section-announcement-bar"]').length) {
+        ffd = false;
+      }
+      if (ffd === true) {
+        header_outer.classList.add('transparent');
+        html_tag.classList.add('has-first-m6fr-wide');
+        html_tag.classList.add('has-first-m6bx-wide');
+        html_tag.classList.add('has-first-flexbile-wide');
+        html_tag.classList.add('dm-ready');
+        root_styles.style.setProperty('--transparent_header_fg', 'var(--{{ color_palette }}_fg)');
+        root_styles.style.setProperty('--transparent_header_fg_brightness', 'var(--{{ color_palette }}_fg_brightness)');
+        var brightness = getComputedStyle(document.documentElement).getPropertyValue(
+            '--transparent_header_fg_brightness'
+        );
+        root_styles.style.setProperty('--transparent_header_fg_brightness', brightness);
+        root_styles.style.setProperty('--transparent_header_fg_hover', 'var(--{{ color_palette }}_btn_bg)');
+        root_styles.style.setProperty('--transparent_header_bg', 'var(--{{ color_palette }}"_bg)');
+      }
+    }
+  </script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:sections.static_section.name",
+  "disabled_on": {
+    "groups": ["header", "footer", "custom.overlay"]
+  },
+  "settings": [
+    {
+      "type": "select",
+      "id": "width",
+      "label": "t:sections.static_section.settings.width.label",
+      "options": [
+        {
+          "value": "boxed",
+          "label": "t:sections.static_section.settings.width.options__1.label"
+        },
+        {
+          "value": "wide",
+          "label": "t:sections.static_section.settings.width.options__2.label"
+        }
+      ],
+      "default": "wide"
+    },
+    {
+      "type": "checkbox",
+      "id": "transparent",
+      "label": "t:sections.static_section.settings.transparent.label",
+      "info": "t:sections.static_section.settings.transparent.info",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "t:sections.static_section.settings.layout.label",
+      "info": "t:sections.static_section.settings.layout.info",
+      "options": [
+        {
+          "value": "layout_1",
+          "label": "t:sections.static_section.settings.layout.options__1.label",
+          "group": "t:sections.static_section.settings.layout.options__1.group"
+        },
+        {
+          "value": "layout_2",
+          "label": "t:sections.static_section.settings.layout.options__2.label",
+          "group": "t:sections.static_section.settings.layout.options__2.group"
+        },
+        {
+          "value": "layout_3",
+          "label": "t:sections.static_section.settings.layout.options__3.label",
+          "group": "t:sections.static_section.settings.layout.options__3.group"
+        },
+        {
+          "value": "layout_4",
+          "label": "t:sections.static_section.settings.layout.options__4.label",
+          "group": "t:sections.static_section.settings.layout.options__4.group"
+        },
+        {
+          "value": "layout_5",
+          "label": "t:sections.static_section.settings.layout.options__5.label",
+          "group": "t:sections.static_section.settings.layout.options__5.group"
+        },
+        {
+          "value": "layout_6",
+          "label": "t:sections.static_section.settings.layout.options__6.label",
+          "group": "t:sections.static_section.settings.layout.options__6.group"
+        },
+        {
+          "value": "layout_7",
+          "label": "t:sections.static_section.settings.layout.options__7.label",
+          "group": "t:sections.static_section.settings.layout.options__7.group"
+        },
+        {
+          "value": "layout_8",
+          "label": "t:sections.static_section.settings.layout.options__8.label",
+          "group": "t:sections.static_section.settings.layout.options__8.group"
+        },
+        {
+          "value": "layout_9",
+          "label": "t:sections.static_section.settings.layout.options__9.label",
+          "group": "t:sections.static_section.settings.layout.options__9.group"
+        },
+        {
+          "value": "layout_10",
+          "label": "t:sections.static_section.settings.layout.options__10.label",
+          "group": "t:sections.static_section.settings.layout.options__10.group"
+        },
+        {
+          "value": "layout_11",
+          "label": "t:sections.static_section.settings.layout.options__11.label",
+          "group": "t:sections.static_section.settings.layout.options__11.group"
+        }
+      ],
+      "default": "layout_1"
+    },
+    {
+      "type": "range",
+      "id": "custom_height",
+      "label": "t:sections.static_section.settings.custom_height.label",
+      "min": 30,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 50
+    },
+    {
+      "type": "header",
+      "content": "t:sections.static_section.settings.colors.header"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_palette",
+      "label": "t:global.color_palette.label",
+      "default": "scheme-2"
+    },
+    {
+      "id": "background_overlay_opacity",
+      "type": "range",
+      "label": "t:sections.static_section.settings.colors.background_overlay_opacity.label",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 50
+    },
+    {
+      "type": "header",
+      "content": "t:sections.static_section.settings.images.header"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:sections.static_section.settings.images.paragraph"
+    },
+    {
+      "id": "image_1",
+      "type": "image_picker",
+      "label": "t:sections.static_section.settings.images.image_1.label"
+    },
+    {
+      "type": "range",
+      "id": "image_1_overlay_opacity",
+      "label": "t:sections.static_section.settings.images.image_overlay_opacity.label",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 0
+    },
+    {
+      "id": "image_2",
+      "type": "image_picker",
+      "label": "t:sections.static_section.settings.images.image_2.label"
+    },
+    {
+      "type": "range",
+      "id": "image_2_overlay_opacity",
+      "label": "t:sections.static_section.settings.images.image_overlay_opacity.label",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 0
+    },
+    {
+      "id": "image_3",
+      "type": "image_picker",
+      "label": "t:sections.static_section.settings.images.image_3.label"
+    },
+    {
+      "type": "range",
+      "id": "image_3_overlay_opacity",
+      "label": "t:sections.static_section.settings.images.image_overlay_opacity.label",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "t:sections.static_section.settings.video.header"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:sections.static_section.settings.video.paragraph"
+    },
+    {
+      "id": "video_1",
+      "type": "video",
+      "label": "t:sections.static_section.settings.video.video.label"
+    },
+    {
+      "id": "video_1_enable_controls",
+      "type": "checkbox",
+      "label": "t:global.video.enable_controls.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "video_1_mute",
+      "label": "t:global.video.video_mute.label",
+      "info": "t:global.video.video_mute.info",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "video_1_overlay_opacity",
+      "label": "t:sections.static_section.settings.video.video_overlay_opacity.label",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "t:sections.static_section.settings.content.header"
+    },
+    {
+      "type": "header",
+      "content": "t:global.typography.title.label"
+    },
+    {
+      "type": "richtext",
+      "id": "title",
+      "label": "t:global.typography.title.label",
+      "info": "t:global.typography.title.info",
+      "default": "<h2>This is the static section</h2>"
+    },
+    {
+      "id": "recommended_heading_size",
+      "type": "checkbox",
+      "label": "t:global.typography.recommended_heading_size.label",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "title_underline_style",
+      "label": "t:global.typography.title_underline_style.label",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:global.typography.title_underline_style.none.label"
+        },
+        {
+          "value": "secondary_font",
+          "label": "t:global.typography.title_underline_style.secondary_font.label",
+          "group": "t:global.typography.title_underline_style.group.fonts"
+        },
+        {
+          "value": "secondary_font_accent",
+          "label": "t:global.typography.title_underline_style.secondary_font_accent.label",
+          "group": "t:global.typography.title_underline_style.group.fonts"
+        },
+        {
+          "value": "secondary_font_gradient",
+          "label": "t:global.typography.title_underline_style.secondary_font_gradient.label",
+          "group": "t:global.typography.title_underline_style.group.fonts"
+        },
+        {
+          "value": "accent",
+          "label": "t:global.typography.title_underline_style.accent.label",
+          "group": "t:global.typography.title_underline_style.group.colors"
+        },
+        {
+          "value": "gradient",
+          "label": "t:global.typography.title_underline_style.gradient.label",
+          "group": "t:global.typography.title_underline_style.group.colors"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "t:global.typography.text.header"
+    },
+    {
+      "id": "text",
+      "type": "richtext",
+      "label": "t:global.typography.text.label",
+      "default": "<p>Share information and details</p>"
+    },
+    {
+      "type": "header",
+      "content": "t:global.button.header"
+    },
+    {
+      "id": "show_link",
+      "type": "checkbox",
+      "label": "t:global.button.show_link.label",
+      "default": true
+    },
+    {
+      "id": "link_text",
+      "type": "text",
+      "label": "t:global.button.link_text.label",
+      "default": "Button"
+    },
+    {
+      "id": "link_url",
+      "type": "url",
+      "label": "t:global.button.link_url.label"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "t:global.button.button_style.label",
+      "options": [
+        {
+          "value": "primary solid",
+          "label": "t:global.button.button_style.primary.label",
+          "group": "t:global.button.button_style.group.solid"
+        },
+        {
+          "value": "secondary solid",
+          "label": "t:global.button.button_style.secondary.label",
+          "group": "t:global.button.button_style.group.solid"
+        },
+        {
+          "value": "tertiary solid",
+          "label": "t:global.button.button_style.tertiary.label",
+          "group": "t:global.button.button_style.group.solid"
+        },
+        {
+          "value": "primary plain",
+          "label": "t:global.button.button_style.primary.label",
+          "group": "t:global.button.button_style.group.plain"
+        },
+        {
+          "value": "secondary plain",
+          "label": "t:global.button.button_style.secondary.label",
+          "group": "t:global.button.button_style.group.plain"
+        },
+        {
+          "value": "tertiary plain",
+          "label": "t:global.button.button_style.tertiary.label",
+          "group": "t:global.button.button_style.group.plain"
+        },
+        {
+          "value": "primary inv",
+          "label": "t:global.button.button_style.primary.label",
+          "group": "t:global.button.button_style.group.inv"
+        },
+        {
+          "value": "secondary inv",
+          "label": "t:global.button.button_style.secondary.label",
+          "group": "t:global.button.button_style.group.inv"
+        },
+        {
+          "value": "tertiary inv",
+          "label": "t:global.button.button_style.tertiary.label",
+          "group": "t:global.button.button_style.group.inv"
+        },
+        {
+          "value": "primary link",
+          "label": "t:global.button.button_style.primary.label",
+          "group": "t:global.button.button_style.group.link"
+        },
+        {
+          "value": "secondary link",
+          "label": "t:global.button.button_style.secondary.label",
+          "group": "t:global.button.button_style.group.link"
+        },
+        {
+          "value": "tertiary link",
+          "label": "t:global.button.button_style.tertiary.label",
+          "group": "t:global.button.button_style.group.link"
+        }
+      ],
+      "default": "primary plain"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.static_section.settings.mobile_images.header"
+    },
+    {
+      "id": "image_1_mobile",
+      "type": "image_picker",
+      "label": "t:sections.static_section.settings.images.image_1.label"
+    },
+    {
+      "id": "image_2_mobile",
+      "type": "image_picker",
+      "label": "t:sections.static_section.settings.images.image_2.label"
+    },
+    {
+      "id": "image_3_mobile",
+      "type": "image_picker",
+      "label": "t:sections.static_section.settings.images.image_3.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.static_section.settings.mobile.header"
+    },
+    {
+      "type": "select",
+      "id": "slideshow_mobile_height",
+      "label": "t:sections.static_section.settings.mobile.slideshow_mobile_height.label",
+      "options": [
+        {
+          "value": "size-s",
+          "label": "t:sections.static_section.settings.mobile.slideshow_mobile_height.options__1.label"
+        },
+        {
+          "value": "size-m",
+          "label": "t:sections.static_section.settings.mobile.slideshow_mobile_height.options__2.label"
+        },
+        {
+          "value": "size-l",
+          "label": "t:sections.static_section.settings.mobile.slideshow_mobile_height.options__3.label"
+        }
+      ],
+      "default": "size-s"
+    },
+    {
+      "type": "header",
+      "content": "t:global.spacing.header"
+    },
+    {
+      "id": "spacing_desktop",
+      "type": "range",
+      "label": "t:global.spacing.spacing_desktop.label",
+      "min": -300,
+      "max": 300,
+      "step": 10,
+      "unit": "px",
+      "default": 50
+    },
+    {
+      "id": "spacing_mobile",
+      "type": "range",
+      "label": "t:global.spacing.spacing_mobile.label",
+      "min": -300,
+      "max": 300,
+      "step": 10,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "id": "fix_zindex",
+      "type": "range",
+      "label": "t:global.fix_zindex.label",
+      "info": "t:global.fix_zindex.info",
+      "min": 0,
+      "max": 25,
+      "step": 1,
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.static_section.presets.name"
+    }
+  ]
+}
+{% endschema %}

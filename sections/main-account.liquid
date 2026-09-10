@@ -1,0 +1,448 @@
+<div class="m6fr size-s">
+  <article class="palette-{{ section.settings.color_palette }}
+    {{ section.settings.text_position }}
+    module-color-palette
+    "
+    {% if section.settings.enable_custom_text_styling %}style="font-size:{{ section.settings.font_size }};--main_fz:{{ block.settings.font_size }};"{% endif %}
+  >
+    <figure>
+      <span class="img-overlay" style="opacity:{{ section.settings.overlay_opacity | divided_by: 100.0 }}"></span>
+      <picture>
+        {%- if section.settings.image -%}
+        {%- assign default_alt = 'customer.account.title' | t %}
+          <img
+            src="{{ section.settings.image | image_url: width: 1024 }}"
+            srcset="{% render 'image-srcset', image: section.settings.image %}"
+            sizes="
+              (min-width: 1280px) 1280px
+              100vw
+            "
+            width="1260"
+            height="265"
+            alt="{{ section.settings.image.alt | default: default_alt | escape }}"
+          >
+        {% else %}
+          {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+        {% endif %}
+      </picture>
+    </figure>
+    <p>{{ 'customer.account.welcome' | t: first_name: customer.first_name }}</p>
+    <{{ section.settings.title_size }} class="ff-{{ section.settings.title_font }}">{{ 'customer.account.title' | t }} </{{ section.settings.title_size }}>
+    <p>{{ 'customer.account.subtitle_html' | t }}</p>
+  </article>
+</div>
+<div class="cols">
+  <article class="width-36">
+    <h2 class="size-18 margin-half">{{ 'customer.account.details' | t }}</h2>
+    <div class="m6bx size-s margin-half">
+      <span class="img-overlay"></span>
+      <div>
+        <ul class="l4as caption">
+          <li><span>{{ 'customer.name' | t }}</span> <span>{{ customer.name }}</span></li>
+          {%- if customer.phone != blank -%}<li><span>{{ 'customer.phone_number' | t }}</span> {{ customer.phone }}</li>{%- endif -%}
+          <li><span>{{ 'customer.email' | t }}</span> <a href="./" class="email">{{ customer.email }}</a></li>
+          {%- if customer.default_address != empty -%}
+              <li><span>{{ 'customer.account.address' | t }}</span>
+                <span>
+                  {% liquid
+                    if customer.default_address.company != empty and customer.default_address.company != blank
+                      echo customer.default_address.company
+                      echo '<br>'
+                    endif
+                    if customer.default_address.street != empty and customer.default_address.street != blank
+                      echo customer.default_address.street
+                      echo '<br>'
+                    endif
+                    if customer.default_address.zip != empty and customer.default_address.zip != blank
+                      echo customer.default_address.zip
+                      assign zip = true
+                    endif
+                    if customer.default_address.city != empty and customer.default_address.city != blank
+                      if zip
+                        echo '&nbsp;'
+                      endif
+                      echo customer.default_address.city
+                      assign city = true
+                    endif
+                    if zip or city
+                      echo '</br>'
+                    endif
+                    if customer.default_address.country != empty and customer.default_address.country != blank
+                      echo customer.default_address.country
+                    endif
+                  -%}
+                </span>
+              </li>
+          {%- endif -%}
+        </ul>
+      </div>
+    </div>
+    <p class="link-btn">
+      <a href="{{ routes.account_addresses_url }}" class="inline">{{ 'customer.account.manage_addresses' | t }}&nbsp;<i aria-hidden="true" class="icon-chevron-right"></i></a>
+    </p>
+    {% assign app_blocks = section.blocks | where: "type", "@app" %}
+    {% for app_block in app_blocks %}
+      {% render app_block %}
+    {% endfor %}
+  </article>
+  {%- if section.settings.text != empty or section.settings.show_phone_link or section.settings.show_mail_link or section.settings.show_whatsapp_link -%}
+    <article class="width-64">
+      <h2 class="size-18 margin-half">{{ 'customer.account.customer_service' | t }}</h2>
+      <div class="m6bx size-s">
+        <span class="img-overlay"></span>
+        <div>
+          {{ section.settings.text }}
+          {%- if section.settings.show_phone_link or section.settings.show_mail_link or section.settings.show_whatsapp_link -%}
+          <p class="link-btn">
+              {% if shop.phone != empty and shop.phone != blank and section.settings.show_phone_link %}
+                <a href="tel:{{ shop.phone }}" class="inv overlay-black">{{ shop.phone }}</a>
+              {% endif %}
+              {% if shop.email != empty and shop.email != blank and section.settings.show_mail_link %}
+                <a href="mailto:{{ shop.email }}" class="email inv overlay-black">{{ shop.email }}</a>
+              {% endif %}
+              {% if settings.whatsapp != empty and settings.whatsapp != 0 and section.settings.show_whatsapp_link %}
+                <a href="https://wa.me/{{ settings.whatsapp }}" class="inv overlay-black">{{ 'footer.whatsapp_html' | t }}</a>
+              {% endif %}
+            </p>
+          {%- endif -%}
+        </div>
+      </div>
+    </article>
+  {%- endif -%}
+</div>
+
+<h2 class="size-18 margin-half">{{ 'customer.account.orders_title' | t }}</h2>
+{%- if customer.orders == blank -%}
+  <p>{{ 'customer.account.no_orders_content' | t }}</p>
+{%- else -%}
+  {%- paginate customer.orders by 12 -%}
+    <div class="table-wrapper">
+      <table class="table-drop">
+        <caption>{{ 'customer.account.orders_title' | t }}</caption>
+        <thead>
+          <tr>
+            <th>{{ 'customer.orders.order_number' | t }}</th>
+            <th>{{ 'customer.orders.date' | t }}</th>
+            <th>{{ 'customer.orders.payment_status' | t }}</th>
+            <th>{{ 'customer.orders.fulfillment_status' | t }}</th>
+            <th>{{ 'customer.orders.total' | t }}</th>
+            <th class="text-end"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {%- for order in customer.orders -%}
+            <tr>
+              <td>{{ order.name }}</td>
+              <td>{{ order.created_at | date: format: 'month_day_year_basic' }}</td>
+              <td class="strong">{% if order.financial_status == 'paid' %}<i aria-hidden="true" class="icon-check"></i> {% endif %}{{ order.financial_status_label }}</td>
+              <td>{{ order.fulfillment_status_label }}</td>
+              <td>{{ order.total_price | money }}</td>
+              <td class="text-end">
+                <a href="./" class="toggle"><i aria-hidden="true" class="icon-chevron-down"></i> <span class="hidden">{{ 'general.read_more.read_more' | t }}</span></a>
+                <a href="{{ order.customer_url }}">{{ 'customer.orders.view_order' | t }}</a>
+              </td>
+            </tr>
+            <tr class="sub hidden">
+              <th>{{ 'customer.orders.payment_status' | t }}</th>
+              <td colspan="5">{% if order.financial_status == 'paid' %}<i aria-hidden="true" class="icon-check"></i> {% endif %}{{ order.financial_status_label }}</td>
+            </tr>
+            <tr class="sub hidden">
+              <th>{{ 'customer.orders.fulfillment_status' | t }}</th>
+              <td colspan="5">{{ order.fulfillment_status_label }}</td>
+            </tr>
+            <tr class="sub hidden">
+              <th>{{ 'customer.orders.total' | t }}</th>
+              <td colspan="5">{{ order.total_price | money }}</td>
+            </tr>
+            <tr class="sub hidden">
+              <td colspan="6"><a href="{{ order.customer_url }}">{{ 'customer.orders.view_order' | t }}</a></td>
+            </tr>
+          {%- endfor -%}
+        </tbody>
+      </table>
+    </div>
+    {%- render 'pagination',
+      paginate: paginate,
+      show_amount: true
+    -%}
+    </nav>
+  {%- endpaginate -%}
+{%- endif -%}
+
+<style>
+	@media only screen and (min-width: 47.5em) {
+		#shopify-section-{{ section.id }} .m6fr figure img { object-position:{{ section.settings.image_position }}; };
+	}
+	@media only screen and (max-width: 47.5em) {
+		#shopify-section-{{ section.id }} .m6fr figure img { object-position:{{ section.settings.image_position_mobile }}; };
+	}
+</style>
+
+{% schema %}
+{
+  "name": "t:main.account_dashboard.name",
+  "class": "margin-double",
+  "settings": [
+    {
+      "type": "select",
+      "id": "show_breadcrumbs",
+      "label": "t:main.account_dashboard.settings.show_breadcrumbs.label",
+      "options": [
+        {
+          "value": "desktop-only",
+          "label": "t:main.account_dashboard.settings.show_breadcrumbs.options__1.label"
+        },
+        {
+          "value": "both",
+          "label": "t:main.account_dashboard.settings.show_breadcrumbs.options__3.label"
+        },
+        {
+          "value": "none",
+          "label": "t:main.account_dashboard.settings.show_breadcrumbs.options__4.label"
+        }
+      ],
+      "default": "both"
+    },
+    {
+      "type": "header",
+      "content": "t:main.account_dashboard.settings.banner.header"
+    },
+    {
+      "id": "image",
+      "type": "image_picker",
+      "label": "t:main.account_dashboard.settings.banner.image.label"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "t:main.account_dashboard.settings.banner.overlay_opacity.label",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 25
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_palette",
+      "label": "t:global.color_palette.label",
+      "default": "scheme-4"
+    },
+    {
+      "id": "image_position",
+      "type": "select",
+      "label": "t:main.account_dashboard.settings.banner.image_position.label",
+      "options": [
+        {
+          "value": "left top",
+          "label": "t:main.account_dashboard.settings.banner.image_position.options__1.label"
+        },
+        {
+          "value": "center top",
+          "label": "t:main.account_dashboard.settings.banner.image_position.options__2.label"
+        },
+        {
+          "value": "right top",
+          "label": "t:main.account_dashboard.settings.banner.image_position.options__3.label"
+        },
+        {
+          "value": "left center",
+          "label": "t:main.account_dashboard.settings.banner.image_position.options__4.label"
+        },
+        {
+          "value": "center center",
+          "label": "t:main.account_dashboard.settings.banner.image_position.options__5.label"
+        },
+        {
+          "value": "right center",
+          "label": "t:main.account_dashboard.settings.banner.image_position.options__6.label"
+        },
+        {
+          "value": "left bottom",
+          "label": "t:main.account_dashboard.settings.banner.image_position.options__7.label"
+        },
+        {
+          "value": "center bottom",
+          "label": "t:main.account_dashboard.settings.banner.image_position.options__8.label"
+        },
+        {
+          "value": "right bottom",
+          "label": "t:main.account_dashboard.settings.banner.image_position.options__9.label"
+        }
+      ],
+      "default": "center center"
+    },
+    {
+      "id": "image_position_mobile",
+      "type": "select",
+      "label": "t:main.account_dashboard.settings.banner.image_position_mobile.label",
+      "options": [
+        {
+          "value": "left top",
+          "label": "t:main.account_dashboard.settings.banner.image_position_mobile.options__1.label"
+        },
+        {
+          "value": "center top",
+          "label": "t:main.account_dashboard.settings.banner.image_position_mobile.options__2.label"
+        },
+        {
+          "value": "right top",
+          "label": "t:main.account_dashboard.settings.banner.image_position_mobile.options__3.label"
+        },
+        {
+          "value": "left center",
+          "label": "t:main.account_dashboard.settings.banner.image_position_mobile.options__4.label"
+        },
+        {
+          "value": "center center",
+          "label": "t:main.account_dashboard.settings.banner.image_position_mobile.options__5.label"
+        },
+        {
+          "value": "right center",
+          "label": "t:main.account_dashboard.settings.banner.image_position_mobile.options__6.label"
+        },
+        {
+          "value": "left bottom",
+          "label": "t:main.account_dashboard.settings.banner.image_position_mobile.options__7.label"
+        },
+        {
+          "value": "center bottom",
+          "label": "t:main.account_dashboard.settings.banner.image_position_mobile.options__8.label"
+        },
+        {
+          "value": "right bottom",
+          "label": "t:main.account_dashboard.settings.banner.image_position_mobile.options__9.label"
+        }
+      ],
+      "default": "center center"
+    },
+    {
+      "id": "text_position",
+      "type": "select",
+      "label": "t:main.account_dashboard.settings.banner.text_position.label",
+      "options": [
+        {
+          "value": "text-start",
+          "label": "t:main.account_dashboard.settings.banner.text_position.options__1.label"
+        },
+        {
+          "value": "text-center",
+          "label": "t:main.account_dashboard.settings.banner.text_position.options__2.label"
+        },
+        {
+          "value": "text-end",
+          "label": "t:main.account_dashboard.settings.banner.text_position.options__3.label"
+        }
+      ],
+      "default": "text-start"
+    },
+    {
+      "type": "select",
+      "id": "title_font",
+      "label": "t:global.typography.title_font.label",
+      "options": [
+        {
+          "value": "primary",
+          "label": "t:global.typography.title_font.primary.label"
+        },
+        {
+          "value": "secondary",
+          "label": "t:global.typography.title_font.secondary.label"
+        }
+      ],
+      "default": "primary"
+    },
+    {
+      "type": "select",
+      "id": "title_size",
+      "label": "t:global.typography.title_size.label",
+      "options": [
+        {
+          "value": "h4",
+          "label": "t:global.typography.title_size.h4.label"
+        },
+        {
+          "value": "h3",
+          "label": "t:global.typography.title_size.h3.label"
+        },
+        {
+          "value": "h2",
+          "label": "t:global.typography.title_size.h2.label"
+        },
+        {
+          "value": "h1",
+          "label": "t:global.typography.title_size.h1.label"
+        }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "header",
+      "content": "t:global.typography.enable_custom_text_styling.header"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_custom_text_styling",
+      "label": "t:global.typography.enable_custom_text_styling.label",
+      "info": "t:global.typography.enable_custom_text_styling.info"
+    },
+    {
+      "type": "select",
+      "id": "font_size",
+      "label": "t:global.typography.font_size.label",
+      "options": [
+        {
+          "value": "13px",
+          "label": "t:global.typography.font_size.13px.label"
+        },
+        {
+          "value": "14px",
+          "label": "t:global.typography.font_size.14px.label"
+        },
+        {
+          "value": "16px",
+          "label": "t:global.typography.font_size.16px.label"
+        },
+        {
+          "value": "18px",
+          "label": "t:global.typography.font_size.18px.label"
+        }
+      ],
+      "default": "16px"
+    },
+    {
+      "type": "header",
+      "content": "t:main.account_dashboard.settings.customer_service.header"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "t:main.account_dashboard.settings.customer_service.text.label",
+      "default": "<p>Extra shop info</p>"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_phone_link",
+      "label": "t:main.account_dashboard.settings.customer_service.show_phone_link.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_mail_link",
+      "label": "t:main.account_dashboard.settings.customer_service.show_mail_link.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_whatsapp_link",
+      "label": "t:main.account_dashboard.settings.customer_service.show_whatsapp_link.label",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "@app"
+    }
+  ]
+}
+{% endschema %}

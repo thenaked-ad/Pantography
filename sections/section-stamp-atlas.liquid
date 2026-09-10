@@ -1,0 +1,1067 @@
+{% comment %}
+  ============================================================
+  STAMP ATLAS — interactive "browse artworks by location" map
+  ------------------------------------------------------------
+  Self-contained section. Files: this file + assets/stamp-atlas.css
+  + assets/stamp-atlas.js. No other theme files are modified and
+  no tracking/analytics code is touched.
+
+  Products appear on the map when they have these metafields:
+    custom.map_country  (single line text — e.g. "Spain")
+    custom.map_lat      (decimal — optional, e.g. 37.39)
+    custom.map_lng      (decimal — optional, e.g. -5.99)
+  If lat/lng are left empty the pin falls back to the centre of
+  the country. Products are read from the collection chosen in
+  the section settings. Manual "Location" blocks can be used as
+  an alternative to metafields.
+  ============================================================
+{% endcomment %}
+
+{% comment %} map libraries vendored into theme assets — served from
+   Shopify's CDN, no third-party scripts for consent managers to block {% endcomment %}
+<link rel="preload" as="fetch" href="{{ 'sa-world-50m.json' | asset_url }}" crossorigin="anonymous">
+<script src="{{ 'sa-d3.min.js' | asset_url }}" defer></script>
+<script src="{{ 'sa-topojson.min.js' | asset_url }}" defer></script>
+{% comment %} v3: CSS + JS inlined below — no separate asset files to cache or mismatch {% endcomment %}
+<style>
+/* STAMP ATLAS build v11 — 07 Jul 2026 */
+/* ============================================================
+   STAMP ATLAS — self-contained styles
+   Added as a standalone Shopify section. Safe to remove:
+   delete section-stamp-atlas.liquid, stamp-atlas.css, stamp-atlas.js.
+   No other theme files are touched.
+   ============================================================ */
+.stamp-atlas{
+  --sa-ink:#111111;
+  --sa-line:#1a1a1a;
+  --sa-paper:#ffffff;
+  --sa-hover:#ececec;
+  --sa-muted:#9a9a9a;
+  --sa-hair:#e6e6e6;
+  position:relative;
+  max-width:1500px;
+  margin:0 auto;
+  padding-left:40px;
+  padding-right:40px;
+  color:var(--sa-ink);
+  font-weight:300;
+}
+@media (max-width:760px){
+  .stamp-atlas{padding-left:14px;padding-right:14px}
+}
+.stamp-atlas *,.stamp-atlas *::before,.stamp-atlas *::after{box-sizing:border-box}
+
+/* THEME CONFLICT FIX (screen.css:481 + :2007): the Next theme paints every
+   <button> via an absolutely-positioned ::before pseudo-element filled with
+   --theme_bg_btn (#000). It paints OVER the button's own background, so no
+   element-level styling can beat it. Kill the pseudo inside this feature. */
+.stamp-atlas button::before,.stamp-atlas button::after,
+.sa-panel button::before,.sa-panel button::after{
+  content:none !important;display:none !important;
+  background:none !important;border:0 !important;box-shadow:none !important;
+}
+
+/* THEME CONFLICT FIX #3 (screen.css: `*, ::before, ::after { transform-origin: center center }`):
+   the theme re-bases EVERY transform around the element's centre, which
+   silently re-maps all of d3's camera transforms (SVG expects origin 0 0).
+   This single rule caused every "zooms to the bottom-right" symptom. */
+.sa-mapwrap svg, .sa-mapwrap svg * { transform-origin: 0 0 !important; }
+
+/* ---------- header ---------- */
+.sa-head{text-align:center;margin-bottom:8px}
+.sa-eyebrow{font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--sa-muted);margin:0 0 14px}
+.sa-title{font-size:clamp(22px,3vw,34px);font-weight:300;letter-spacing:.18em;text-transform:uppercase;margin:0}
+.sa-sub{margin:14px auto 0;font-size:13px;letter-spacing:.04em;color:#555;max-width:520px;line-height:1.6}
+
+/* ---------- toolbar ---------- */
+.sa-bar{display:flex;justify-content:center;align-items:center;gap:16px;margin:28px 0 6px;flex-wrap:wrap}
+.sa-search{position:relative;width:min(340px,86vw)}
+.sa-search input[type="text"]{
+  width:100%;border:1px solid var(--sa-ink);background:transparent;
+  font-family:inherit;font-weight:300;font-size:13px;letter-spacing:.14em;text-transform:uppercase;
+  padding:11px 38px 11px 14px;outline:none;border-radius:0;color:var(--sa-ink);box-shadow:none;
+}
+.sa-search input::placeholder{color:#b5b5b5}
+.sa-search svg{position:absolute;right:13px;top:50%;transform:translateY(-50%);pointer-events:none}
+.sa-suggest{
+  position:absolute;top:calc(100% - 1px);left:0;right:0;z-index:40;
+  background:var(--sa-paper);border:1px solid var(--sa-ink);display:none;max-height:260px;overflow:auto;
+}
+.stamp-atlas .sa-suggest button{
+  display:flex;justify-content:space-between;width:100% !important;min-width:0 !important;height:auto !important;
+  text-align:left;background:none !important;border:0 !important;border-radius:0 !important;box-shadow:none !important;
+  font-family:inherit !important;font-weight:300 !important;font-size:12px !important;
+  letter-spacing:.14em !important;text-transform:uppercase !important;
+  padding:11px 14px !important;cursor:pointer;color:var(--sa-ink) !important;line-height:1.4 !important;
+}
+.sa-suggest button span{color:var(--sa-muted);font-size:10px;letter-spacing:.2em}
+.sa-suggest button:hover{background:var(--sa-hover)}
+/* !important shields these controls from the theme's global button styles */
+.stamp-atlas .sa-reset{
+  border:1px solid var(--sa-ink) !important;background:transparent !important;color:var(--sa-ink) !important;
+  font-family:inherit !important;font-weight:300 !important;font-size:12px !important;
+  letter-spacing:.18em !important;text-transform:uppercase !important;
+  padding:12px 22px !important;cursor:pointer;border-radius:0 !important;
+  width:auto !important;min-width:0 !important;height:auto !important;min-height:0 !important;
+  box-shadow:none !important;line-height:1.4 !important;
+  transition:background .25s,color .25s;display:none;
+}
+.stamp-atlas .sa-reset:hover{background:var(--sa-ink) !important;color:#fff !important}
+
+/* ---------- map stage ---------- */
+.sa-stage{position:relative;margin-top:10px;overflow:hidden}
+.sa-mapwrap{position:relative;width:100%;overflow:hidden;min-height:200px}
+.sa-mapwrap svg{display:block;width:100%;height:auto;cursor:grab}
+.sa-mapwrap svg:active{cursor:grabbing}
+.sa-country{fill:var(--sa-paper);stroke:var(--sa-line);vector-effect:non-scaling-stroke;transition:fill .25s;cursor:pointer}
+.sa-country.sa-has:hover{fill:var(--sa-hover)}
+.sa-country.sa-none:hover{fill:#f7f7f7}
+.sa-country.sa-selected,.sa-country.sa-selected:hover{fill:var(--sa-ink)}
+.sa-country.sa-dim{opacity:.28}
+.sa-dot{fill:var(--sa-ink);pointer-events:none}
+.sa-dot.sa-inv{fill:#fff}
+.sa-ring{fill:none;stroke:var(--sa-ink);pointer-events:none;opacity:0}
+.sa-ring.sa-inv{stroke:#fff}
+.sa-label{letter-spacing:.22em;text-transform:uppercase;fill:var(--sa-ink);pointer-events:none;opacity:0;transition:opacity .3s;font-family:inherit}
+.sa-label.sa-inv{fill:#fff}
+.sa-zoomctl{position:absolute;left:14px;bottom:14px;display:flex;flex-direction:column;z-index:10}
+.stamp-atlas .sa-zoomctl button{
+  width:36px !important;height:36px !important;min-width:0 !important;min-height:0 !important;
+  border:1px solid var(--sa-ink) !important;background:var(--sa-paper) !important;color:var(--sa-ink) !important;
+  font-size:17px !important;font-weight:300 !important;cursor:pointer;border-radius:0 !important;
+  line-height:1 !important;font-family:inherit !important;padding:0 !important;margin:0 !important;
+  letter-spacing:0 !important;box-shadow:none !important;display:flex;align-items:center;justify-content:center;
+}
+.stamp-atlas .sa-zoomctl button + button{border-top:0 !important}
+.stamp-atlas .sa-zoomctl button:hover{background:var(--sa-ink) !important;color:#fff !important}
+.sa-legend{
+  position:absolute;right:14px;bottom:14px;z-index:10;display:flex;align-items:center;gap:8px;
+  font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:#666;
+  background:rgba(255,255,255,.85);padding:6px 10px;
+}
+.sa-legend i{width:5px;height:5px;border-radius:50%;background:var(--sa-ink);display:inline-block}
+.sa-hint{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  pointer-events:none;opacity:0;transition:opacity .3s;z-index:15;
+}
+.sa-hint span{background:rgba(17,17,17,.82);color:#fff;font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;padding:12px 20px}
+.sa-tip{
+  position:fixed;z-index:9999;pointer-events:none;background:#111;color:#fff;
+  font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;padding:8px 12px;
+  opacity:0;transform:translate(-50%,calc(-100% - 12px));white-space:nowrap;transition:opacity .15s;
+}
+.sa-tip small{display:block;color:#bdbdbd;font-size:9px;letter-spacing:.2em;margin-top:3px}
+
+/* ---------- results panel ---------- */
+.sa-panel{
+  position:fixed;top:0;right:0;bottom:0;height:100vh;height:100dvh;
+  width:min(390px,100%);z-index:10000;
+  background:#ffffff;
+  border-left:1px solid var(--sa-ink);
+  transform:translateX(102%);visibility:hidden;
+  transition:transform .45s cubic-bezier(.22,.8,.24,1),visibility 0s .45s;
+  display:flex;flex-direction:column;
+}
+.sa-panel.sa-open{transform:translateX(0);visibility:visible;transition:transform .45s cubic-bezier(.22,.8,.24,1)}
+.sa-panel-head{padding:26px 28px 20px;border-bottom:1px solid var(--sa-hair);display:flex;justify-content:space-between;align-items:flex-start}
+.sa-place{font-size:17px;letter-spacing:.22em;text-transform:uppercase;font-weight:300;margin:0}
+.sa-count{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:var(--sa-muted);margin:8px 0 0}
+.sa-panel .sa-close{
+  border:0 !important;background:none !important;cursor:pointer;font-size:20px !important;font-weight:300 !important;
+  color:var(--sa-ink) !important;line-height:1 !important;padding:2px 4px !important;font-family:inherit !important;
+  width:auto !important;min-width:0 !important;height:auto !important;min-height:0 !important;
+  border-radius:0 !important;box-shadow:none !important;letter-spacing:0 !important;
+}
+.sa-body{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:22px 28px 28px}
+.sa-card{display:block;text-decoration:none;color:var(--sa-ink);margin-bottom:26px}
+.sa-card-img{position:relative;background:#fff;border:1px solid var(--sa-hair);aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.sa-card-img img{width:100%;height:100%;object-fit:contain;transition:transform .6s ease}
+.sa-card:hover .sa-card-img img{transform:scale(1.04)}
+.sa-card-meta{display:flex;justify-content:space-between;align-items:baseline;margin-top:12px}
+.sa-card-title{font-size:12.5px;letter-spacing:.2em;text-transform:uppercase}
+.sa-card-price{font-size:12px;color:var(--sa-muted);letter-spacing:.06em}
+.sa-card-cta{display:inline-block;margin-top:9px;font-size:10px;letter-spacing:.26em;text-transform:uppercase;border-bottom:1px solid var(--sa-ink);padding-bottom:3px}
+.sa-stampph{
+  width:74%;aspect-ratio:4/5;position:relative;background:#fff;border:1px solid #cfcfcf;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+  -webkit-mask:radial-gradient(circle 5px at 5px 5px,transparent 4.5px,#000 5px) -5px -5px/14px 14px;
+          mask:radial-gradient(circle 5px at 5px 5px,transparent 4.5px,#000 5px) -5px -5px/14px 14px;
+  box-shadow:0 1px 14px rgba(0,0,0,.07);
+}
+.sa-stampph em{font-style:normal;font-size:9px;letter-spacing:.3em;color:#999;text-transform:uppercase}
+.sa-stampph strong{font-weight:400;font-size:13px;letter-spacing:.24em;text-transform:uppercase;text-align:center;padding:0 12px}
+.sa-stampph .sa-rule{width:34px;height:1px;background:#111}
+.sa-empty{padding:8px 0}
+.sa-empty p{font-size:13px;line-height:1.7;color:#444;letter-spacing:.03em;margin:0 0 22px}
+.sa-empty a{
+  display:inline-block;border:1px solid var(--sa-ink);color:var(--sa-ink);text-decoration:none;
+  font-size:11px;letter-spacing:.2em;text-transform:uppercase;padding:12px 22px;margin:0 10px 10px 0;
+  transition:background .25s,color .25s;
+}
+.sa-empty a:hover{background:var(--sa-ink);color:#fff}
+
+/* ---------- mobile ---------- */
+@media (max-width:760px){
+  .sa-panel{
+    position:fixed;top:auto;left:0;right:0;bottom:0;width:100%;height:62vh;
+    border-left:0;border-top:1px solid var(--sa-ink);
+    background:#ffffff !important;-webkit-backdrop-filter:none;backdrop-filter:none;
+    transform:translateY(104%);
+    padding-bottom:env(safe-area-inset-bottom); /* iPhone home indicator */
+  }
+  .sa-panel.sa-open{transform:translateY(0)}
+  .sa-panel-head{padding:18px 20px 14px}
+  .sa-body{padding:16px 20px 24px;display:flex;gap:14px;overflow-x:auto;overflow-y:hidden}
+  .sa-card{min-width:62vw;margin-bottom:0}
+  .sa-legend{display:none}
+  .sa-zoomctl{left:auto;right:8px;bottom:8px}
+  .stamp-atlas .sa-zoomctl button{width:32px !important;height:32px !important;font-size:15px !important}
+}
+
+</style>
+
+{%- liquid
+  assign pad_top = section.settings.padding_top | append: 'px'
+  assign pad_bottom = section.settings.padding_bottom | append: 'px'
+-%}
+
+<div
+  class="stamp-atlas"
+  data-stamp-atlas
+  data-empty-text="{{ section.settings.empty_text | escape }}"
+  data-browse-url="{{ section.settings.browse_link | default: '/collections/all' }}"
+  data-browse-label="{{ section.settings.browse_label | escape }}"
+  data-request-email="{{ section.settings.request_email | escape }}"
+  data-request-label="{{ section.settings.request_label | escape }}"
+  {% if section.settings.collection != blank %}data-collection-url="{{ section.settings.collection.url }}"{% endif %}
+  data-world-url="{{ 'sa-world-50m.json' | asset_url }}"
+  style="padding-top:{{ pad_top }};padding-bottom:{{ pad_bottom }};"
+>
+  <header class="sa-head">
+    {%- if section.settings.eyebrow != blank -%}
+      <p class="sa-eyebrow">{{ section.settings.eyebrow }}</p>
+    {%- endif -%}
+    {%- if section.settings.heading != blank -%}
+      <h2 class="sa-title">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+    {%- if section.settings.subheading != blank -%}
+      <p class="sa-sub">{{ section.settings.subheading }}</p>
+    {%- endif -%}
+  </header>
+
+  <div class="sa-bar">
+    {%- if section.settings.show_search -%}
+      <div class="sa-search">
+        <input type="text" data-sa-q placeholder="{{ section.settings.search_placeholder | default: 'Search a location' | escape }}" autocomplete="off" spellcheck="false" aria-label="Search a location">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.5-4.5"/></svg>
+        <div class="sa-suggest" data-sa-suggest></div>
+      </div>
+    {%- endif -%}
+    <button type="button" class="sa-reset" data-sa-reset>{{ section.settings.reset_label | default: 'View the world' }}</button>
+  </div>
+
+  <div class="sa-stage" style="margin-top:{{ section.settings.gap_search_map | default: 24 }}px">
+    <div class="sa-mapwrap" data-sa-map>
+      <div class="sa-zoomctl">
+        <button type="button" data-sa-zin aria-label="Zoom in">+</button>
+        <button type="button" data-sa-zout aria-label="Zoom out">&minus;</button>
+      </div>
+      {%- if section.settings.show_legend -%}
+        <div class="sa-legend"><i></i> {{ section.settings.legend_label | default: 'Artwork available' }}</div>
+      {%- endif -%}
+      <div class="sa-hint" data-sa-hint><span>Pinch or ctrl + scroll to zoom</span></div>
+    </div>
+
+    <aside class="sa-panel" data-sa-panel aria-live="polite">
+      <div class="sa-panel-head">
+        <div>
+          <h3 class="sa-place" data-sa-place></h3>
+          <p class="sa-count" data-sa-count></p>
+        </div>
+        <button type="button" class="sa-close" data-sa-close aria-label="Close">&times;</button>
+      </div>
+      <div class="sa-body" data-sa-body></div>
+    </aside>
+  </div>
+
+  {%- comment -%}
+    Catalogue data. Collection products are fetched by stamp-atlas.js in
+    pages of 250 via the collection.map alternate view (no Liquid loop cap).
+    Manual "Location" blocks are inlined here.
+  {%- endcomment -%}
+  <script type="application/json" data-sa-data>
+    [
+      {%- assign first = true -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'location' and block.settings.product != blank and block.settings.country != blank -%}
+          {%- assign bp = block.settings.product -%}
+          {%- unless first -%},{%- endunless -%}
+          {%- assign first = false -%}
+          {
+            "title": {% if block.settings.title != blank %}{{ block.settings.title | json }}{% else %}{{ bp.title | json }}{% endif %},
+            "country": {{ block.settings.country | json }},
+            "lat": {{ block.settings.lat | json }},
+            "lng": {{ block.settings.lng | json }},
+            "price": {% if bp.price_varies %}{{ bp.price_min | money | prepend: 'From ' | json }}{% else %}{{ bp.price_min | money | json }}{% endif %},
+            "url": {{ bp.url | json }},
+            "img": {% if bp.featured_image %}{{ bp.featured_image | image_url: width: 600 | json }}{% else %}null{% endif %}
+          }
+        {%- endif -%}
+      {%- endfor -%}
+    ]
+  </script>
+</div>
+
+<script>
+/* STAMP ATLAS build v11 — 07 Jul 2026 */
+/* ============================================================
+   STAMP ATLAS — self-contained interactive map
+   - No dependencies on other theme JS. No globals except window.d3
+     / window.topojson (loaded lazily, only when this section is
+     scrolled into view, so site performance is unaffected).
+   - Does not touch tracking, analytics or any third-party code.
+   - Safe to remove together with section-stamp-atlas.liquid
+     and stamp-atlas.css.
+   ============================================================ */
+(function () {
+  'use strict';
+  try { console.log('[Stamp Atlas] build v11'); } catch (e) {}
+
+  var D3_SRCS   = ['https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js', 'https://unpkg.com/d3@7/dist/d3.min.js'];
+  var TOPO_SRCS = ['https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js', 'https://unpkg.com/topojson-client@3/dist/topojson-client.min.js'];
+  /* 50m resolution so small nations & territories (St. Barts, Montserrat,
+     Monaco, Anguilla, …) exist as selectable shapes. Lazy-loaded on scroll. */
+  var WORLD_SRC = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json';
+  var WORLD_ALT = 'https://unpkg.com/world-atlas@2/countries-50m.json';
+
+  /* Map common spellings to the country names used by the world atlas */
+  var ALIAS = {
+    'usa':'United States of America','us':'United States of America','united states':'United States of America','america':'United States of America',
+    'uk':'United Kingdom','great britain':'United Kingdom','england':'United Kingdom','scotland':'United Kingdom','wales':'United Kingdom','northern ireland':'United Kingdom',
+    'uae':'United Arab Emirates',
+    'czech republic':'Czechia',
+    'ivory coast':"Côte d'Ivoire",'cote divoire':"Côte d'Ivoire","cote d'ivoire":"Côte d'Ivoire",
+    'democratic republic of the congo':'Dem. Rep. Congo','democratic republic of congo':'Dem. Rep. Congo','drc':'Dem. Rep. Congo',
+    'republic of the congo':'Congo','congo brazzaville':'Congo',
+    'central african republic':'Central African Rep.',
+    'south sudan':'S. Sudan',
+    'bosnia and herzegovina':'Bosnia and Herz.','bosnia':'Bosnia and Herz.',
+    'dominican republic':'Dominican Rep.',
+    'equatorial guinea':'Eq. Guinea',
+    'solomon islands':'Solomon Is.',
+    'east timor':'Timor-Leste',
+    'western sahara':'W. Sahara',
+    'burma':'Myanmar','myanmar (burma)':'Myanmar',
+    'swaziland':'eSwatini','eswatini':'eSwatini',
+    'north macedonia':'Macedonia','macedonia':'Macedonia',
+    'falkland islands':'Falkland Is.',
+    'turkey':'Turkey','turkiye':'Turkey','türkiye':'Turkey',
+    'holland':'Netherlands',
+    'cape verde':'Cabo Verde',
+    'faroe islands':'Faeroe Is.',
+    'st. barts':'St-Barthélemy','st barts':'St-Barthélemy','saint barthelemy':'St-Barthélemy',
+    'antigua':'Antigua and Barb.','antigua and barbuda':'Antigua and Barb.',
+    'st. kitts':'St. Kitts and Nevis','st kitts':'St. Kitts and Nevis','st kitts and nevis':'St. Kitts and Nevis',
+    'st. lucia':'Saint Lucia','st lucia':'Saint Lucia',
+    'st. vincent':'St. Vin. and Gren.','st vincent':'St. Vin. and Gren.','st vincent and the grenadines':'St. Vin. and Gren.',
+    'cayman islands':'Cayman Is.',
+    'turks and caicos':'Turks and Caicos Is.','turks & caicos':'Turks and Caicos Is.',
+    'british virgin islands':'British Virgin Is.','bvi':'British Virgin Is.',
+    'trinidad & tobago':'Trinidad and Tobago',
+    'french polynesia':'Fr. Polynesia',
+    'macau':'Macao',
+    'vatican city':'Vatican',
+    'korea':'South Korea',
+    'guyana':'Guyana','british guiana':'Guyana',
+    'papua new guinea':'Papua New Guinea','new guinea':'Papua New Guinea'
+  };
+
+  /* Hardened loader: some storefront scripts (consent managers, chat
+     widgets) intercept dynamically-added script tags, so a single attempt
+     can hang forever. Attempts time out, retry, fall back to a second CDN,
+     poll for the expected global, and never cache a failure. */
+  function loadOnce(src) {
+    return new Promise(function (resolve, reject) {
+      var s = document.createElement('script');
+      var done = false;
+      s.src = src; s.async = true;
+      s.onload = function () { if (!done) { done = true; resolve(); } };
+      s.onerror = function () { if (!done) { done = true; reject(new Error('failed: ' + src)); } };
+      document.head.appendChild(s);
+      setTimeout(function () { if (!done) { done = true; reject(new Error('timeout: ' + src)); } }, 9000);
+    });
+  }
+  function ensureGlobal(name, sources) {
+    return new Promise(function (resolve, reject) {
+      var i = 0;
+      function attempt() {
+        if (window[name]) return resolve();
+        if (i >= sources.length) return reject(new Error('[Stamp Atlas] could not load ' + name));
+        var src = sources[i++];
+        loadOnce(src).then(pollGlobal, attempt);
+      }
+      function pollGlobal() {
+        var t0 = Date.now();
+        (function poll() {
+          if (window[name]) return resolve();
+          if (Date.now() - t0 > 2500) return attempt();
+          setTimeout(poll, 100);
+        })();
+      }
+      attempt();
+    });
+  }
+  var libsPromise = null;
+  function loadLibs() {
+    if (!libsPromise) {
+      libsPromise = ensureGlobal('d3', D3_SRCS)
+        .then(function () { return ensureGlobal('topojson', TOPO_SRCS); });
+      libsPromise.catch(function (e) {
+        libsPromise = null; /* don't cache failures — allow retry */
+        try { console.error('[Stamp Atlas] library load failed, will retry on next trigger', e); } catch (x) {}
+      });
+    }
+    return libsPromise;
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* SPEED: data fetching is separated from map building so it can start
+     at page load (see prefetch() in boot) instead of on-scroll */
+  function inlineData(root) {
+    var dataEl = root.querySelector('[data-sa-data]');
+    if (!dataEl) return [];
+    try { return JSON.parse(dataEl.textContent) || []; } catch (e) { return []; }
+  }
+  function worldPromiseFor(root) {
+    /* world atlas served from the theme's own assets (Shopify CDN) so no
+       third-party CDN and no consent-manager interception; CDN as backup */
+    var src = root.getAttribute('data-world-url') || WORLD_SRC;
+    function get(u) { return fetch(u).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }); }
+    return get(src).catch(function () { return get(WORLD_SRC); }).catch(function () { return get(WORLD_ALT); });
+  }
+  function catalogPromiseFor(root) {
+    /* collection products arrive in pages of 250 via the `map` alternate
+       collection view — avoids Liquid's per-render product cap.
+       SPEED: first three pages fetch in PARALLEL (covers 750 products). */
+    var inline = inlineData(root);
+    var collUrl = root.getAttribute('data-collection-url');
+    if (!collUrl) return Promise.resolve(inline);
+    var sep = collUrl.indexOf('?') > -1 ? '&' : '?';
+    function page(n) {
+      return fetch(collUrl + sep + 'view=map&page=' + n)
+        .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .catch(function () { return { items: [], next: false }; });
+    }
+    return Promise.all([page(1), page(2), page(3)]).then(function (js) {
+      var all = inline.concat(js[0].items || [], js[1].items || [], js[2].items || []);
+      if (!js[2].next) return all;
+      function more(n) {
+        return page(n).then(function (j) {
+          all = all.concat(j.items || []);
+          return (j.next && n < 12) ? more(n + 1) : all;
+        });
+      }
+      return more(4);
+    });
+  }
+  function prefetch(el) {
+    if (!el._saPrefetch) {
+      el._saPrefetch = { world: worldPromiseFor(el), catalog: catalogPromiseFor(el) };
+      el._saPrefetch.world.catch(function () {});
+      el._saPrefetch.catalog.catch(function () {});
+    }
+    return el._saPrefetch;
+  }
+
+  function initAtlas(root) {
+    var d3 = window.d3, topojson = window.topojson;
+    var inline = inlineData(root);
+
+    var cfg = {
+      emptyText:   root.getAttribute('data-empty-text') || 'No artworks from {location} yet.',
+      browseUrl:   root.getAttribute('data-browse-url') || '/collections/all',
+      browseLabel: root.getAttribute('data-browse-label') || 'View all artworks',
+      requestEmail: root.getAttribute('data-request-email') || '',
+      requestLabel: root.getAttribute('data-request-label') || 'Request this location'
+    };
+
+    var wrap   = root.querySelector('[data-sa-map]');
+    var panel  = root.querySelector('[data-sa-panel]');
+    var pPlace = root.querySelector('[data-sa-place]');
+    var pCount = root.querySelector('[data-sa-count]');
+    var pBody  = root.querySelector('[data-sa-body]');
+    var resetB = root.querySelector('[data-sa-reset]');
+    var hint   = root.querySelector('[data-sa-hint]');
+
+    /* idempotent re-init: the theme editor fires shopify:section:load on
+       top of the normal boot — clear any previous map before drawing */
+    if (wrap) {
+      Array.prototype.forEach.call(wrap.querySelectorAll('svg'), function (s) { s.parentNode.removeChild(s); });
+    }
+    if (root._saTip && root._saTip.parentNode) root._saTip.parentNode.removeChild(root._saTip);
+
+    var tip = document.createElement('div');
+    tip.className = 'sa-tip';
+    document.body.appendChild(tip);
+    root._saTip = tip;
+
+    /* THEME CONFLICT FIX (screen.css:586): #content creates a stacking
+       context (position:relative; z-index:4), so a fixed panel inside it can
+       never rise above the header (z-index 9999). Teleport the panel node to
+       <body> — also immune to ancestor transform/overflow clipping. */
+    Array.prototype.forEach.call(document.querySelectorAll('body > .sa-panel'), function (p) {
+      p.parentNode.removeChild(p);
+    });
+    if (panel) document.body.appendChild(panel);
+
+    /* theme-proof control styling: inline !important beats any theme CSS */
+    function imp(el, props) {
+      if (!el) return;
+      for (var k in props) el.style.setProperty(k, props[k], 'important');
+    }
+    function hoverable(el, normal, hovered) {
+      imp(el, normal);
+      el.addEventListener('mouseenter', function () { imp(el, hovered); });
+      el.addEventListener('mouseleave', function () { imp(el, normal); });
+    }
+    var isMobile = wrap && wrap.clientWidth > 0 && wrap.clientWidth < 640;
+    var zBtnBase = {
+      'background': '#ffffff', 'color': '#111111', 'border': '1px solid #111111',
+      'border-radius': '0', 'box-shadow': 'none', 'width': isMobile ? '32px' : '36px',
+      'height': isMobile ? '32px' : '36px', 'min-width': '0', 'min-height': '0',
+      'padding': '0', 'line-height': '1', 'font-size': isMobile ? '15px' : '17px',
+      'letter-spacing': '0', 'text-transform': 'none', 'font-weight': '300'
+    };
+    var zBtnHover = { 'background': '#111111', 'color': '#ffffff' };
+    Array.prototype.forEach.call(root.querySelectorAll('.sa-zoomctl button'), function (b, i) {
+      hoverable(b, zBtnBase, zBtnHover);
+      if (i > 0) b.style.setProperty('border-top', '0', 'important');
+    });
+    if (resetB) hoverable(resetB, {
+      'background': 'transparent', 'color': '#111111', 'border': '1px solid #111111',
+      'border-radius': '0', 'box-shadow': 'none', 'padding': '12px 22px',
+      'width': 'auto', 'min-width': '0', 'height': 'auto', 'min-height': '0',
+      'font-size': '12px', 'letter-spacing': '.18em', 'text-transform': 'uppercase',
+      'line-height': '1.4', 'font-weight': '300'
+    }, { 'background': '#111111', 'color': '#ffffff' });
+    imp((panel || root).querySelector('[data-sa-close]'), {
+      'background': 'none', 'color': '#111111', 'border': '0', 'border-radius': '0',
+      'box-shadow': 'none', 'padding': '2px 4px', 'width': 'auto', 'min-width': '0',
+      'height': 'auto', 'min-height': '0', 'font-size': '20px', 'line-height': '1',
+      'letter-spacing': '0'
+    });
+
+    root._saMobile = isMobile;
+    /* square canvas on mobile: bigger map, pan sideways like a map app */
+    var W = 1420, H = isMobile ? 1420 : 700;
+    var svg = d3.select(wrap).insert('svg', ':first-child')
+      .attr('viewBox', '0 0 ' + W + ' ' + H)
+      .attr('preserveAspectRatio', 'xMidYMid meet');
+    var g = svg.append('g');
+
+    var projection = d3.geoNaturalEarth1().scale(W / 5.6).translate([W / 2, H / 2 + 18]);
+    var path = d3.geoPath(projection);
+
+    var zoom = d3.zoom()
+      .scaleExtent([1, 80]) /* high max so tiny islands can be framed */
+      .translateExtent([[0, 0], [W, H]])
+      .filter(function (ev) {
+        if (ev.type === 'wheel') return ev.ctrlKey || ev.metaKey;
+        return !ev.button;
+      })
+      .wheelDelta(function (ev) {
+        /* BUGFIX: the old ctrlKey x10 multiplier let one pinch event zoom
+           up to ~28x, flinging the view into empty ocean ("zooms to the
+           corner"). Cap each event to ~1.25x for smooth, controlled zoom. */
+        var base = -ev.deltaY * (ev.deltaMode === 1 ? .05 : ev.deltaMode ? 1 : .002) * (ev.ctrlKey ? 6 : 1);
+        if (ev.metaKey && !ev.ctrlKey) base = -base;
+        return Math.max(-0.32, Math.min(0.32, base));
+      })
+      .on('zoom', function (ev) {
+        g.attr('transform', ev.transform);
+        updateDetail(ev.transform.k);
+      });
+    svg.call(zoom);
+
+    /* plain-scroll hint */
+    var hintT;
+    svg.on('wheel', function (ev) {
+      if (ev.ctrlKey || ev.metaKey) return;
+      if (!hint) return;
+      hint.style.opacity = 1;
+      clearTimeout(hintT);
+      hintT = setTimeout(function () { hint.style.opacity = 0; }, 1100);
+    });
+
+    function canonical(name) {
+      if (!name) return null;
+      var k = String(name).trim().toLowerCase();
+      return ALIAS[k] || null; /* resolved against topo names after load */
+    }
+
+    var pre = prefetch(root); /* usually already resolved — started at page load */
+    Promise.all([pre.world, pre.catalog]).then(function (res) {
+      var world = res[0];
+      var CATALOG = res[1];
+      var countries = topojson.feature(world, world.objects.countries).features;
+
+      /* CARTOGRAPHY FIX: overseas territories are part of their parent
+         country's shape in the map data (Martinique is "France", etc.).
+         Split them into their own selectable countries by geography. */
+      var TERRITORIES = [
+        { name: 'Martinique',    parent: 'France',      bbox: [-61.5, 14.2, -60.6, 15.1] },
+        { name: 'Guadeloupe',    parent: 'France',      bbox: [-62.0, 15.7, -60.9, 16.7] },
+        { name: 'French Guiana', parent: 'France',      bbox: [-55.5,  1.8, -51.0,  6.2] },
+        { name: 'Réunion',       parent: 'France',      bbox: [ 54.9, -21.6, 56.1, -20.6] },
+        { name: 'Bonaire',       parent: 'Netherlands', bbox: [-68.6, 11.9, -68.0, 12.5] }
+      ];
+      function inBbox(pt, bb) { return pt[0] >= bb[0] && pt[1] >= bb[1] && pt[0] <= bb[2] && pt[1] <= bb[3]; }
+      TERRITORIES.forEach(function (t) {
+        var parent = countries.find(function (f) { return f.properties.name === t.parent; });
+        if (!parent || !parent.geometry || parent.geometry.type !== 'MultiPolygon') return;
+        var mine = [], rest = [];
+        parent.geometry.coordinates.forEach(function (poly) {
+          (inBbox(poly[0][0], t.bbox) ? mine : rest).push(poly);
+        });
+        if (!mine.length) return;
+        parent.geometry.coordinates = rest;
+        countries.push({ type: 'Feature', properties: { name: t.name },
+          geometry: { type: 'MultiPolygon', coordinates: mine } });
+      });
+
+      /* fit the whole world (incl. Antarctica) neatly inside the frame */
+      projection.fitExtent([[12, 12], [W - 12, H - 12]],
+        { type: 'FeatureCollection', features: countries });
+
+      /* pan limits hug the drawn world; on mobile start zoomed in */
+      var worldB = path.bounds({ type: 'FeatureCollection', features: countries });
+      var EXT = [[0, Math.max(0, worldB[0][1] - 12)], [W, Math.min(H, worldB[1][1] + 12)]];
+      zoom.translateExtent(EXT);
+      function clampT(k, cx, cy) {
+        var tx = W / 2 - k * cx, ty = H / 2 - k * cy;
+        tx = Math.max(W - k * EXT[1][0], Math.min(-k * EXT[0][0], tx));
+        ty = Math.max(H - k * EXT[1][1], Math.min(-k * EXT[0][1], ty));
+        return d3.zoomIdentity.translate(tx, ty).scale(k);
+      }
+      var homeT = d3.zoomIdentity;
+      if (isMobile) {
+        var k0 = Math.max(1, Math.min(3, H / (EXT[1][1] - EXT[0][1])));
+        zoom.scaleExtent([k0, 80]);
+        homeT = clampT(k0, projection([10, 30])[0], (EXT[0][1] + EXT[1][1]) / 2);
+      }
+
+      var topoByLower = {};
+      countries.forEach(function (f) { topoByLower[f.properties.name.toLowerCase()] = f.properties.name; });
+
+      /* resolve catalogue country names + coordinates */
+      var byCountry = {};
+      /* products located inside a split territory belong to it, regardless
+         of what the metafield says (e.g. Martinique artworks tagged France) */
+      CATALOG.forEach(function (p) {
+        var lat = parseFloat(p.lat), lng = parseFloat(p.lng);
+        if (!isFinite(lat) || !isFinite(lng)) return;
+        TERRITORIES.forEach(function (t) {
+          if (inBbox([lng, lat], t.bbox)) p.country = t.name;
+        });
+      });
+      CATALOG.forEach(function (p) {
+        var c = canonical(p.country) || topoByLower[String(p.country || '').trim().toLowerCase()];
+        if (!c) return; /* unmatched country — skip quietly */
+        p._c = c;
+        (byCountry[c] = byCountry[c] || []).push(p);
+      });
+
+      var featureByName = {};
+      countries.forEach(function (f) { featureByName[f.properties.name] = f; });
+
+      /* fall back to country centroid when lat/lng not set */
+      CATALOG.forEach(function (p) {
+        if (!p._c) return;
+        var lat = parseFloat(p.lat), lng = parseFloat(p.lng);
+        if (isFinite(lat) && isFinite(lng)) {
+          var xy = projection([lng, lat]);
+          p._x = xy[0]; p._y = xy[1];
+        } else {
+          var cen = path.centroid(featureByName[p._c]);
+          p._x = cen[0]; p._y = cen[1];
+        }
+      });
+
+      g.selectAll('path.sa-country')
+        .data(countries)
+        .join('path')
+        .attr('class', function (d) { return 'sa-country ' + (byCountry[d.properties.name] ? 'sa-has' : 'sa-none'); })
+        .attr('d', path)
+        .attr('stroke-width', .7)
+        .on('mousemove', function (ev, d) {
+          var list = byCountry[d.properties.name];
+          tip.innerHTML = d.properties.name +
+            (list ? '<small>' + list.length + ' artwork' + (list.length > 1 ? 's' : '') + ' — view</small>'
+                  : '<small>Coming to the project</small>');
+          tip.style.left = ev.clientX + 'px';
+          tip.style.top = ev.clientY + 'px';
+          tip.style.opacity = 1;
+        })
+        .on('mouseleave', function () { tip.style.opacity = 0; })
+        .on('click', function (ev, d) { ev.stopPropagation(); tapSelect(d, ev.currentTarget); })
+        /* MOBILE FIX: d3's touch gesture handling can swallow taps so no
+           'click' ever fires on phones — detect taps via BOTH touch and
+           pointer events (different browsers suppress different ones);
+           tapSelect() dedupes so a tap can never select twice */
+        .on('touchstart', function (ev) {
+          var t = ev.touches[0];
+          this._saTap = [t.clientX, t.clientY, Date.now()];
+        })
+        .on('touchend', function (ev, d) {
+          var tp = this._saTap; this._saTap = null;
+          if (!tp) return;
+          var t = ev.changedTouches[0];
+          if (Date.now() - tp[2] < 500 && Math.abs(t.clientX - tp[0]) < 14 && Math.abs(t.clientY - tp[1]) < 14) {
+            ev.preventDefault(); ev.stopPropagation();
+            tapSelect(d, this);
+          }
+        })
+        .on('pointerdown', function (ev) {
+          if (ev.pointerType === 'mouse') return;
+          this._saPtr = [ev.clientX, ev.clientY, Date.now()];
+        })
+        .on('pointerup', function (ev, d) {
+          if (ev.pointerType === 'mouse') return;
+          var tp = this._saPtr; this._saPtr = null;
+          if (!tp) return;
+          if (Date.now() - tp[2] < 500 && Math.abs(ev.clientX - tp[0]) < 14 && Math.abs(ev.clientY - tp[1]) < 14) {
+            ev.stopPropagation();
+            tapSelect(d, this);
+          }
+        });
+
+      /* one marker per location — floating + flat variants share a dot,
+         labelled with the shorter title so labels never overlap themselves */
+      var locs = {};
+      CATALOG.forEach(function (p) {
+        if (!p._c) return;
+        var key = p._c + '|' + Math.round(p._x) + '|' + Math.round(p._y);
+        var L = locs[key];
+        if (!L) locs[key] = { _c: p._c, _x: p._x, _y: p._y, title: p.title };
+        else if (p.title.length < L.title.length) L.title = p.title;
+      });
+      var LOCS = Object.keys(locs).map(function (key, i) { var p = locs[key]; p._key = i; return p; });
+      root._saLocs = LOCS;
+      var marks = g.append('g');
+      LOCS.forEach(function (p) {
+        marks.append('circle').datum(p).attr('class', 'sa-dot').attr('cx', p._x).attr('cy', p._y).attr('r', 2.4);
+        marks.append('circle').datum(p).attr('class', 'sa-ring').attr('cx', p._x).attr('cy', p._y).attr('r', 5).attr('stroke-width', .6);
+        marks.append('text').datum(p).attr('class', 'sa-label').attr('x', p._x).attr('y', p._y - 7)
+          .attr('text-anchor', 'middle').text(p.title);
+      });
+      svg.call(zoom.transform, homeT);
+      updateDetail(homeT.k);
+      buildSearch(countries, byCountry);
+
+      /* ---------------- interactions ---------------- */
+      /* zoom to a country's MAIN landmass — countries with overseas
+         territories (France, Netherlands, USA, …) otherwise have bounds
+         spanning half the planet and the camera flies to the wrong place */
+      function mainLandmass(d) {
+        if (d.geometry && d.geometry.type === 'MultiPolygon') {
+          var best = null, bestA = -1;
+          d.geometry.coordinates.forEach(function (coords) {
+            var f = { type: 'Feature', geometry: { type: 'Polygon', coordinates: coords } };
+            var a = d3.geoArea(f);
+            if (a > bestA) { bestA = a; best = f; }
+          });
+          return best || d;
+        }
+        return d;
+      }
+
+      var _lastTap = 0;
+      function tapSelect(d, el) {
+        if (Date.now() - _lastTap < 600) return; /* dedupe click+touch+pointer */
+        _lastTap = Date.now();
+        selectCountry(d, el);
+      }
+
+      function selectCountry(d, el) {
+        var b = path.bounds(mainLandmass(d));
+        var k = Math.min(50, .82 / Math.max((b[1][0] - b[0][0]) / W, (b[1][1] - b[0][1]) / H));
+        k = Math.max(k, zoom.scaleExtent()[0]);
+        svg.transition().duration(950).ease(d3.easeCubicInOut)
+          .call(zoom.transform, clampT(k, (b[0][0] + b[1][0]) / 2, (b[0][1] + b[1][1]) / 2));
+
+        g.selectAll('.sa-country').classed('sa-selected', false).classed('sa-dim', true);
+        if (el) d3.select(el).classed('sa-selected', true).classed('sa-dim', false);
+
+        var name = d.properties.name;
+        g.selectAll('.sa-dot,.sa-ring,.sa-label').classed('sa-inv', function (m) { return m._c === name; });
+
+        openPanel(name);
+        resetB.style.display = 'inline-block';
+      }
+
+      function openPanel(name) {
+        var list = byCountry[name] || [];
+        pPlace.textContent = name;
+        pCount.textContent = list.length
+          ? list.length + ' artwork' + (list.length > 1 ? 's' : '') + ' available'
+          : 'No artworks released yet';
+        pBody.innerHTML = '';
+
+        if (!list.length) {
+          var wrapEl = document.createElement('div');
+          wrapEl.className = 'sa-empty';
+          var pEl = document.createElement('p');
+          pEl.textContent = cfg.emptyText.replace('{location}', name);
+          wrapEl.appendChild(pEl);
+          var a1 = document.createElement('a');
+          a1.href = cfg.browseUrl; a1.textContent = cfg.browseLabel;
+          wrapEl.appendChild(a1);
+          if (cfg.requestEmail) {
+            var a2 = document.createElement('a');
+            a2.href = 'mailto:' + cfg.requestEmail + '?subject=' + encodeURIComponent('Artwork request — ' + name);
+            a2.textContent = cfg.requestLabel;
+            wrapEl.appendChild(a2);
+          }
+          pBody.appendChild(wrapEl);
+        } else {
+          list.forEach(function (p) {
+            var a = document.createElement('a');
+            a.className = 'sa-card'; a.href = p.url;
+            var img = p.img
+              ? '<img src="' + p.img + '" alt="' + esc(p.title) + '" loading="lazy">'
+              : '<div class="sa-stampph"><em>Pantography</em><strong>' + esc(p.title) + '</strong><span class="sa-rule"></span><em>Reimagined stamp</em></div>';
+            a.innerHTML =
+              '<div class="sa-card-img">' + img + '</div>' +
+              '<div class="sa-card-meta"><span class="sa-card-title">' + esc(p.title) + '</span>' +
+              '<span class="sa-card-price">' + esc(p.price || '') + '</span></div>' +
+              '<span class="sa-card-cta">View artwork</span>';
+            pBody.appendChild(a);
+          });
+        }
+        panel.classList.add('sa-open');
+        /* belt & braces: some theme/editor stacks interfere with the CSS
+           visibility transition — enforce visibility inline while open */
+        panel.style.setProperty('visibility', 'visible', 'important');
+        panel.style.setProperty('z-index', '10000', 'important');
+      }
+
+      function hidePanel() {
+        panel.classList.remove('sa-open');
+        panel.style.removeProperty('visibility');
+      }
+
+      function resetView() {
+        hidePanel();
+        g.selectAll('.sa-country').classed('sa-selected', false).classed('sa-dim', false);
+        g.selectAll('.sa-dot,.sa-ring,.sa-label').classed('sa-inv', false);
+        svg.transition().duration(900).ease(d3.easeCubicInOut)
+          .call(zoom.transform, homeT);
+        resetB.style.display = 'none';
+      }
+
+      /* BUGFIX: the close button lives inside the panel, which is teleported
+         to <body> — query it from the panel, never from the section root,
+         and guard every binding so one miss can't kill the rest. */
+      var closeB = panel ? panel.querySelector('[data-sa-close]') : null;
+      if (closeB) closeB.addEventListener('click', hidePanel);
+      if (resetB) resetB.addEventListener('click', resetView);
+      svg.on('click', function () { if (panel && panel.classList.contains('sa-open')) resetView(); });
+      var zinB = root.querySelector('[data-sa-zin]'), zoutB = root.querySelector('[data-sa-zout]');
+      if (zinB) zinB.addEventListener('click', function () { svg.transition().duration(350).call(zoom.scaleBy, 1.6); });
+      if (zoutB) zoutB.addEventListener('click', function () { svg.transition().duration(350).call(zoom.scaleBy, 1 / 1.6); });
+
+      /* ---------------- search ---------------- */
+      function buildSearch(countries, byCountry) {
+        var q = root.querySelector('[data-sa-q]');
+        var box = root.querySelector('[data-sa-suggest]');
+        if (!q || !box) return;
+        var items = [];
+        CATALOG.forEach(function (p) { if (p._c) items.push({ label: p.title.toUpperCase(), sub: p._c, country: p._c }); });
+        Object.keys(byCountry).forEach(function (c) {
+          items.push({ label: c.toUpperCase(), sub: byCountry[c].length + ' artwork' + (byCountry[c].length > 1 ? 's' : ''), country: c });
+        });
+        countries.forEach(function (f) {
+          var n = f.properties.name;
+          if (!byCountry[n]) items.push({ label: n.toUpperCase(), sub: 'Coming soon', country: n });
+        });
+
+        q.addEventListener('input', function () {
+          var v = q.value.trim().toLowerCase();
+          box.innerHTML = '';
+          if (v.length < 2) { box.style.display = 'none'; return; }
+          var hits = items.filter(function (i) { return i.label.toLowerCase().indexOf(v) > -1; }).slice(0, 8);
+          if (!hits.length) { box.style.display = 'none'; return; }
+          hits.forEach(function (h) {
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.innerHTML = esc(h.label) + '<span>' + esc(h.sub) + '</span>';
+            b.addEventListener('click', function () {
+              box.style.display = 'none'; q.value = '';
+              var f = featureByName[h.country];
+              if (f) {
+                var el = g.selectAll('.sa-country').filter(function (d) { return d.properties.name === h.country; }).node();
+                selectCountry(f, el);
+              }
+            });
+            box.appendChild(b);
+          });
+          box.style.display = 'block';
+        });
+        document.addEventListener('click', function (e) {
+          if (!e.target.closest('.sa-search')) box.style.display = 'none';
+        });
+      }
+    });
+
+    /* DECLUTTER: greedy label collision — at each zoom step only labels
+       that don't overlap an already-placed label are shown; more appear
+       as you zoom in and space opens up */
+    var _lastBucket = null, _shownLabels = {};
+    function computeShownLabels(k) {
+      var S = (svg.node().clientWidth || 1000) / W; /* css px per user unit at k=1 */
+      var px = k * S;
+      var placed = [];
+      _shownLabels = {};
+      var items = (root._saLocs || []).slice().sort(function (a, b) { return a._y - b._y || a._x - b._x; });
+      items.forEach(function (p) {
+        var w = p.title.length * 7 + 18;   /* label footprint in screen px */
+        var h = 20;
+        var ok = true;
+        for (var i = 0; i < placed.length; i++) {
+          var q = placed[i];
+          if (Math.abs(p._x - q.x) * px < (w + q.w) / 2 && Math.abs(p._y - q.y) * px < h) { ok = false; break; }
+        }
+        if (ok) { placed.push({ x: p._x, y: p._y, w: w }); _shownLabels[p._key] = true; }
+      });
+    }
+    function updateDetail(k) {
+      g.selectAll('.sa-dot').attr('r', 2.6 / k);
+      g.selectAll('.sa-ring').attr('opacity', k > 2.4 ? .9 : 0).attr('r', 6 / k).attr('stroke-width', 1 / k);
+      if (k > 2.4) {
+        var bucket = Math.round(k * 4) / 4;
+        if (bucket !== _lastBucket) { computeShownLabels(k); _lastBucket = bucket; }
+      }
+      g.selectAll('.sa-label')
+        .style('opacity', function (d) { return (k > 2.4 && _shownLabels[d._key]) ? 1 : 0; })
+        .attr('font-size', (10.5 / k) + 'px')
+        .attr('y', function (d) { return d._y - 9 / k; });
+    }
+
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+  }
+
+  /* ------------------------------------------------------------------ */
+  function boot(scope) {
+    (scope || document).querySelectorAll('[data-stamp-atlas]').forEach(function (el) {
+      if (el.dataset.saInit) return;
+      el.dataset.saInit = '1';
+      prefetch(el); /* SPEED: world + catalogue start downloading right now */
+      var start = function () {
+        loadLibs().then(function () { initAtlas(el); }).catch(function () {
+          /* one delayed retry — consent/chat scripts often release their
+             grip on script injection a few seconds after page load */
+          setTimeout(function () {
+            loadLibs().then(function () { initAtlas(el); }).catch(function (e) {
+              try { console.error('[Stamp Atlas] giving up:', e); } catch (x) {}
+            });
+          }, 3500);
+        });
+      };
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (en) {
+            if (en.isIntersecting) { io.disconnect(); start(); }
+          });
+        }, { rootMargin: '900px' }); /* SPEED: build well before it scrolls into view */
+        io.observe(el);
+      } else {
+        start();
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () { boot(); });
+  } else {
+    boot();
+  }
+  /* re-init inside the Shopify theme editor */
+  document.addEventListener('shopify:section:load', function (e) {
+    if (e.target) {
+      e.target.querySelectorAll('[data-stamp-atlas]').forEach(function (el) { delete el.dataset.saInit; });
+      boot(e.target);
+    }
+  });
+  /* re-init when the viewport crosses the mobile breakpoint (e.g. the
+     theme editor's desktop/mobile toggle) so the right canvas is used */
+  var resizeT;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeT);
+    resizeT = setTimeout(function () {
+      document.querySelectorAll('[data-stamp-atlas]').forEach(function (el) {
+        if (!el.dataset.saInit || el._saMobile == null) return;
+        var w = el.querySelector('[data-sa-map]');
+        if (!w) return;
+        var m = w.clientWidth > 0 && w.clientWidth < 640;
+        if (m !== el._saMobile) loadLibs().then(function () { initAtlas(el); });
+      });
+    }, 350);
+  });
+})();
+
+</script>
+
+{% schema %}
+{
+  "name": "Stamp Atlas map",
+  "tag": "section",
+  "class": "section-stamp-atlas",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Products appear on the map when they have the metafields custom.map_country (required), custom.map_lat and custom.map_lng (optional — pin falls back to the centre of the country). Choose the collection to read products from below, or add manual Location blocks."
+    },
+    { "type": "header", "content": "Content" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow (small line above heading)" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "The Stamp Atlas" },
+    { "type": "textarea", "id": "subheading", "label": "Subheading", "default": "An artwork from every country in the world. Select a location to explore the artworks available from that part of the map." },
+    { "type": "collection", "id": "collection", "label": "Collection with mapped products" },
+    { "type": "header", "content": "Map options" },
+    { "type": "checkbox", "id": "show_search", "label": "Show location search", "default": true },
+    { "type": "text", "id": "search_placeholder", "label": "Search placeholder", "default": "Search a location" },
+    { "type": "checkbox", "id": "show_legend", "label": "Show legend", "default": true },
+    { "type": "text", "id": "legend_label", "label": "Legend label", "default": "Artwork available" },
+    { "type": "text", "id": "reset_label", "label": "Reset button label", "default": "View the world" },
+    { "type": "range", "id": "gap_search_map", "label": "Space between search bar and map", "min": 0, "max": 80, "step": 4, "unit": "px", "default": 24 },
+    { "type": "header", "content": "Empty state (countries without artworks)" },
+    { "type": "textarea", "id": "empty_text", "label": "Text ({location} is replaced by the country name)", "default": "The aim of the project is to produce an artwork from every country in the world — {location} is still to come." },
+    { "type": "url", "id": "browse_link", "label": "Browse all link" },
+    { "type": "text", "id": "browse_label", "label": "Browse all label", "default": "View all artworks" },
+    { "type": "text", "id": "request_email", "label": "Request email (leave blank to hide)", "default": "studio@pantography.com" },
+    { "type": "text", "id": "request_label", "label": "Request button label", "default": "Request this location" },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 56 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 72 }
+  ],
+  "blocks": [
+    {
+      "type": "location",
+      "name": "Location (manual)",
+      "settings": [
+        { "type": "product", "id": "product", "label": "Product" },
+        { "type": "text", "id": "title", "label": "Title override (optional)" },
+        { "type": "text", "id": "country", "label": "Country (e.g. Spain)" },
+        { "type": "text", "id": "lat", "label": "Latitude (optional)" },
+        { "type": "text", "id": "lng", "label": "Longitude (optional)" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Stamp Atlas map" }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,42 @@
+<div class="align-center margin-double" style="max-width: 720px;">
+    <{{ settings.global_title_size }} class="margin-30">{{ 'customer.activate_account.title' | t }}</{{ settings.global_title_size }}>
+{%- assign activate_customer_form_classes = 'f8lg f8vl' %}
+{%- form 'activate_customer_password', class: activate_customer_form_classes -%}
+    {%- if form.posted_successfully? -%}
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var alertAttributes = { message: "{{ 'customer.recover_password.posted_successfully' | t }}", type: "success", origin: "login" },
+                    showAlertEvent = new CustomEvent("showAlert", {detail: alertAttributes});
+                window.dispatchEvent(showAlertEvent);
+            });
+        </script>
+    {%- elsif form.errors -%}
+        {%- for error in form.errors -%}
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    var alertAttributes = { message: '{%- if error == "form" -%}{{ form.errors.messages[error] }}{%- else -%}{{ form.errors.translated_fields[error] | capitalize }} {{ form.errors.messages[error] }}{%- endif -%}', type: "error", origin: "login" },
+                        showAlertEvent = new CustomEvent("showAlert", {detail: alertAttributes});
+                    window.dispatchEvent(showAlertEvent);
+                });
+            </script>
+        {%- endfor -%}
+    {%- endif -%}
+    <fieldset>
+        <legend>{{ 'customer.activate_account.title' | t }}</legend>
+        <div class="cols">
+            <p class="width-50">
+                <label for="password">{{ 'customer.activate_account.password' | t }}<span class="overlay-theme">*</span> <a href="./" class="show"><span>{{ 'general.accessibility.show' | t }}</span> <span class="hidden">{{ 'general.accessibility.hide' | t }}</span></a></label>
+                <input type="password" id="password" name="customer[password]" placeholder="{{ 'customer.activate_account.password' | t }}" required>
+            </p>
+            <p class="width-50">
+                <label for="password_confirmation">{{ 'customer.activate_account.password_confirmation' | t }}<span class="overlay-theme">*</span> <a href="./" class="show"><span>{{ 'general.accessibility.show' | t }}</span> <span class="hidden">{{ 'general.accessibility.hide' | t }}</span></a></label>
+                <input type="password" id="password_confirmation" name="customer[password_confirmation]" placeholder="{{ 'customer.activate_account.password_confirmation' | t }}" required data-match="#password" data-match-error="{{ 'customer.register.passwords_dont_match' | t }}">
+            </p>
+        </div>
+        <p class="link-btn">
+            <button type="submit{% if settings.button_style == 'inv' %} inv{% endif %}">{{ 'customer.activate_account.submit' | t }}</button>
+            <button type="submit" class="inline" name="decline">{{ 'customer.activate_account.decline' | t }}</button>
+        </p>
+    </fieldset>
+{%- endform -%}
+</div>

@@ -1,0 +1,196 @@
+{% comment %}theme-check-disable ImgLazyLoading{% endcomment %}
+<article class="palette-{{ section.settings.color_palette }} m6er inv module-color-palette" style="--glw:720px;">
+  <h1>
+    <span class="strong">{{ '404.404' | t }}</span> {{ '404.title' | t }}
+  </h1>
+  <p>{{ '404.subtitle_html' | t }}</p>
+  {%- if section.settings.show_link and section.settings.link_text != empty and section.settings.link_url != blank -%}
+    {%- liquid
+      assign button_color = section.settings.button_style | split: ' ' | first
+      assign button_style = section.settings.button_style | split: ' ' | last
+      assign is_link = false
+      if button_style == 'link'
+        assign is_link = true
+      endif
+    -%}
+    <p class="link-btn">
+      <a href="{{ section.settings.link_url }}" class="overlay-{{ button_color }} {% if is_link %}strong inline{% else %}{{ button_style }}{% endif %}">
+        {{ section.settings.link_text }}{% if is_link %}&nbsp;<i aria-hidden="true" class="icon-arrow-right"></i>{% endif %}
+      </a>
+    </p>
+  {%- endif %}
+
+</article>
+
+<figure
+  id="background"
+  class="palette-{{ section.settings.color_palette }} module-color-palette"
+  {% if settings.enable_animations %}
+    data-sal="fade" data-sal-duration="500"
+  {% endif %}
+>
+  <span class="img-overlay" style="opacity:{{ section.settings.overlay_opacity | divided_by: 100.0 }}"></span>
+  {%- if section.settings.video -%}
+    {%- liquid
+      assign source = section.settings.video.sources | where: 'height', 1080 | where: 'format', 'mp4' | first
+      if source == null
+        assign source = section.settings.video.sources | where: 'format', 'mp4' | first
+      endif
+      if source == null
+        assign source = section.settings.video.sources | where: 'format', 'mov' | first
+      endif
+      if source == null
+        assign source = section.settings.video.sources.first
+      endif
+    -%}
+    <video class="lazy" autoplay muted loop playsinline poster="{{ section.settings.video.preview_image | image_url }}">
+      <source data-src="{{ source.url }}" type="video/mp4">
+    </video>
+  {%- endif -%}
+  {%- if section.settings.image -%}
+    {%- assign default_alt = 'header.extra_img_default_alt' | t %}
+    <picture
+      {% if section.settings.video %}
+        class="mobile-only"
+      {% endif %}
+    >
+      <img
+        src="{{ section.settings.image | image_url: width: 1400 }}"
+        srcset="{% render 'image-srcset', image: section.settings.image %}"
+        sizes="100vw"
+        width="1400"
+        height="846"
+        alt="{{ section.settings.image.alt | default: default_alt | escape }}"
+        style="object-position: {{ section.settings.image.presentation.focal_point }}"
+        loading="lazy"
+      >
+    </picture>
+  {% endif %}
+</figure>
+
+{% schema %}
+{
+  "name": "t:main.404.name",
+  "class": "align-center margin-double",
+  "settings": [
+    {
+      "id": "image",
+      "type": "image_picker",
+      "label": "t:main.404.settings.image.label",
+      "info": "t:main.404.settings.image.info"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "t:main.404.settings.overlay_opacity.label",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 0
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_palette",
+      "label": "t:global.color_palette.label",
+      "default": "scheme-4"
+    },
+    {
+      "id": "video",
+      "type": "video",
+      "label": "t:main.404.settings.video.label",
+      "info": "t:main.404.settings.video.info"
+    },
+    {
+      "type": "header",
+      "content": "t:global.button.header"
+    },
+    {
+      "id": "show_link",
+      "type": "checkbox",
+      "label": "t:global.button.show_link.label",
+      "default": true
+    },
+    {
+      "id": "link_text",
+      "type": "text",
+      "label": "t:main.404.settings.link_text.label",
+      "default": "Button"
+    },
+    {
+      "id": "link_url",
+      "type": "url",
+      "label": "t:main.404.settings.link_url.label",
+      "default": "/"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "t:global.button.button_style.label",
+      "options": [
+        {
+          "value": "primary solid",
+          "label": "t:global.button.button_style.primary.label",
+          "group": "t:global.button.button_style.group.solid"
+        },
+        {
+          "value": "secondary solid",
+          "label": "t:global.button.button_style.secondary.label",
+          "group": "t:global.button.button_style.group.solid"
+        },
+        {
+          "value": "tertiary solid",
+          "label": "t:global.button.button_style.tertiary.label",
+          "group": "t:global.button.button_style.group.solid"
+        },
+        {
+          "value": "primary plain",
+          "label": "t:global.button.button_style.primary.label",
+          "group": "t:global.button.button_style.group.plain"
+        },
+        {
+          "value": "secondary plain",
+          "label": "t:global.button.button_style.secondary.label",
+          "group": "t:global.button.button_style.group.plain"
+        },
+        {
+          "value": "tertiary plain",
+          "label": "t:global.button.button_style.tertiary.label",
+          "group": "t:global.button.button_style.group.plain"
+        },
+        {
+          "value": "primary inv",
+          "label": "t:global.button.button_style.primary.label",
+          "group": "t:global.button.button_style.group.inv"
+        },
+        {
+          "value": "secondary inv",
+          "label": "t:global.button.button_style.secondary.label",
+          "group": "t:global.button.button_style.group.inv"
+        },
+        {
+          "value": "tertiary inv",
+          "label": "t:global.button.button_style.tertiary.label",
+          "group": "t:global.button.button_style.group.inv"
+        },
+        {
+          "value": "primary link",
+          "label": "t:global.button.button_style.primary.label",
+          "group": "t:global.button.button_style.group.link"
+        },
+        {
+          "value": "secondary link",
+          "label": "t:global.button.button_style.secondary.label",
+          "group": "t:global.button.button_style.group.link"
+        },
+        {
+          "value": "tertiary link",
+          "label": "t:global.button.button_style.tertiary.label",
+          "group": "t:global.button.button_style.group.link"
+        }
+      ],
+      "default": "primary plain"
+    }
+  ]
+}
+{% endschema %}
