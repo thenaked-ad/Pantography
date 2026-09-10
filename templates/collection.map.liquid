@@ -26,6 +26,7 @@
       {%- endif -%}
     {%- endfor -%}
   ],
-  "next": {% if paginate.next %}true{% else %}false{% endif %}
+  "next": {% if paginate.next %}true{% else %}false{% endif %},
+  "pages": {{ paginate.pages }}
 }
 {%- endpaginate -%}
