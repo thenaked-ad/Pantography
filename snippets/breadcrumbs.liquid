@@ -1,0 +1,99 @@
+<nav class="n6br fw-{{ settings.body_font_weight }}{% if settings.breadcrumbs_font == 'primary' %} title-font{% endif %}" role="navigation" aria-label="breadcrumbs" {% if settings.enable_animations %}data-sal="fade" data-sal-duration="500"{% endif %}>
+  <ol{% if hide_mobile %} class="mobile-hide"{% endif %}>
+
+    <li>
+      <a href="/" title="Home">{{ 'general.breadcrumbs.home' | t }}</a>
+    </li>
+
+    {% if template.name == 'collection' and collection.handle %}
+      {% if current_tags %}
+        {% capture url %}/collections/{{ collection.handle }}{% endcapture %}
+        <li>
+          {{ collection.title | link_to: url }}
+        </li>
+        <li>
+          {% for tag in current_tags %}
+            {% assign filter = tag | split: ':' | last %}
+            {{ filter | capitalize }} {% unless forloop.last %}+ {% endunless %}
+          {% endfor %}
+        </li>
+      {% else %}
+        <li>
+          {{ collection.title }}
+        </li>
+      {% endif %}
+
+    {% elsif template.name == 'blog' %}
+      <li>
+        {{ 'blog.breadcrumb' | t | capitalize | link_to: blog.url }}
+      </li>
+      <li>
+        {{ blog.title | capitalize }}
+      </li>
+
+    {% elsif template.name == 'article' %}
+      <li>
+        {{ 'blog.breadcrumb' | t | capitalize | link_to: blog.url }}
+      </li>
+      <li>
+        {{ blog.title | link_to: blog.url }}
+      </li>
+      <li>
+        {{ article.title }}
+      </li>
+
+    {% elsif template.name == 'page' %}
+     <li>
+       {{ page.title }}
+     </li>
+
+    {% elsif page_title == 'Account' and template.name != 'account' %}
+      <li>
+        {{ page_title }}
+      </li>
+      <li>
+        {{ template.name | capitalize }}
+      </li>
+
+    {% elsif template.name == 'search' %}
+    <li>
+      {{ 'search.title' | t }}
+    </li>
+
+    {% elsif template.name == 'cart' %}
+    <li>
+      {{ 'cart.title' | t }}
+    </li>
+
+    {% elsif template.name == 'product' and product != blank %}
+    <li>
+        {{ product.title }}
+    </li>
+
+    {% elsif template.suffix != nil %}
+    <li>
+      {{ template.suffix | capitalize }}
+    </li>
+
+    {% else %}
+     <li>
+       {{ page_title }}
+     </li>
+
+    {% endif %}
+  </ol>
+
+  {%- if template.name == 'product' and back_button -%}
+      <p class="mobile-only margin-content"><a class="breadcrumb-back"><i aria-hidden="true" class="icon-chevron-left"></i> {{ 'general.breadcrumbs.back' | t }}</a></p>
+  {%- endif -%}
+</nav>
+
+{% unless back_button %}
+    {%- if template.name == 'product' and hide_mobile -%}
+        <style>
+            @media only screen and (max-width: 760px) {
+                #shopify-section-{{ section.id }}:has(+ .shopify-section > article.product-space) .n6br { margin-top: calc(var(--content_padding_top) * -1) !important; }
+            }
+        </style>
+    {%- endif -%}
+{% endunless %}

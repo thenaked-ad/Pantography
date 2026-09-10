@@ -1,0 +1,187 @@
+<!doctype html>
+{%- assign rtl_languages = 'ae,ar,arc,bcc,bqi,ckb,dv,fa,glk,ha,he,kwh,ks,ku,mzn,nqo,pnb,ps,sd,ug,ur,yi' | split: ',' %}
+<html lang="{{ request.locale.iso_code }}" data-theme="next" dir="{% if rtl_languages contains localization.language.iso_code %}rtl{% else %}ltr{% endif %}" class="no-js btn-hover-up t1pl {% if request.design_mode %}theme-editor{% endif %}">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="x-ua-compatible" content="ie=edge">
+    {%- assign formatted_initial_value = gift_card.initial_value | money_without_trailing_zeros: gift_card.currency -%}
+    {%- assign formatted_initial_value_stripped = formatted_initial_value | strip_html -%}
+    <title>{{ 'gift_cards.issued.page_title' | t: value: formatted_initial_value_stripped, shop: shop.name }}</title>
+		<meta name="theme-color" content="{{ settings.accent_color }}">
+		<meta name="MobileOptimized" content="320">
+		<meta name="HandheldFriendly" content="true">
+		<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=5, viewport-fit=cover, shrink-to-fit=no">
+		<meta name="msapplication-config" content="{{ 'browserconfig.xml' | asset_url }}">
+		<link rel="canonical" href="{{ canonical_url }}">
+		{% unless settings.primary_font.system? and settings.secondary_font.system? %}<link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>{%- endunless -%}
+		<link rel="preload" as="style" href="{{ 'screen.css' | asset_url }}">
+		<link rel="preload" as="style" href="{{ 'screen-settings.css' | asset_url }}">
+		{% if rtl_languages contains localization.language.iso_code %}<link rel="preload" as="style" href="{{ 'rtl.css' | asset_url }}">{% endif %}
+		{% unless settings.primary_font.system? %}<link rel="preload" as="font" href="{{ settings.primary_font | font_url }}" type="font/woff2" crossorigin>{% endunless %}
+		{% unless settings.secondary_font.system? %}<link rel="preload" as="font" href="{{ settings.secondary_font | font_url }}" type="font/woff2" crossorigin>{% endunless %}
+		<link rel="preload" as="font" href="{{ 'icomoon.woff' | asset_url }}" crossorigin>
+		<link media="screen" rel="stylesheet" href="{{ 'screen.css' | asset_url }}" id="core-css">
+		<link media="screen" rel="stylesheet" href="{{ 'screen-settings.css' | asset_url }}" id="custom-css">
+		{% if rtl_languages contains localization.language.iso_code %}<link media="screen" rel="stylesheet" href="{{ 'rtl.css' | asset_url }}">{% endif %}
+		<noscript><link rel="stylesheet" href="{{ 'async-menu.css' | asset_url }}"></noscript>
+		<link media="all" rel="stylesheet" href="{{ 'page-misc.css' | asset_url }}" id="misc-css">
+		{%- if settings.favicon -%}
+    	<link rel="icon" href="{{ settings.favicon | image_url: width: 32, height: 32 }}" type="image/png">
+			<link rel="mask-icon" href="safari-pinned-tab.svg" color="#333333">
+			<link rel="apple-touch-icon" href="apple-touch-icon.png">
+    {%- endif -%}
+		<script>document.documentElement.classList.remove('no-js');</script>
+		{% render 'social-meta-tags' %}
+		{{ content_for_header }}
+		<style>
+			{% for scheme in settings.color_schemes -%}
+				:root {
+				--{{ scheme.id }}:                      {% if scheme.settings.primary_bg_gradient != empty %}{{ scheme.settings.primary_bg_gradient }}{% else %}{{ scheme.settings.primary_bg }}{% endif %};
+				--{{ scheme.id }}_solid:                {{ scheme.settings.primary_bg }};
+				--{{ scheme.id }}_bg:                   var(--{{ scheme.id }});
+				--{{ scheme.id }}_bg_dark:              {% assign primary_bg_hex = scheme.settings.primary_bg | color_to_hex  %}{% if primary_bg_hex == '#ffffff' or primary_bg_hex == '#FFFFFF' %}var(--{{ scheme.id }}_bg);{% else %}{{ scheme.settings.primary_bg | color_darken: 2 }};{% endif %}
+				--{{ scheme.id }}_bg_var:               var(--{{ scheme.id }}_bg_dark);
+				--{{ scheme.id }}_bg_secondary:         {{ scheme.settings.secondary_bg }};
+				--{{ scheme.id }}_fg:                   {{ scheme.settings.primary_fg }};
+				--{{ scheme.id }}_fg_sat:               {{ scheme.settings.primary_fg | color_lighten: 75 }};
+				--{{ scheme.id }}_title:                {% if scheme.settings.title_color_gradient != empty %}{{ scheme.settings.title_color_gradient }}{% else %}{{ scheme.settings.title_color }}{% endif %};
+				--{{ scheme.id }}_title_solid:          {{ scheme.settings.title_color }};
+
+				--{{ scheme.id }}_primary_btn_bg:       {{ scheme.settings.primary_button_bg }};
+				--{{ scheme.id }}_primary_btn_bg_dark:  {{ scheme.settings.primary_button_bg | color_darken: 7 }};
+				--{{ scheme.id }}_primary_btn_fg:       {{ scheme.settings.primary_button_fg }};
+				--{{ scheme.id }}_secondary_btn_bg:     {{ scheme.settings.secondary_button_bg }};
+				--{{ scheme.id }}_secondary_btn_bg_dark:{{ scheme.settings.secondary_button_bg | color_darken: 7 }};
+				--{{ scheme.id }}_secondary_btn_fg:     {{ scheme.settings.secondary_button_fg }};
+				--{{ scheme.id }}_tertiary_btn_bg:      {{ scheme.settings.tertiary_button_bg }};
+				--{{ scheme.id }}_tertiary_btn_bg_dark: {{ scheme.settings.tertiary_button_bg | color_darken: 7 }};
+				--{{ scheme.id }}_tertiary_btn_fg:      {{ scheme.settings.tertiary_button_fg }};
+				--{{ scheme.id }}_btn_bg:       		var(--{{ scheme.id }}_primary_btn_bg);
+				--{{ scheme.id }}_btn_bg_dark:  		var(--{{ scheme.id }}_primary_btn_bg_dark);
+				--{{ scheme.id }}_btn_fg:       		var(--{{ scheme.id }}_primary_btn_fg);
+				--{{ scheme.id }}_bd:                   {{ scheme.settings.primary_bd }};
+				--{{ scheme.id }}_input_bg:             {{ scheme.settings.input_bg }};
+				--{{ scheme.id }}_input_bg_dark:        {{ scheme.settings.input_bg  | color_darken: 5 }};
+				--{{ scheme.id }}_input_fg:             {{ scheme.settings.input_fg }};
+				--{{ scheme.id }}_input_pl:             {{ scheme.settings.input_fg | color_lighten: 4 }};
+				--{{ scheme.id }}_accent:               {{ scheme.settings.accent }};
+				--{{ scheme.id }}_accent_gradient:      {% if scheme.settings.accent_gradient != empty %}{{ scheme.settings.accent_gradient }}{% else %}{{ scheme.settings.accent }}{% endif %};
+				{% assign brightness = scheme.settings.primary_fg | color_brightness %}
+				--{{ scheme.id }}_fg_brightness: {% if brightness >= 128 %}1{% else %}0{% endif %}; {% comment %}0 is dark, 1 is light{% endcomment %}
+				{% if scheme.id == settings.default_color_scheme.id %}
+					--body_bg:            				var(--{{ scheme.id }}_bg);
+				{% endif %}
+				--{{ scheme.id }}_bg_darkmode:        {{ scheme.settings.primary_bg_darkmode }};
+				--{{ scheme.id }}_fg_darkmode:        {{ scheme.settings.primary_fg_darkmode }};
+				--{{ scheme.id }}_primary_btn_bg_darkmode: {{ scheme.settings.primary_button_bg_darkmode }};
+				--{{ scheme.id }}_primary_btn_fg_darkmode: {{ scheme.settings.primary_button_fg_darkmode }};
+				}
+				{% if scheme.id == settings.default_color_scheme.id %}:root, {% endif %}[class*="palette-{{ scheme.id }}"], [data-active-content*="{{ scheme.id }}"] {
+				--primary_bg:             var(--{{ scheme.id }}_bg);
+				--bg_secondary:           var(--{{ scheme.id }}_bg_secondary);
+				--primary_text:           var(--{{ scheme.id }}_fg);
+				--primary_text_h:         var(--{{ scheme.id }}_title);
+				--headings_text:          var(--primary_text_h);
+				--headings_text_solid:    var(--{{ scheme.id }}_title_solid);
+				--primary_btn_bg:         var(--{{ scheme.id }}_primary_btn_bg);
+				--primary_btn_bg_dark:    var(--{{ scheme.id }}_primary_btn_bg_dark);
+				--primary_btn_fg:       var(--{{ scheme.id }}_primary_btn_fg);
+				--secondary_btn_bg:       var(--{{ scheme.id }}_secondary_btn_bg);
+				--secondary_btn_bg_dark:  var(--{{ scheme.id }}_secondary_btn_bg_dark);
+				--secondary_btn_fg:     var(--{{ scheme.id }}_secondary_btn_fg);
+				--tertiary_btn_bg:        var(--{{ scheme.id }}_tertiary_btn_bg);
+				--tertiary_btn_bg_dark:   var(--{{ scheme.id }}_tertiary_btn_bg_dark);
+				--tertiary_btn_fg:      var(--{{ scheme.id }}_tertiary_btn_fg);
+				--input_bg:               var(--{{ scheme.id }}_input_bg);
+				--input_bg_dark:          var(--{{ scheme.id }}_input_bg_dark);
+				--input_fg:               var(--{{ scheme.id }}_input_fg);
+				--input_pl:               var(--{{ scheme.id }}_input_pl);
+				--input_bd:               var(--{{ scheme.id }}_bd);
+				--custom_bd:              var(--custom_input_bd);
+				--secondary_bg: 		  var(--primary_btn_bg);
+				--accent:                 var(--{{ scheme.id }}_accent);
+				--theme_bg:               var(--accent);
+				--accent_gradient:        var(--{{ scheme.id }}_accent_gradient);
+				--primary_text_brightness:var(--{{ scheme.id }}_fg_brightness);
+				--primary_default_body_text:     var(--{{ settings.default_color_scheme.id }}_fg);
+				--primary_default_heading_text:  var(--{{ settings.default_color_scheme.id }}_title);
+				}
+				{% if scheme.settings.title_color_gradient != empty %}
+					{% if scheme.id == settings.default_color_scheme.id %}h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6,{% endif %}
+					[class*="palette-{{ scheme.id }}"] h1, [data-active-content*="{{ scheme.id }}"] h1,
+					[class*="palette-{{ scheme.id }}"] h2, [data-active-content*="{{ scheme.id }}"] h2,
+					[class*="palette-{{ scheme.id }}"] h3, [data-active-content*="{{ scheme.id }}"] h3,
+					[class*="palette-{{ scheme.id }}"] h4, [data-active-content*="{{ scheme.id }}"] h4,
+					[class*="palette-{{ scheme.id }}"] h5, [data-active-content*="{{ scheme.id }}"] h5,
+					[class*="palette-{{ scheme.id }}"] h6, [data-active-content*="{{ scheme.id }}"] h6,
+					[class*="palette-{{ scheme.id }}"] .ff-heading, [data-active-content*="{{ scheme.id }}"] .ff-heading {
+					background: var(--headings_text);
+					background-clip: text; -webkit-background-clip: text;
+					text-fill-color: transparent; -webkit-text-fill-color: transparent;
+					line-height: max(1.25, var(--main_lh_h));
+					}
+				{% endif %}
+				.day-switched {
+				--{{ scheme.id }}_bg:     var(--{{ scheme.id }}_bg_darkmode);
+				--{{ scheme.id }}_fg:     var(--{{ scheme.id }}_fg_darkmode);
+				--{{ scheme.id }}_btn_bg: var(--{{ scheme.id }}_primary_btn_bg_darkmode);
+				--{{ scheme.id }}_btn_fg: var(--{{ scheme.id }}_primary_btn_fg_darkmode);
+				}
+				{% if scheme.id == settings.default_color_scheme.id %}.day-switched, {% endif %}.day-switched [class*="palette-{{ scheme.id }}"], .day-switched [data-active-content*="{{ scheme.id }}"] {
+				--primary_bg:             var(--{{ scheme.id }}_bg);
+				--bg_secondary:           var(--primary_bg);
+				--primary_text:           var(-{{ scheme.id }}_fg);
+				--primary_text_h:         var(--primary_text);
+				--headings_text:          var(--primary_text);
+				--headings_text_solid:    var(--primary_text);
+				--primary_btn_bg:         var(--{{ scheme.id }}_btn_bg);
+				--primary_btn_bg_dark:    var(--primary_btn_bg);
+				--primary_btn_fg:         var(--{{ scheme.id }}_btn_fg);
+				--secondary_btn_bg:       var(--primary_btn_bg);
+				--secondary_btn_bg_dark:  var(--primary_btn_bg);
+				--secondary_btn_fg:       var(--primary_btn_fg);
+				--tertiary_btn_bg:        var(--primary_btn_bg);
+				--tertiary_btn_bg_dark:   var(--primary_btn_bg);
+				--tertiary_btn_fg:        var(--primary_btn_fg);
+				--primary_default_body_text:     var(--primary_text);
+				--primary_default_heading_text:  var(--primary_text);
+				{% if scheme.id == settings.default_color_scheme.id %}
+					--body_bg:            	var(--primary_bg);
+				{% endif %}
+				}
+			{% endfor %}
+			@media only screen and (max-width: 47.5em) {
+			.text-palette-default-mobile, [class*="palette-"].text-palette-default-mobile { --primary_text: var(--{{ settings.default_color_scheme.id }}_fg); --headings_text: var(--{{ settings.default_color_scheme.id }}_title);}
+			}
+
+			{% if request.design_mode %}
+				#root li:has(.block-shopify-attributes) { position: relative; }
+				#root .block-shopify-attributes { height: 100%; left: 0; position: absolute; top: 0; width: 100%; z-index: 99999; }
+				html:not(.inspect-mode-enabled) #root .block-shopify-attributes { pointer-events: none; }
+			{% endif %}
+		</style>
+	</head>
+	<body class="template-{{ template.name | handle }}">
+		<div id="root">
+			<main id="content">
+				{{ content_for_layout }}
+			</main>
+		</div>
+		{% render 'global-variables' %}
+		{%- if rtl_languages contains localization.language.iso_code -%}<link media="screen" rel="stylesheet" href="{{ 'rtl.css' | asset_url }}">{%- endif -%}
+		<script defer src="{{ 'scripts.js' | asset_url }}"></script>
+		<script defer src="{{ 'custom.js' | asset_url }}"></script>
+    	<script defer src="{{ 'vendor/qrcode.js' | shopify_asset_url }}"></script>
+		<script>
+			var string = { qrImageAlt: {{ 'gift_cards.issued.qr_image_alt' | t | json }} };
+		  document.addEventListener('DOMContentLoaded', function() {
+		    new QRCode( document.querySelector('.giftcard-qr'), {
+		     text: document.querySelector('.giftcard-qr').dataset.identifier,
+		     width: 120,
+		     height: 120,
+		     imageAltText: string.qrImageAlt
+		     });
+		  });
+		</script>
+	</body>
+</html>

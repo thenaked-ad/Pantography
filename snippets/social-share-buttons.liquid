@@ -1,0 +1,18 @@
+{%- if share_whatsapp -%}
+  <span><a target="_blank" href="https://api.whatsapp.com/send?text={{ shop.url }}{{ share.url }}"><i aria-hidden="true" class="icon-whatsapp"></i> <span>{{ 'social_share.whatsapp' | t }}</span></a></span>
+{% endif %}
+{%- if share_facebook -%}
+  <span><a target="_blank" onclick="return !window.open(this.href,'{{ share.title }}', 'width=500,height=500')" href="https://www.facebook.com/sharer/sharer.php?u={{ shop.url }}{{ share.url }}"><i aria-hidden="true" class="icon-facebook"></i> <span>{{ 'social_share.facebook' | t }}</span></a></span>
+{%- endif %}
+{% if share_twitter -%}
+  <span><a target="_blank" onclick="return !window.open(this.href,'{{ share.title }}', 'width=500,height=500')" href="https://twitter.com/intent/tweet?url={{ shop.url }}{{ share.url }}"><i aria-hidden="true" class="icon-twitter"></i> <span>{{ 'social_share.twitter' | t }}</span></a></span>
+{%- endif -%}
+{%- if share_pinterest -%}
+  <span><a target="_blank" onclick="return !window.open(this.href,'{{ share.title }}', 'width=500,height=500')" href="https://pinterest.com/pin/create/button/?url={{ shop.url }}{{ share.url }}&media={{ share.image | image_url }}&description={{ share.title | url_encode }}"><i aria-hidden="true" class="icon-pinterest"></i> <span>{{ 'social_share.pinterest' | t }}</span></a></span>
+{% endif %}
+{%- if share_messenger -%}
+  <span class="desktop-hide"><a href="fb-messenger://share/?link={{ shop.url }}{{ share.url }}"><i aria-hidden="true" class="icon-messenger"></i> <span>{{ 'social_share.messenger' | t }}</span></a></span>
+{%- endif -%}
+{%- if share_email -%}
+  <span><a href="mailto:?subject=&body={{ shop.url }}{{ share.url }}"><i aria-hidden="true" class="icon-envelope-fill"></i> <span>{{ 'social_share.email' | t }}</span></a></span>
+{%- endif -%}

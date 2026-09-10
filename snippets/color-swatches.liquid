@@ -1,0 +1,21 @@
+{% assign colors = settings.color_swatch_hexes | newline_to_br | strip_newlines | replace: '<br />', ',' | split: ',' %}
+<style>
+    {%- for color in colors -%}
+    {%- liquid
+        assign hex = color | split: ':' | last
+        assign hex_handleized = hex | handleize
+        assign handle = color | split: ':' | first | handleize
+        assign img = handle | append: '.png'
+    -%}
+    .swatch-custom-color-{{ handle }} {
+        {% if hex contains '-' %}
+            {% assign hex = hex | split: '-' %}
+            --color: linear-gradient(135deg, {{ hex | first }} 0%,{{ hex | first }} 49%,{{ hex | last }} 50%,{{ hex | last }} 100%)!important;
+        {% elsif hex_handleized != handle %}
+            --color: {{ hex }}!important;
+        {% else %}
+            --color: url("{{ img | asset_img_url }}")!important;
+        {% endif %}
+    }
+    {%- endfor -%}
+</style>

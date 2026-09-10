@@ -1,0 +1,19 @@
+<link href="{{ 'backend-theme-picker.css' | asset_url }}" rel="preload" as="style" onload="this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="{{ 'backend-theme-picker.css' | asset_url }}"></noscript>
+<script defer src="{{ 'backend-theme-picker.js' | asset_url }}"></script>
+<aside id="color-palette" class="theme-picker">
+  <p class="strong">{{ 'general.color_palette.title' | t }}&nbsp;<span class="scheme-tip">{{ 'general.color_palette.info' | t }}</span></p>
+  <ul>
+    <li class="palette-white">{{ 'general.color_palette.white' | t }}</li>
+    <li class="palette-black">{{ 'general.color_palette.black' | t }}</li>
+    <li class="palette-light">{{ 'general.color_palette.light' | t }}</li>
+    <li class="palette-dark">{{ 'general.color_palette.dark' | t }}</li>
+    <li class="palette-accent">{{ 'general.color_palette.accent' | t }}</li>
+    <li class="palette-light_2">{{ 'general.color_palette.light_2' | t }}</li>
+    <li class="palette-light_gradient">{{ 'general.color_palette.light_gradient' | t }}</li>
+    <li class="palette-dark_gradient">{{ 'general.color_palette.dark_gradient' | t }}</li>
+  </ul>
+  <p><i aria-hidden="true" class="icon-eye-outline"></i> {{ 'general.accessibility.only_you_can_see_this' | t }}</p>
+  <a href="./" class="btn-toggle"><i aria-hidden="true" class="icon-minus"></i> <span class="hidden">{{ 'general.accessibility.minimize' | t }}</span></a>
+  <a href="./" class="btn-close"><i aria-hidden="true" class="icon-x"></i> <span class="hidden">{{ 'general.accessibility.close' | t }}</span></a>
+</aside>

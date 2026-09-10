@@ -1,0 +1,70 @@
+{%- liquid
+  capture current
+    cycle 1, 2
+  endcapture
+  if article == blank
+    assign author = "Author"
+    assign title =  "Article title"
+    assign date =  "now" | time_tag: format: 'month_day_year'
+  else
+    assign author = article.author
+    assign title =  article.title
+    assign date =  article.published_at | time_tag: format: 'month_day_year'
+  endif
+  assign button_style = button_style | default: 'primary link'
+  assign button_color = button_style | split: ' ' | first
+  assign button_style = button_style | split: ' ' | last
+  assign is_link = false
+  if button_style == 'link'
+    assign is_link = true
+  endif
+-%}
+<li {% if settings.enable_animations %}data-sal="fade" data-sal-duration="500" data-sal-delay="{{ index | times: 100 }}"{% endif %}>
+  {% if show_image %}
+    <figure class="img-cover">
+      {%- if article.tags.size > 0 and show_tags -%}
+        <span>
+          {%- for tag in article.tags limit: 1 -%}
+            <span class="s1bx">{{ tag }}</span>
+          {%- endfor -%}
+        </span>
+      {%- endif -%}
+      <a href="{{ article.url }}">
+        <picture class="orientation">
+          {% if article.image %}
+            <img
+              src="{{ article.image | image_url }}"
+              srcset="{% render 'image-srcset', image: article.image %}"
+              sizes="
+                {% if settings.width < 2000 %}
+                  (min-width: 1300px) calc({{ settings.width }}px * 0.5)
+                {% endif %}
+                (min-width: 760px) calc(100vw * 0.5)
+                100vw
+              "
+              width="410"
+              height="310"
+              alt="{{ article.image.alt | default: article.title | escape }}"
+              loading="lazy"
+            >
+          {% else %}
+            {{ 'lifestyle-' | append: current | placeholder_svg_tag: 'placeholder-svg' }}
+          {% endif %}
+        </picture>
+      </a>
+    </figure>
+  {% endif %}
+  <div>
+    <h3 class="size-22"><a href="{{ article.url }}">{{ title }}</a></h3>
+    {%- if show_excerpt and article.excerpt_or_content.size > 0 -%}
+      <p>{{ article.excerpt_or_content | strip_html | truncate: 150 }}</p>
+    {% endif %}
+    {% if show_author or show_date %}
+      <ul class="l4in" style="--dist_a: 12px;">
+        {%- if show_date %}<li><i aria-hidden="true" class="icon-calendar"></i> {{ date }}</li>{%- endif -%}
+        {%- if show_author -%}<li><a href="{{ article.url }}">{% if show_date %}{{ 'blog.written_by' | t }}{% else %}{{ 'blog.written_by' | t | capitalize }}{% endif %} {{ author }}</a></li>{%- endif -%}
+      </ul>
+    {% endif %}
+    <p class="link-btn"><a href="{{ article.url }}" class="overlay-{{ button_color }} {% if is_link %}inline strong{% else %}{{ button_style }}{% endif %}"><span>{{ 'general.read_more.read_more' | t }}{% if is_link %}</span>&nbsp;<i aria-hidden="true" class="icon-arrow-right"></i>{% endif %}</a></p>
+  </div>
+</li>

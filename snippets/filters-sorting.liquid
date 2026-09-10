@@ -1,0 +1,376 @@
+{% comment %}theme-check-disable ImgLazyLoading{% endcomment %}
+{%- liquid
+  assign display = display | default: 'filters'
+  assign origin = origin | default: 'collection'
+  assign object = object | default: collection
+  assign show_amount_of_products = show_amount_of_products | default: false
+  assign show_collection_image = show_collection_image | default: false
+  assign show_filters = show_filters | default: false
+  assign hide_active_filters = hide_active_filters | default: false
+  assign sort_by = object.sort_by | default: object.default_sort_by
+
+  if origin == "collection"
+    assign amount_of_products = collection.products_count | default: 0
+    assign amount_of_products_translation = 'collection.amount_of_products'
+  elsif origin == "search"
+    assign amount_of_products = search.results_count | default: 0
+    assign amount_of_products_translation = 'search.amount_of_results'
+  endif
+    assign quick_links = quick_links | default: empty
+    assign collections_menu = collections_menu | default: empty
+    if quick_links != empty
+        assign has_quick_links = true
+    endif
+    if collections_menu != empty
+        assign has_quick_links = true
+    endif
+    assign filters = filters | default: object.filters
+    for filter in filters
+        if filter.active_values != null and filter.active_values != empty
+            assign has_active_filters = true
+            break
+        endif
+        if filter.type == "price_range"
+            if filter.min_value.value != nil or filter.max_value.value != nil
+                if filter.min_value.value != filter.range_min or filter.max_value.value != filter.range_max
+                    assign has_active_filters = true
+                    break
+                endif
+            endif
+        endif
+    endfor
+-%}
+{%- if has_active_filters -%}
+    {%- capture active_filters -%}
+        <ul class="l4fl margin-0">
+            <li class="strong{% if mobile %} wide{% endif %}">{{ 'collection.filters.current_filters' | t }}</li>
+            {%- for filter in filters -%}
+                {%- for value in filter.active_values -%}
+                    <li>
+                        <label for="Filter-{{ value.param_name }}-{{ value.value }}">
+                            <a href="{{ value.url_to_remove }}">
+                                <span>{{ filter.label | escape }}</span> {{ value.label | escape }}
+                            </a>
+                        </label>
+                    </li>
+                {%- endfor -%}
+                {% if filter.type == "price_range" %}
+                    {%- if filter.min_value.value != nil or filter.max_value.value != nil -%}
+                        {%- if filter.min_value.value != filter.range_min or filter.max_value.value != filter.range_max -%}
+                            <li>
+                                <a href="{{ filter.url_to_remove }}" class="clear-range">
+                                    <span>{{ filter.label | escape }}</span> {% if filter.min_value.value %}{{ filter.min_value.value | money }}{% else %}{{ filter.range_min | money }}{% endif %} - {% if filter.max_value.value %}{{ filter.max_value.value | money }}{% else %}{{ filter.range_max | money }}{% endif %}
+                                </a>
+                            </li>
+                        {%- endif -%}
+                    {%- endif -%}
+                {% endif %}
+            {%- endfor -%}
+            {% unless mobile %}<li class="inline"><a href="{{ collection.url }}" class="remove-all">{{ 'collection.filters.remove_all_filters' | t }}</a></li>{% endunless %}
+        </ul>
+    {%- endcapture -%}
+{%- endif -%}
+
+{%- if has_quick_links -%}
+    {%- capture quick_links_menu -%}
+        <nav class="n6as mobile-hide">
+            <ul>
+                <li class="active"><a href="{{ routes.collections_url }}">{{ 'collection.view_all_collections' | t }}</a></li>
+                {%- liquid
+                    assign handles = empty
+                    assign collection_links = quick_links.links | where: 'type', 'collection_link'
+                    assign collection_links_handles = collection_links | map: 'handle'
+                    assign handles = handles | concat: collection_links_handles
+                -%}
+                {%- for link in quick_links.links -%}
+                    <li class="{% if main_menu_items_clickable == false and link.links != blank %} inactive{% endif %}{% if link.active or link.child_active %} toggle active{% endif %}">
+                        <a href="{{ link.url }}">{{ link.title }}</a>
+                        {%- if link.links != blank -%}
+                            {%- liquid
+                                assign collection_links = link.links | where: 'type', 'collection_link'
+                                assign collection_links_handles = collection_links | map: 'handle'
+                                assign handles = handles | concat: collection_links_handles
+                            -%}
+                            <a href="./" class="toggle active">{{ 'general.accessibility.toggle' | t: item: link.title }}</a>
+                            <ul>
+                                {%- for sublink in link.links -%}
+                                    {%- liquid
+                                        assign collection_links = sublink.links | where: 'type', 'collection_link'
+                                        assign collection_links_handles = collection_links | map: 'handle'
+                                        assign handles = handles | concat: collection_links_handles
+                                    -%}
+                                    <li class="{% if sublink.active or sublink.child_active %}toggle active{% endif %}">
+                                        <a href="{{ sublink.url }}">{{ sublink.title }}</a>
+                                        {%- if sublink.links != blank -%}
+                                            <a href="./" class="toggle active">{{ 'general.accessibility.toggle' | t: item: sublink.title }}</a>
+                                            <ul>
+                                                {%- for subsublink in sublink.links -%}
+                                                    {%- liquid
+                                                        assign collection_links = subsublink.links | where: 'type', 'collection_link'
+                                                        assign collection_links_handles = collection_links | map: 'handle'
+                                                        assign handles = handles | concat: collection_links_handles
+                                                    -%}
+                                                    <li class="{% if subsublink.active %}toggle active{% endif %}">
+                                                        <a href="{{ subsublink.url }}">{{ subsublink.title }}</a>
+                                                    </li>
+                                                {%- endfor -%}
+                                            </ul>
+                                        {%- endif -%}
+                                    </li>
+                                {%- endfor -%}
+                            </ul>
+                        {%- endif -%}
+                    </li>
+                {%- endfor -%}
+                {%- for collection in collections_menu -%}
+                    {% unless handles contains collection.handle %}
+                        <li class="{% if main_menu_items_clickable == false and link.links != blank %} inactive{% endif %}{% if collection.handle == object.handle %} active toggle{% endif %}">
+                            <a href="{{ collection.url }}">{{ collection.title }}</a>
+                        </li>
+                    {% endunless %}
+                {%- endfor -%}
+            </ul>
+        </nav>
+    {%- endcapture -%}
+{%- endif %}
+
+{%- if display == 'filters' -%}
+    {%- if object.image and show_collection_image and filters_layout == 'static' -%}
+        <figure class="desktop-only{% if settings.multiply_collection_images == 'multiply' %} img-multiply{% elsif settings.multiply_collection_images == 'multiply-bg' %} img-multiply-bg{% endif %}">
+            <img
+                src="{{ 'placeholder-pixel.png' | asset_img_url }}"
+                srcset="{% render 'image-srcset', image: object.image, max_width: 533 %}"
+                sizes="
+                  (min-width: 1000px) 330
+                  0
+                "
+                alt="{{ object.image.alt | default: object.title | escape }}"
+                width="330"
+                height="330"
+                {% unless section.index <= 2 %}loading="lazy"{% endunless %}>
+        </figure>
+    {%- endif -%}
+    <div>
+        {%- if has_quick_links -%}
+            {{ quick_links_menu }}
+        {%- endif %}
+        {% if show_filters %}
+            <header class="margin-10">
+                {% if filters_layout == 'static' %}
+                    <b>{{ 'collection.filters.filter' | t }}</b>
+                {% else %}
+                    <{{ settings.drawers_font_size_heading }}>{{ 'collection.filters.filter' | t }}</{{ settings.drawers_font_size_heading }}>
+                {% endif %}
+            </header>
+        {% endif %}
+        {%- if has_active_filters and hide_active_filters == false -%}
+            {% if filters_layout == 'static' %}<div class="mobile-only">{% endif %}
+                {{ active_filters }}
+            {% if filters_layout == 'static' %}</div>{% endif %}
+        {%- endif -%}
+    </div>
+    {% if show_filters %}
+      <form action="" method="get" class="f8fl" id="filter" data-template="{{ section.id }}">
+          <link href="{{ 'async-validation.css' | asset_url }}" rel="preload" as="style" onload="this.rel='stylesheet'">
+          <noscript><link rel="stylesheet" href="{{ 'async-validation.css' | asset_url }}"></noscript>
+          {%- if search.performed -%}
+              <input type="hidden" name="q" value="{{ search.terms | escape }}">
+          {%- elsif object.current_vendor or object.current_type -%}
+              <input type="hidden" name="q" value="{{ object.current_vendor }}{{ object.current_type }}">
+          {%- endif -%}
+        <fieldset>
+         <div class="mobile-only">
+             <h4 data-filter-toggle="sort_by">{{ 'collection.sort_by.sort_by' | t }}</h4>
+             <ul class="check">
+                 {%- for option in object.sort_options -%}
+                     <li><input type="radio" id="sort_by_{{ forloop.index }}" name="sort_by" value="{{ option.value }}" {% if option.value == sort_by %}checked{% endif %}> <label for="sort_by_{{ forloop.index }}">{{ option.name }}</label></li>
+                 {%- endfor -%}
+             </ul>
+         </div>
+       {%- for filter in filters -%}
+         {%- case filter.type -%}
+           {%- when 'list' -%}
+             {%- if filter.param_name == 'filter.v.availability' -%}
+               {%- assign in_stock_filter = filter.values | where: 'value', '1' | first -%}
+               <h4 data-filter-toggle="{{ filter.label | handleize }}">{{ filter.label }}</h4>
+               <ul class="check switch">
+                 <li>
+                   <input type="checkbox" name="{{ in_stock_filter.param_name }}" value="{{ in_stock_filter.value }}" id="Filter-{{ in_stock_filter.param_name }}-{{ in_stock_filter.value }}" {% if in_stock_filter.active %}checked{% endif %}>
+                   <label for="Filter-{{ in_stock_filter.param_name }}-{{ in_stock_filter.value }}" class="strong">
+                     <a href="{%- if in_stock_filter.active -%}{{ in_stock_filter.url_to_remove }}{%- else -%}{{ in_stock_filter.url_to_add }}{%- endif -%}">
+                       {{ in_stock_filter.label }}
+                     </a>
+                   </label>
+                 </li>
+               </ul>
+             {%- else -%}
+                 {%- liquid
+                     assign triggers = settings.color_swatch_name | newline_to_br | strip_newlines | replace: '<br />', ',' | split: ','
+                     if settings.enable_color_swatches and triggers contains filter.label
+                         assign is_color = true
+                     else
+                         assign is_color = false
+                     endif
+                 -%}
+               <h4 data-filter-toggle="{{ filter.label | handleize }}">{{ filter.label }}</h4>
+               <ul class="check{% unless enable_filters_checkboxes %} plain{% endunless %}">
+                 {%- for filter_value in filter.values -%}
+                     <li>
+                     <input type="checkbox" name="{{ filter_value.param_name }}" value="{{ filter_value.value }}" id="Filter-{{ filter_value.param_name }}-{{ filter_value.value }}" {% if filter_value.active %}checked{% endif %}>
+                     <label for="Filter-{{ filter_value.param_name }}-{{ filter_value.value }}" class="{% if is_color or filter_value.swatch.color %} color{% endif %}{% if filter_value.swatch.image %} align-middle plain{% endif %}">
+                         {% if filter_value.swatch.image %}
+                             {%- liquid
+                                 case section.settings.image_swatches_size
+                                     when 'xs'
+                                         assign width = 20
+                                     when 's'
+                                         assign width = 35
+                                     when 'm'
+                                         assign width = 50
+                                     when 'l'
+                                         assign width = 65
+                                 endcase
+                                 assign width_2 = width | times: 2
+                             -%}
+                             <figure class="size-{{ section.settings.image_swatches_size }}{% if section.settings.image_swatches_fill_images %} img-cover{% if section.settings.image_swatches_show_in_circle %} rounded{% endif %}{% endif %}">
+                                 <picture>
+                                     <img src="{{ filter_value.swatch.image | image_url: width: width }}"
+                                          srcset="{{ filter_value.swatch.image | image_url: width: width }} 1x,{{ filter_value.swatch.image | image_url: width: width_2 }} 2x"
+                                          alt="{{ value.label | escape }}"
+                                          width="{{ width }}"
+                                          height="{{ width }}"
+                                          style="object-fit:{% if section.settings.image_swatches_fill_images %}cover{% else %}contain{% endif %};"
+                                          loading="lazy"
+                                     >
+                                 </picture>
+                             </figure>
+                         {% elsif filter_value.swatch.color %}
+                             <i aria-hidden="true" class="icon-circle" style="--color: {{ filter_value.swatch.color }}"></i>
+                         {% elsif is_color %}
+                             <i aria-hidden="true" class="icon-circle swatch-custom-color-{{ filter_value.label | handleize }}" style="--color: {{ filter_value.label | split: ' ' | last }};"></i>
+                         {% endif %}
+                         <span>
+                             {{ filter_value.label }} <span>({{ filter_value.count }})</span>
+                         </span>
+                     </label>
+                   </li>
+                 {%- endfor -%}
+                 {%- if filter.values.size > filters_show_more_limit -%}<li class="link-more"><a href="./" class="link-more strong" data-limit="{{ filters_show_more_limit }}">{{ 'general.read_more.show' | t }} <span>{{ 'general.read_more.more' | t }}</span> <span class="hidden">{{ 'general.read_more.less' | t }}</span> <i aria-hidden="true" class="icon-chevron-down"></i></a></li>{%- endif -%}
+               </ul>
+             {%- endif -%}
+           {%- when 'boolean' -%}
+             <h4 data-filter-toggle="{{ filter.label | handleize }}">{{ filter.label }}</h4>
+             <ul class="check{% unless enable_filters_checkboxes %} plain{% endunless %}">
+               {%- for filter_value in filter.values -%}
+                 <li>
+                   <input type="checkbox" name="{{ filter_value.param_name }}" value="{{ filter_value.value }}" id="Filter-{{ filter_value.param_name }}-{{ filter_value.value }}" {% if filter_value.active %}checked{% endif %}>
+                   <label for="Filter-{{ filter_value.param_name }}-{{ filter_value.value }}"><a href="{%- if filter_value.active -%}{{ filter_value.url_to_remove }}{%- else -%}{{ filter_value.url_to_add }}{%- endif -%}">{{ filter_value.label }} <span>({{ filter_value.count }})</span></a></label>
+                 </li>
+               {%- endfor -%}
+               {%- if filter.values.size > filters_show_more_limit -%}<li class="link-more"><a href="./" class="link-more strong" data-limit="{{ filters_show_more_limit }}">{{ 'general.read_more.show' | t }} <span>{{ 'general.read_more.more' | t }}</span> <span class="hidden">{{ 'general.read_more.less' | t }}</span> <i aria-hidden="true" class="icon-chevron-down"></i></a></li>{%- endif -%}
+             </ul>
+           {%- when 'price_range' -%}
+             <h4 data-filter-toggle="{{ filter.label | handleize }}">{{ filter.label }}</h4>
+             <div>
+                 <p class="input-range">
+                   <span>
+                     <label for="{{ filter.min_value.param_name }}">{{ 'collection.filters.price.range_from' | t }}</label>
+                     <span class="input-prefix">
+                       <span>{{ cart.currency.symbol }}</span>
+                       <input type="number" id="min" name="{{ filter.min_value.param_name }}" value="{% if filter.min_value.value -%}{{ filter.min_value.value | ceil | divided_by: 100 }}{% else %}0{% endif %}" min="{{ filter.range_min | ceil | divided_by: 100 }}">
+                     </span>
+                   </span>
+                   <span>
+                     <label for="{{ filter.max_value.param_name }}">{{ 'collection.filters.price.range_to' | t }}</label>
+                     <span class="input-prefix">
+                       <span>{{ cart.currency.symbol }}</span>
+                       <input type="number" id="max" name="{{ filter.max_value.param_name }}" value="{% if filter.max_value.value -%}{{ filter.max_value.value | ceil | divided_by: 100 }}{% else %}{{ filter.range_max | ceil | divided_by: 100 }}{% endif %}" max="{{ filter.range_max | ceil | divided_by: 100 }}">
+                     </span>
+                   </span>
+                 </p>
+             </div>
+         {%- endcase -%}
+       {%- endfor -%}
+         <footer class="sticky-in-panel">
+             <p class="link-btn{% if filters_layout == 'static' %} desktop-hide{% endif %}" style="--dist_ba: 20px">
+                {%- if has_active_filters -%}<a href="{{ collection.url }}" class="remove-all inv">{{ 'collection.filters.remove_all_filters' | t }}</a>{% endif %}
+                 <a href="./" {% if filters_layout == 'drawer' %}data-panel-hide="filters"{% else %}aria-controls="filter"{% endif %} class="submit">{{ 'collection.filters.show_products' | t: count: amount_of_products }} <span>({{ amount_of_products }})</span></a>
+             </p>
+         </footer>
+     </fieldset>
+    </form>
+    {% endif %}
+
+{%- elsif display == 'sorting' -%}
+ {%- if has_active_filters and hide_active_filters == false -%}
+     <header>
+         <form action="./" method="post" class="mobile-hide">
+             <fieldset>
+                 <legend>Active filters</legend>
+                 {{ active_filters }}
+             </fieldset>
+         </form>
+     </header>
+ {%- endif -%}
+
+<form action="./" method="post" class="f8sr"{% unless show_filters %} id="filter" data-template="{{ section.id }}"{% endunless %} {% if block_attributes %} {{ block_attributes }}{% endif %}>
+ <fieldset>
+     {%- if show_amount_of_products or show_filters -%}
+         <p class="text-start">
+             {%- if show_amount_of_products -%}
+                 <span class="mobile-hide">{{ amount_of_products_translation | t: count: amount_of_products, amount: amount_of_products }}</span>
+             {%- endif -%}
+             {%- if show_filters -%}
+                 <a {% if filters_layout == 'drawer' %}data-panel="filters" href="./"{% else %}href="#filter"{% endif %} class="mobile-only"><i aria-hidden="true" class="icon-filter"></i> Filters</a>
+             {%- endif -%}
+         </p>
+     {%- endif -%}
+     <ul class="l4in hr-hide-mobile" aria-controls="collection">
+         {%- liquid
+             assign grid_width_1 = grid_1 | split: '|' | first
+             assign grid_label_1 = grid_1 | split: '|' | last
+             assign grid_width_2 = grid_2 | split: '|' | first
+             assign grid_label_2 = grid_2 | split: '|' | last
+         -%}
+         <li class="strong">{{ 'collection.sort_by.view' | t }}</li>
+         <li><input type="radio" id="fsc" name="fsa" data-width="{{ grid_width_1 }}"{% if collection_grid_view == grid_width_1 %}checked{% endif %}><label for="fsc"><span class="hr-only">1</span><span class="hr-hide"><span class="mobile-only">1</span> <span class="mobile-hide">{{ grid_label_1 }}</span></span></label></li>
+         <li><input type="radio" id="fsd" name="fsa" data-width="{{ grid_width_2 }}"{% if collection_grid_view == grid_width_2 %}checked{% endif %}><label for="fsd"><span class="hr-only">2</span><span class="hr-hide"><span class="mobile-only">2</span> <span class="mobile-hide">{{ grid_label_2 }}</span></span></label></li>
+     </ul>
+   <p class="has-select">
+       {%- if show_amount_of_products -%}
+           <span class="mobile-only">{{ amount_of_products_translation | t: count: amount_of_products, amount: amount_of_products }}</span>
+       {%- endif -%}
+       {% if show_filters %}<span class="mobile-hide">{% endif %}
+         <label for="sort_by" class="hidden">{{ 'collection.sort_by.sort_by' | t }}</label>
+         <select id="sort_by" name="sort_by">
+           {%- for option in object.sort_options -%}
+             <option value="{{ option.value }}" {% if option.value == sort_by %}selected{% endif %}>{{ option.name }}</option>
+           {%- endfor -%}
+         </select>
+       {% if show_filters %}</span>{% endif %}
+   </p>
+   {%- if show_filters and filters_layout == 'drawer' -%}
+     <p class="mobile-hide"><a data-panel="filters" href="./"><i aria-hidden="true" class="icon-filter"></i> {{ 'collection.filters.filter' | t }}</a></p>
+    {%- endif -%}
+ </fieldset>
+</form>
+
+{%- elsif display == 'active_filters' -%}
+ {%- if has_active_filters -%}
+     <header>
+         <form action="./" method="post" class="mobile-hide">
+             <fieldset>
+                 <legend>Active filters</legend>
+                 {{ active_filters }}
+             </fieldset>
+         </form>
+     </header>
+ {%- endif -%}
+
+{%- elsif display == 'mobile-filter-button' and show_filters -%}
+   <form action="./" method="post" class="desktop-hide">
+     <fieldset>
+       <p class="link-btn desktop-hide"><a {% if filters_layout == 'drawer' %}data-panel="filters" href="./"{% else %}href="#filter"{% endif %}><i aria-hidden="true" class="icon-filter"></i> {{ 'collection.filters.filter' | t }}</a></p>
+     </fieldset>
+   </form>
+{%- endif -%}

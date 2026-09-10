@@ -1,0 +1,31 @@
+{% layout none %}
+{%- comment -%}
+  STAMP ATLAS data feed — alternate collection view (?view=map&page=N).
+  Returns one JSON page (up to 250 products) of map data for the
+  Stamp Atlas section. Part of the self-contained Stamp Atlas feature:
+  section-stamp-atlas.liquid + stamp-atlas.css + stamp-atlas.js + this file.
+{%- endcomment -%}
+{%- paginate collection.products by 250 -%}
+{
+  "items": [
+    {%- assign first = true -%}
+    {%- for product in collection.products -%}
+      {%- assign m_country = product.metafields.custom.map_country.value -%}
+      {%- if m_country != blank -%}
+        {%- unless first -%},{%- endunless -%}
+        {%- assign first = false -%}
+        {
+          "title": {{ product.title | json }},
+          "country": {{ m_country | json }},
+          "lat": {{ product.metafields.custom.map_lat.value | json }},
+          "lng": {{ product.metafields.custom.map_lng.value | json }},
+          "price": {% if product.price_varies %}{{ product.price_min | money | prepend: 'From ' | json }}{% else %}{{ product.price_min | money | json }}{% endif %},
+          "url": {{ product.url | json }},
+          "img": {% if product.featured_image %}{{ product.featured_image | image_url: width: 600 | json }}{% else %}null{% endif %}
+        }
+      {%- endif -%}
+    {%- endfor -%}
+  ],
+  "next": {% if paginate.next %}true{% else %}false{% endif %}
+}
+{%- endpaginate -%}

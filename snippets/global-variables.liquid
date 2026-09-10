@@ -1,0 +1,71 @@
+{%- liquid
+  assign language_code_downcased = localization.language.iso_code | downcase
+  assign datepicker_path_url = 'datepicker-lang-' | append: language_code_downcased | append: '.js'
+  assign datepicker_path = datepicker_path_url | asset_url
+-%}
+<script>
+  window.routes = {
+      predictive_search_url: '{{ routes.predictive_search_url }}',
+      cart_url: '{{ routes.cart_url }}',
+      cart_add_url: '{{ routes.cart_add_url }}',
+      cart_change_url: '{{ routes.cart_change_url }}',
+      cart_update_url: '{{ routes.cart_update_url }}',
+      product_recommendations_url: '{{ routes.product_recommendations_url }}'
+  };
+  window.general = {
+      {% if template.name == 'product' %}
+      viewed_product: '{{ product.url }}',
+      viewed_product_id: '{{ product.id }}',
+      {% endif %}
+      template: '{{ template.name }}',
+      cookiebanner_testmode: {{ settings.cookiebanner_testmode }},
+      age_verify_popup_testmode: {{ settings.age_verify_popup_testmode }},
+      newsletter_popup_testmode: {{ settings.newsletter_popup_testmode }},
+      language: '{{ localization.language.iso_code | downcase }}'
+  };
+  window.datepicker_path_global = '{{ datepicker_path }}';
+  window.translations = {
+      readmore_text: {{ "general.read_more.read_more" | t | json }},
+      unavailable_text: {{ "product.form.unavailable" | t | json }},
+      search_text: {{ "search.title" | t | json }},
+      close_text: {{ "general.accessibility.close" | t | json }},
+      toggle_text: {{ "general.accessibility.toggle" | t: item: "" | json }},
+      added_to_cart: {{ "general.alerts.added_to_cart" | t | json }},
+      general_alerts_success_text: {{ "general.alerts.success" | t | json }},
+      general_alerts_info_text: {{ "general.alerts.info" | t | json }},
+      general_alerts_error_text: {{ "general.alerts.error" | t | json }}
+  };
+  window.filepaths = {
+      a_js_backend_listeners: '{{ "backend-listeners.js" | asset_url }}',
+      a_js_custom_async: '{{ 'custom-async.js' | asset_url }}',
+      a_css_announcement: '{{ "async-announcement.css" | asset_url }}',
+      a_css_compare: '{{ "async-compare.css" | asset_url }}',
+      a_css_hovers: '{{ "async-hovers.css" | asset_url }}',
+      a_css_fancybox: '{{ "async-fancybox.css" | asset_url }}',
+      a_css_marquee: '{{ "async-marquee.css" | asset_url }}',
+      a_css_menu: '{{ "async-menu.css" | asset_url }}',
+      a_css_panels: '{{ "async-panels.css" | asset_url }}',
+      a_css_product: '{{ "page-product.css" | asset_url }}',
+      a_css_popups: '{{ "async-popups.css" | asset_url }}',
+      a_css_print: '{{ "async-print.css" | asset_url }}',
+      a_css_product_scrolled: '{{ "async-product-sticky.css" | asset_url }}',
+      a_css_search: '{{ "async-search.css" | asset_url }}',
+      a_css_select: '{{ "async-select.css" | asset_url }}',
+      a_css_ui_sliders: '{{ "async-ui-sliders.css" | asset_url }}',
+      a_css_validation: '{{ "async-validation.css" | asset_url }}',
+      a_css_animations: '{{ "async-animations.css" | asset_url }}',
+      a_css_datepicker: '{{ "async-datepicker.css" | asset_url }}',
+      a_js_compare: '{{ "plugin-compare.js" | asset_url }}',
+      a_js_countdown: '{{ "plugin-countdown.js" | asset_url }}',
+      a_js_fancybox: '{{ "plugin-fancybox.js" | asset_url }}',
+      a_js_masonry: '{{ "plugin-masonry.js" | asset_url }}',
+      a_js_outline: '{{ "plugin-outline.js" | asset_url }}',
+      a_js_popup: '{{ "plugin-popups.js" | asset_url }}',
+      a_js_selects: '{{ "plugin-selects.js" | asset_url }}',
+      a_js_sliders: '{{ "plugin-sliders.js" | asset_url }}',
+      a_js_typewritter: '{{ "plugin-typewritter.js" | asset_url }}',
+      a_js_validator: '{{ "plugin-validator.js" | asset_url }}',
+      a_js_animations: '{{ "plugin-animations.js" | asset_url }}',
+      a_js_datepicker: '{{ "plugin-datepicker.js" | asset_url }}'
+  }
+</script>

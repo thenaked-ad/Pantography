@@ -1,0 +1,34 @@
+{%- assign login_form_classes = 'm6pn f8vl' %}
+{%- form 'customer_login', class: login_form_classes, id: 'login', aria-hidden: 'true' -%}
+	{%- if form.errors -%}
+		{%- for error in form.errors -%}
+			<script>
+				document.addEventListener('DOMContentLoaded', function () {
+					var alertAttributes = { message: "{%- if error == 'form' -%}{{ form.errors.messages[error] }}{%- else -%}{{ form.errors.translated_fields[error] | capitalize }} {{ form.errors.messages[error] }}{%- endif -%}", type: "error", origin: "login" },
+							showAlertEvent = new CustomEvent("showAlert", {detail: alertAttributes});
+					window.dispatchEvent(showAlertEvent);
+				});
+			</script>
+		{%- endfor -%}
+	{%- endif -%}
+	<fieldset>
+		<legend class="hidden">{{ 'customer.login.title' | t }}</legend>
+		<header>
+			<{{ settings.drawers_font_size_heading }}>{{ 'customer.login.title' | t }}</{{ settings.drawers_font_size_heading }}>
+			<p>{{ 'customer.login.subtitle' | t }}</p>
+		</header>
+		<p>
+			<label for="drawer_login_email">{{ 'customer.login.email' | t }}<span class="overlay-theme">*</span></label>
+			<input type="email" id="drawer_login_email" name="customer[email]" placeholder="{{ 'customer.login.email' | t }}" required>
+		</p>
+		<p>
+			<label for="drawer_login_password">{{ 'customer.login.password' | t }}<span class="overlay-theme">*</span> <a href="./" class="show"><span>Toon</span> <span class="hidden">Hide</span></a></label>
+			<input type="password" id="drawer_login_password" name="customer[password]" placeholder="{{ 'customer.login.password' | t }}" required>
+		</p>
+		<p class="text-end"><a href="{{ routes.account_login_url }}#recover">{{ 'customer.login.forgot_password' | t }}</a></p>
+		<p class="link-btn wide">
+			<button type="submit"{% if settings.button_style == 'inv' %} class="inv"{% endif %}>{{ 'customer.login.submit' | t }}</button>
+			<a href="{{ routes.account_register_url }}" data-panel="register" role="button" class="inline">{{ 'customer.login.create_account_button' | t }}&nbsp;<i aria-hidden="true" class="icon-arrow-right"></i></a>
+		</p>
+	</fieldset>
+{%- endform -%}

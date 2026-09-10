@@ -1,0 +1,41 @@
+{%- assign register_form_classes = 'm6pn f8vl' %}
+{%- form 'create_customer', class: register_form_classes, id: 'register', aria-hidden: 'true' -%}
+	{%- if form.errors -%}
+		{%- for error in form.errors -%}
+			<script>
+				document.addEventListener('DOMContentLoaded', function () {
+					var alertAttributes = { message: "{%- if error == 'form' -%}{{ form.errors.messages[error] }}{%- else -%}{{ form.errors.translated_fields[error] | capitalize }} {{ form.errors.messages[error] }}{%- endif -%}", type: "error", origin: "login" },
+							showAlertEvent = new CustomEvent("showAlert", {detail: alertAttributes});
+					window.dispatchEvent(showAlertEvent);
+				});
+			</script>
+		{%- endfor -%}
+	{%- endif -%}
+
+	<fieldset>
+		<legend class="hidden">{{ 'customer.login.title' | t }}</legend>
+		<header>
+			<{{ settings.drawers_font_size_heading }}>{{ 'customer.register.title' | t }}</{{ settings.drawers_font_size_heading }}>
+			<p>{{ 'customer.register.create_account_info' | t }}</p>
+		</header>
+		<p>
+			<label for="drawer_register_first_name">{{ 'customer.register.first_name' | t }}<span class="overlay-theme">*</span></label>
+			<input type="text" id="drawer_register_first_name" name="customer[first_name]" placeholder="{{ 'customer.register.first_name' | t }}" {% if form.first_name %}value="{{ form.first_name }}"{% endif %} required>
+		</p>
+		<p>
+			<label for="drawer_register_last_name">{{ 'customer.register.last_name' | t }}<span class="overlay-theme">*</span></label>
+			<input type="text" id="drawer_register_last_name" name="customer[last_name]" placeholder="{{ 'customer.register.last_name' | t }}" {% if form.last_name %}value="{{ form.last_name }}"{% endif %} required>
+		</p>
+		<p>
+			<label for="drawer_register_email_address">{{ 'customer.register.email' | t }}<span class="overlay-theme">*</span></label>
+			<input type="email" id="drawer_register_email_address" name="customer[email]" placeholder="{{ 'customer.register.email' | t }}" {% if form.email %}value="{{ form.email }}"{% endif %} required>
+		</p>
+		<p>
+			<label for="drawer_register_password">{{ 'customer.register.password' | t }}<span class="overlay-theme">*</span> <a href="./" class="show"><span>{{ 'general.accessibility.show' | t }}</span> <span class="hidden">{{ 'general.accessibility.hide' | t }}</span></a></label>
+			<input type="password" id="drawer_register_password" name="customer[password]" placeholder="{{ 'customer.register.password' | t }}" required>
+		</p>
+		<p class="link-btn wide">
+			<button type="submit"{% if settings.button_style == 'inv' %} class="inv"{% endif %}>{{ 'customer.register.submit' | t }}</button>
+		</p>
+	</fieldset>
+{%- endform -%}

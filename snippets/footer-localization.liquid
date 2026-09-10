@@ -1,0 +1,35 @@
+{%- comment -%}
+  Footer Country/Region selector (Shopify Markets)
+  - Uses a fallback label if the localization key is missing
+{%- endcomment -%}
+
+{%- if localization.available_countries.size > 1 -%}
+  {%- assign country_label_key = 'localization.country_label' -%}
+  {%- assign country_label_text = country_label_key | t -%}
+  {%- if country_label_text == country_label_key or country_label_text == blank -%}
+    {%- assign country_label_text = 'Country/Region' -%}
+  {%- endif -%}
+
+  <div class="footer-localization">
+    {%- form 'localization', id: 'FooterCountryForm', class: 'footer-localization__form' -%}
+      <label class="visually-hidden" for="FooterCountry">{{ country_label_text }}</label>
+      <select
+        id="FooterCountry"
+        name="country_code"
+        class="footer-localization__select"
+        aria-label="{{ country_label_text }}"
+        onchange="this.form.submit()"
+      >
+        {%- for country in localization.available_countries -%}
+          <option
+            value="{{ country.iso_code }}"
+            {%- if country.iso_code == localization.country.iso_code -%} selected{%- endif -%}
+            data-currency="{{ country.currency.iso_code }}"
+          >
+            {{ country.name }} ({{ country.currency.iso_code }})
+          </option>
+        {%- endfor -%}
+      </select>
+    {%- endform -%}
+  </div>
+{%- endif -%}

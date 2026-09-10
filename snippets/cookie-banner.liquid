@@ -1,0 +1,28 @@
+{%- if settings.show_cookiebanner -%}
+  <article id="cookie" class="popup-a width-440 text-start align-end" data-title="cookies-popup" {% if settings.show_newsletterpopup %}data-popup-after="newsletter-popup"{% endif %} data-popup-delay="000" style="font-size:{{ settings.cookiebanner_font_size }};">
+    {%- if settings.cookiebanner_title != empty -%}
+      <header>
+        <div class="title-styling
+        {% if settings.cookiebanner_title_underline_style != 'none' %}
+          title-underline-none
+          {% if settings.cookiebanner_title_underline_style contains 'accent' %}
+            title-underline-accent
+          {% elsif settings.cookiebanner_title_underline_style contains 'gradient' %}
+            title-underline-gradient
+          {% endif %}
+          {% if settings.cookiebanner_title_underline_style contains 'secondary_font' %}
+            title-underline-secondary-font
+          {% endif %}
+        {% endif %}
+      ">
+          {{ settings.cookiebanner_title }}
+        </div>
+      </header>
+    {%- endif -%}
+    {%- if settings.cookiebanner_text -%}{{ settings.cookiebanner_text }}{%- endif -%}
+    <p class="link-btn">
+      <a href="./" class="inline close cookie-decline">{{ 'cookiebanner.decline' | t }}</a>
+      <a href="./" class="close cookie-accept{% if settings.button_style == 'inv' %} inv{% endif %}">{{ 'cookiebanner.accept' | t }}</a>
+    </p>
+  </article>
+{%- endif -%}
