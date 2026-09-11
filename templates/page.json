@@ -1,1 +1,89 @@
-{"sections":{"breadcrumbs":{"type":"breadcrumbs","settings":{"hide_mobile":false,"back_button":false}},"main-page":{"type":"main-page","blocks":{"spacer_jqNfb3":{"type":"spacer","settings":{"height":40}},"title":{"type":"title","settings":{"title_size":"h2"}},"spacer_hcEFqG":{"type":"spacer","settings":{"height":80}},"content":{"type":"content","settings":{}}},"block_order":["spacer_jqNfb3","title","spacer_hcEFqG","content"],"settings":{"max_width":980,"content_alignment":"start","text_alignment":"start","spacing_desktop":50,"spacing_mobile":30}},"section_stamp_atlas_wKVhH6":{"type":"section-stamp-atlas","name":"Stamp Atlas map","settings":{"eyebrow":"","heading":"","subheading":"Select a location to explore the artworks available from that part of the map.","collection":"stamp-atlas","show_search":false,"search_placeholder":"Search a location","show_legend":true,"legend_label":"Artwork available","reset_label":"Reset","gap_search_map":24,"empty_text":"The aim of the project is to produce an artwork from every country in the world — {location} is still to come.","browse_link":"shopify:\/\/collections\/a-z","browse_label":"View all artworks","request_email":"studio@pantography.com","request_label":"Request this location","padding_top":0,"padding_bottom":72}}},"order":["breadcrumbs","main-page","section_stamp_atlas_wKVhH6"]}
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "breadcrumbs": {
+      "type": "breadcrumbs",
+      "settings": {
+        "hide_mobile": false,
+        "back_button": false
+      }
+    },
+    "main-page": {
+      "type": "main-page",
+      "blocks": {
+        "spacer_jqNfb3": {
+          "type": "spacer",
+          "settings": {
+            "height": 40
+          }
+        },
+        "title": {
+          "type": "title",
+          "settings": {
+            "title_size": "h2"
+          }
+        },
+        "spacer_hcEFqG": {
+          "type": "spacer",
+          "settings": {
+            "height": 80
+          }
+        },
+        "content": {
+          "type": "content",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "spacer_jqNfb3",
+        "title",
+        "spacer_hcEFqG",
+        "content"
+      ],
+      "settings": {
+        "max_width": 980,
+        "content_alignment": "start",
+        "text_alignment": "start",
+        "spacing_desktop": 50,
+        "spacing_mobile": 30
+      }
+    },
+    "section_stamp_atlas_wKVhH6": {
+      "type": "section-stamp-atlas",
+      "disabled": true,
+      "name": "Stamp Atlas map",
+      "settings": {
+        "eyebrow": "",
+        "heading": "",
+        "subheading": "Select a location to explore the artworks available from that part of the map.",
+        "collection": "stamp-atlas",
+        "show_search": false,
+        "search_placeholder": "Search a location",
+        "show_legend": true,
+        "legend_label": "Artwork available",
+        "reset_label": "Reset",
+        "gap_search_map": 24,
+        "empty_text": "The aim of the project is to produce an artwork from every country in the world — {location} is still to come.",
+        "browse_link": "shopify://collections/a-z",
+        "browse_label": "View all artworks",
+        "request_email": "studio@pantography.com",
+        "request_label": "Request this location",
+        "padding_top": 0,
+        "padding_bottom": 72
+      }
+    }
+  },
+  "order": [
+    "breadcrumbs",
+    "main-page",
+    "section_stamp_atlas_wKVhH6"
+  ]
+}
