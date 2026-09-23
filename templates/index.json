@@ -281,7 +281,7 @@
         "text_B4K6Wd": {
           "type": "text",
           "settings": {
-            "text": "<p>These are the newly released flat print variant, not to be confused with the original floating artworks. The size has been specifically considered, allowing you to curate a gallery wall, with pricing tiered favouring the idea of a collection.</p><p>Printed on art grade paper, each print is embossed with the studios signature, editioned and framed by hand in London.</p>",
+            "text": "<p>These are the newly released flat print variant, the size has been specifically considered, allowing you to curate a gallery wall, with pricing tiered favouring the idea of a collection.</p><p>Printed on art grade paper, each print is embossed with the studios signature, editioned and framed by hand in London.</p>",
             "font": "secondary",
             "enable_custom_text_styling": false,
             "font_size": "13px"
@@ -360,6 +360,7 @@
         },
         "text_TdzrYc": {
           "type": "text",
+          "disabled": true,
           "settings": {
             "text": "<p>These are the newly released flat print variant, not to be confused with the original floating artworks. The size has been specifically considered, allowing you to curate a gallery wall, with pricing tiered favouring the idea of a collection.</p><p>Printed on art grade paper, each print is embossed with the studios signature, editioned and framed by hand in London.</p>",
             "font": "secondary",
@@ -383,6 +384,7 @@
         },
         "buttons_mkry9L": {
           "type": "buttons",
+          "disabled": true,
           "settings": {
             "show_first_link": true,
             "first_link_text": "View the collection",
@@ -401,6 +403,7 @@
         "buttons_mCek3j",
         "buttons_mkry9L"
       ],
+      "disabled": true,
       "settings": {
         "image": "shopify://shop_images/6GridWebsite_454a2eae-5648-4a25-80e3-1f603f05cb1a.jpg",
         "video": "shopify://files/videos/App Preview 45.mp4",
@@ -478,7 +481,7 @@
         "custom_height": 250,
         "color_palette": "white",
         "overlay_opacity": 0,
-        "layout": "image-right",
+        "layout": "image-left",
         "text_position": "text-start",
         "background_color_palette": "scheme-1",
         "background_overlay_opacity": 0,
@@ -542,7 +545,7 @@
         "custom_height": 250,
         "color_palette": "white",
         "overlay_opacity": 0,
-        "layout": "image-left",
+        "layout": "image-right",
         "text_position": "text-start",
         "background_color_palette": "scheme-1",
         "background_overlay_opacity": 0,
