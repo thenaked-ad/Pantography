@@ -50,7 +50,7 @@
 %}
 
 {% if section.settings.show_socials %}
-  {%- capture 'socials' -%}
+  {%- capture socials -%}
     {%- if settings.social_instagram -%}instagram|{{settings.social_instagram}}|{{ settings.social_instagram_name }}->{%- endif -%}
     {%- if settings.social_pinterest -%}pinterest|{{settings.social_pinterest}}|{{ settings.social_pinterest_name }}->{%- endif -%}
     {%- if settings.social_youtube -%}youtube|{{settings.social_youtube}}|{{ settings.social_youtube_name }}->{%- endif -%}
@@ -61,7 +61,7 @@
     {%- if settings.social_snapchat -%}snapchat|{{settings.social_snapchat}}|{{ settings.social_snapchat_name }}{%- endif -%}
   {%- endcapture -%}
   {%- assign socials = socials | split: "->" -%}
-  {%- capture 'socials_block' -%}
+  {%- capture socials_block -%}
     {%- if socials.size > 0 -%}
       <ul class="l4sc class_x">
         {%- for social in socials -%}
@@ -1167,3 +1167,16 @@
   ]
 }
 {% endschema %}
+{% comment %}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: "{%- capture 'socials' -%}"
+  to: "{%- capture socials -%}"
+  position: 1628..1651
+- from: "{%- capture 'socials_block' -%}"
+  to: "{%- capture socials_block -%}"
+  position: 2730..2759
+{% endcomment %}
