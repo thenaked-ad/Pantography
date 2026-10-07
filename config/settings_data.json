@@ -205,7 +205,7 @@
       },
       "11691043060932305884": {
         "type": "shopify://apps/last-second-coupon/blocks/lsc-widget/01a0fe0c-f175-7ffe-add4-482671698731",
-        "disabled": true,
+        "disabled": false,
         "settings": {}
       }
     },
