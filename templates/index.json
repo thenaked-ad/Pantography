@@ -444,7 +444,7 @@
         "text_rXMX7b": {
           "type": "text",
           "settings": {
-            "text": "<p>Turnaround time for the artwork is currently 2 - 3 weeks. Shipping costs are calculated at checkout. Duties may apply. </p><p>Free UK Shipping on all artworks</p>",
+            "text": "<p>Turnaround time for the artwork is currently 2 - 3 weeks. Shipping costs are calculated at checkout.&nbsp;</p><p>Free UK Shipping on all artworks</p>",
             "font": "secondary",
             "enable_custom_text_styling": false,
             "font_size": "13px"
