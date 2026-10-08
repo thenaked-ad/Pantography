@@ -1,0 +1,15 @@
+{
+  "sections": {
+    "builder": {
+      "type": "miniatures-builder",
+      "settings": {
+        "allow_duplicates": true,
+        "show_positions": true,
+        "show_description": true
+      }
+    }
+  },
+  "order": [
+    "builder"
+  ]
+}

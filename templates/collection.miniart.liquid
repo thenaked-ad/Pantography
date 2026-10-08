@@ -1,0 +1,35 @@
+{% layout none %}
+{%- comment -%}
+  MINIATURES BUILDER catalogue feed: alternate collection view (?view=miniart&page=N).
+  Returns one JSON page (up to 250 products) of every artwork in the collection
+  that has miniature art. Read by assets/miniatures-builder.js.
+
+  The art itself is assets/mini-<handle>.webp. snippets/miniature-art-index.liquid
+  lists which handles have a file, with their computed colours, as
+  |handle:Colour,Colour|handle:Colour|...
+{%- endcomment -%}
+{%- capture art_index -%}{%- render 'miniature-art-index' -%}{%- endcapture -%}
+{%- paginate collection.products by 250 -%}
+{
+  "items": [
+    {%- assign first = true -%}
+    {%- for product in collection.products -%}
+      {%- assign key = '|' | append: product.handle | append: ':' -%}
+      {%- if art_index contains key -%}
+        {%- assign colours = art_index | split: key | last | split: '|' | first -%}
+        {%- unless first -%},{%- endunless -%}
+        {%- assign first = false -%}
+        {
+          "h": {{ product.handle | json }},
+          "t": {{ product.title | json }},
+          "u": {{ product.url | json }},
+          "a": {{ 'mini-' | append: product.handle | append: '.webp' | asset_url | json }},
+          "c": {{ colours | split: ',' | json }},
+          "s": {{ product.tags | join: ' ' | downcase | json }}
+        }
+      {%- endif -%}
+    {%- endfor -%}
+  ],
+  "pages": {{ paginate.pages }}
+}
+{%- endpaginate -%}

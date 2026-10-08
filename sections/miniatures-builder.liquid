@@ -1,0 +1,239 @@
+{%- comment -%}
+  MINIATURES BUILDER
+  Lets a customer fill a Miniatures frame before buying, in one of three ways:
+  choose each position, arrange a set from a shortlist, or leave it to the studio.
+
+  Size is the product, frame colour is the variant, and the picks travel as line
+  item properties: one per position plus a hidden _spec string for the framer.
+  The catalogue comes from the collection.miniart alternate view.
+
+  JS lives in assets/miniatures-builder.js, not {% javascript %}, because this
+  theme's compiled_assets bundle does not regenerate.
+{%- endcomment -%}
+
+{{ 'miniatures-builder.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'miniatures-builder.js' | asset_url }}" defer></script>
+
+{%- liquid
+  assign catalogue = section.settings.catalogue_collection
+  if catalogue == blank
+    assign catalogue = collections['a-z']
+  endif
+  assign sizes_collection = section.settings.sizes_collection
+  if sizes_collection == blank
+    assign sizes_collection = collections['miniatures']
+  endif
+  assign form_id = 'miniatures-form-' | append: section.id
+-%}
+
+{%- capture sizes_json -%}
+  [
+  {%- assign first_size = true -%}
+  {%- for p in sizes_collection.products -%}
+    {%- assign count = p.title | split: ' ' | first | plus: 0 -%}
+    {%- case count -%}
+      {%- when 9 -%}{%- assign grid_cols = 3 -%}{%- assign grid_rows = 3 -%}{%- assign w_cm = 44 -%}{%- assign h_cm = 47 -%}
+      {%- when 12 -%}{%- assign grid_cols = 4 -%}{%- assign grid_rows = 3 -%}{%- assign w_cm = 52 -%}{%- assign h_cm = 46 -%}
+      {%- when 20 -%}{%- assign grid_cols = 5 -%}{%- assign grid_rows = 4 -%}{%- assign w_cm = 60.5 -%}{%- assign h_cm = 56.5 -%}
+      {%- when 35 -%}{%- assign grid_cols = 7 -%}{%- assign grid_rows = 5 -%}{%- assign w_cm = 79 -%}{%- assign h_cm = 66 -%}
+      {%- when 60 -%}{%- assign grid_cols = 10 -%}{%- assign grid_rows = 6 -%}{%- assign w_cm = 105 -%}{%- assign h_cm = 76 -%}
+      {%- else -%}{%- continue -%}
+    {%- endcase -%}
+    {%- assign frame_index = 0 -%}
+    {%- for option in p.options -%}
+      {%- if option == 'Frame Colour' -%}{%- assign frame_index = forloop.index0 -%}{%- endif -%}
+    {%- endfor -%}
+    {%- unless first_size -%},{%- endunless -%}
+    {%- assign first_size = false -%}
+    {
+      "id": {{ p.id }},
+      "count": {{ count }},
+      "cols": {{ grid_cols }},
+      "rows": {{ grid_rows }},
+      "w": {{ w_cm }},
+      "h": {{ h_cm }},
+      "title": {{ p.title | json }},
+      "url": {{ p.url | json }},
+      "variants": [
+        {%- for v in p.variants -%}
+          {
+            "id": {{ v.id }},
+            "frame": {{ v.options[frame_index] | json }},
+            "price": {{ v.price | money | json }},
+            "available": {{ v.available | json }}
+          }{%- unless forloop.last -%},{%- endunless -%}
+        {%- endfor -%}
+      ]
+    }
+  {%- endfor -%}
+  ]
+{%- endcapture -%}
+
+<miniatures-builder
+  class="mb"
+  data-section-id="{{ section.id }}"
+  data-product-id="{{ product.id }}"
+  data-feed-url="{{ catalogue.url }}"
+  data-show-positions="{{ section.settings.show_positions }}"
+  data-allow-duplicates="{{ section.settings.allow_duplicates }}"
+>
+  <script type="application/json" data-mb-sizes>{{ sizes_json | strip_newlines }}</script>
+
+  <div class="mb__layout">
+    <div class="mb__stage">
+      <div class="mb__frame-wrap">
+        <div class="mb__frame" data-mb-frame data-frame="White">
+          <div class="mb__mount">
+            <div class="mb__grid" data-mb-grid></div>
+          </div>
+        </div>
+      </div>
+      <p class="mb__stage-note" data-mb-stage-note></p>
+      <div class="mb__stage-tools">
+        <button type="button" class="mb__link" data-mb-clear-cell hidden>Remove this artwork</button>
+        <button type="button" class="mb__link" data-mb-clear-all>Clear the frame</button>
+      </div>
+    </div>
+
+    <div class="mb__panel">
+      <div class="mb__head">
+        <h1 class="mb__title" data-mb-title>{{ product.title }}</h1>
+        <p class="mb__price" data-mb-price>{{ product.selected_or_first_available_variant.price | money }}</p>
+        <p class="mb__dims" data-mb-dims></p>
+      </div>
+
+      <fieldset class="mb__group">
+        <legend class="mb__label">Size</legend>
+        <div class="mb__pills" data-mb-sizes-list role="radiogroup"></div>
+      </fieldset>
+
+      <fieldset class="mb__group">
+        <legend class="mb__label">Frame <span data-mb-frame-name></span></legend>
+        <div class="mb__swatches" data-mb-frames role="radiogroup"></div>
+      </fieldset>
+
+      <fieldset class="mb__group">
+        <legend class="mb__label">How would you like to fill it?</legend>
+        <div class="mb__modes" role="tablist">
+          <button type="button" class="mb__mode" role="tab" data-mb-mode="pick">
+            <strong>Choose each one</strong>
+            <span>Pick an artwork for every position</span>
+          </button>
+          <button type="button" class="mb__mode" role="tab" data-mb-mode="arrange">
+            <strong>Arrange my favourites</strong>
+            <span>Star a few, we lay out the frame</span>
+          </button>
+          <button type="button" class="mb__mode" role="tab" data-mb-mode="studio">
+            <strong>Leave it to the studio</strong>
+            <span>Our team composes it for you</span>
+          </button>
+        </div>
+      </fieldset>
+
+      <div class="mb__mode-help" data-mb-help="pick">
+        <p>Select a position in the frame, then choose an artwork for it. You can use the same artwork more than once.</p>
+        <label class="mb__check">
+          <input type="checkbox" data-mb-studio-fill>
+          <span>Let the studio fill any positions I leave empty</span>
+        </label>
+      </div>
+      <div class="mb__mode-help" data-mb-help="arrange">
+        <p>Star your favourites below, then arrange them across the frame. Artworks repeat if you star fewer than the frame holds.</p>
+        <div class="mb__actions">
+          <button type="button" class="mb__secondary" data-mb-generate>Arrange my frame</button>
+        </div>
+      </div>
+      <div class="mb__mode-help" data-mb-help="studio">
+        <p>The studio will compose your frame. Star any artworks you would like included and add a note if you have places in mind.</p>
+        <label class="mb__label" for="mb-notes-{{ section.id }}">Notes for the studio (optional)</label>
+        <textarea id="mb-notes-{{ section.id }}" class="mb__notes" rows="3" maxlength="500" data-mb-notes placeholder="For example: places we have lived, mostly blues and greens"></textarea>
+      </div>
+
+      <div class="mb__shortlist" data-mb-shortlist-wrap hidden>
+        <p class="mb__label">Your shortlist <span data-mb-shortlist-count></span></p>
+        <ul class="mb__chips" data-mb-shortlist></ul>
+      </div>
+
+      {%- form 'product', product, id: form_id, class: 'f8pr mb__form' -%}
+        <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}" data-mb-variant>
+        <input type="hidden" name="quantity" value="1">
+        <div data-mb-properties></div>
+        <p class="mb__status" data-mb-status aria-live="polite"></p>
+        <p class="link-btn wide mb__submit">
+          <button type="submit" class="overlay-buy_button" data-mb-submit>{{ 'product.form.add_to_cart' | t }}</button>
+        </p>
+      {%- endform -%}
+
+      {%- if section.settings.show_description and product.description != blank -%}
+        <details class="mb__details">
+          <summary>About this frame</summary>
+          <div class="mb__rte">{{ product.description }}</div>
+        </details>
+      {%- endif -%}
+    </div>
+  </div>
+
+  <div class="mb__picker" data-mb-picker>
+    <div class="mb__picker-head">
+      <h2 class="mb__picker-title" data-mb-picker-title>Choose an artwork</h2>
+      <div class="mb__filters">
+        <label class="mb__search">
+          <span class="mb__visually-hidden">Search artworks</span>
+          <input type="search" placeholder="Search a country, city or region" autocomplete="off" data-mb-search>
+        </label>
+        <div class="mb__chips mb__chips--filters" data-mb-colours></div>
+      </div>
+    </div>
+    <p class="mb__picker-status" data-mb-picker-status>Loading the artworks</p>
+    <ul class="mb__cards" data-mb-cards></ul>
+  </div>
+</miniatures-builder>
+
+{% schema %}
+{
+  "name": "Miniatures builder",
+  "tag": "section",
+  "class": "shopify-section-miniatures-builder",
+  "settings": [
+    {
+      "type": "collection",
+      "id": "catalogue_collection",
+      "label": "Artworks to choose from",
+      "info": "Defaults to the A-Z collection. Only artworks with miniature art are shown."
+    },
+    {
+      "type": "collection",
+      "id": "sizes_collection",
+      "label": "Frame sizes",
+      "info": "Defaults to the Miniatures collection. Products must be titled with their count, e.g. 12 Miniatures."
+    },
+    {
+      "type": "checkbox",
+      "id": "allow_duplicates",
+      "label": "Allow the same artwork more than once",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_positions",
+      "label": "List every position in the cart and order",
+      "info": "When off, positions are still sent to the order, hidden from the customer.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "Show product description",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Miniatures builder"
+    }
+  ],
+  "enabled_on": {
+    "templates": ["product"]
+  }
+}
+{% endschema %}
