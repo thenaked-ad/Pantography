@@ -89,27 +89,19 @@
     6px 22px 40px -6px rgba(30, 22, 12, .30);
 }
 
-/* Four mitred bars, each carrying the real frame texture with the grain along its length. */
+/* Four mitred bars. Each carries its own bar from the studio photo of a whole
+   oak frame, stretched along its length, so the grain never repeats. */
 .mb .mb__bar {
   position: absolute;
   z-index: 2;
-  background-repeat: repeat;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
   pointer-events: none;
 }
 .mb .mb__bar--t,
-.mb .mb__bar--b {
-  left: 0;
-  right: 0;
-  height: var(--mb-t);
-  background-size: auto calc(var(--mb-cm) * 6);
-}
+.mb .mb__bar--b { left: 0; right: 0; height: var(--mb-t); }
 .mb .mb__bar--l,
-.mb .mb__bar--r {
-  top: 0;
-  bottom: 0;
-  width: var(--mb-t);
-  background-size: calc(var(--mb-cm) * 6) auto;
-}
+.mb .mb__bar--r { top: 0; bottom: 0; width: var(--mb-t); }
 .mb .mb__bar--t {
   top: 0;
   clip-path: polygon(0 0, 100% 0, calc(100% - var(--mb-t)) 100%, var(--mb-t) 100%);
@@ -126,16 +118,28 @@
   right: 0;
   clip-path: polygon(0 var(--mb-t), 100% 0, 100% 100%, 0 calc(100% - var(--mb-t)));
 }
-/* Light from the top left: top bar brightest, bottom and right in shade. A thin
-   dark line on each bar's inner edge where it meets the glass. */
-.mb [data-frame] .mb__bar--t { background-image: linear-gradient(to bottom, rgba(255,255,255,.10), rgba(255,255,255,0) 70%, rgba(0,0,0,.22) calc(100% - 1px)), var(--mb-tex-h); }
-.mb [data-frame] .mb__bar--b { background-image: linear-gradient(to top, rgba(0,0,0,.10), rgba(0,0,0,.04) 70%, rgba(0,0,0,.16) calc(100% - 1px)), var(--mb-tex-h); }
-.mb [data-frame] .mb__bar--l { background-image: linear-gradient(to right, rgba(255,255,255,.05), rgba(0,0,0,0) 70%, rgba(0,0,0,.20) calc(100% - 1px)), var(--mb-tex-v); }
-.mb [data-frame] .mb__bar--r { background-image: linear-gradient(to left, rgba(0,0,0,.09), rgba(0,0,0,.03) 70%, rgba(0,0,0,.16) calc(100% - 1px)), var(--mb-tex-v); }
+/* Gentle light from the top left, and a thin dark line on each bar's inner
+   edge where it meets the glass. The photo already carries most of the light. */
+.mb [data-frame] .mb__bar--t { background-image: linear-gradient(to bottom, rgba(255,255,255,.06), rgba(255,255,255,0) 60%, rgba(0,0,0,.20) calc(100% - 1px)), var(--mb-tex-t); }
+.mb [data-frame] .mb__bar--b { background-image: linear-gradient(to top, rgba(0,0,0,.06), rgba(0,0,0,0) 60%, rgba(0,0,0,.14) calc(100% - 1px)), var(--mb-tex-b); }
+.mb [data-frame] .mb__bar--l { background-image: linear-gradient(to right, rgba(255,255,255,.03), rgba(0,0,0,0) 60%, rgba(0,0,0,.18) calc(100% - 1px)), var(--mb-tex-l); }
+.mb [data-frame] .mb__bar--r { background-image: linear-gradient(to left, rgba(0,0,0,.05), rgba(0,0,0,0) 60%, rgba(0,0,0,.14) calc(100% - 1px)), var(--mb-tex-r); }
 
-.mb .mb__frame[data-frame="White"] { --mb-tex-h: url("mb-frame-white-h.webp"); --mb-tex-v: url("mb-frame-white-v.webp"); background: #ebe9e4; }
-.mb .mb__frame[data-frame="Wood"]  { --mb-tex-h: url("mb-frame-oak-h.webp");   --mb-tex-v: url("mb-frame-oak-v.webp");   background: #c5a684; }
-.mb .mb__frame[data-frame="Black"] { --mb-tex-h: url("mb-frame-black-h.webp"); --mb-tex-v: url("mb-frame-black-v.webp"); background: #1e1d1b; }
+.mb .mb__frame[data-frame="Wood"] {
+  --mb-tex-t: url("mb-frame-oak-t.webp"); --mb-tex-b: url("mb-frame-oak-b.webp");
+  --mb-tex-l: url("mb-frame-oak-l.webp"); --mb-tex-r: url("mb-frame-oak-r.webp");
+  background: #d1b294;
+}
+.mb .mb__frame[data-frame="White"] {
+  --mb-tex-t: url("mb-frame-white-t.webp"); --mb-tex-b: url("mb-frame-white-b.webp");
+  --mb-tex-l: url("mb-frame-white-l.webp"); --mb-tex-r: url("mb-frame-white-r.webp");
+  background: #ecebe6;
+}
+.mb .mb__frame[data-frame="Black"] {
+  --mb-tex-t: url("mb-frame-black-t.webp"); --mb-tex-b: url("mb-frame-black-b.webp");
+  --mb-tex-l: url("mb-frame-black-l.webp"); --mb-tex-r: url("mb-frame-black-r.webp");
+  background: #1e1d1b;
+}
 
 /* The mount sits back inside the box frame, so the moulding throws a shadow
    onto its top and left edges. */
@@ -144,7 +148,7 @@
   inset: var(--mb-t);
   z-index: 1;
   background:
-    radial-gradient(140% 110% at 80% 0%, #f4f2ee 0%, #ece9e3 55%, #e3dfd8 100%);
+    radial-gradient(140% 110% at 75% 0%, #fbfaf8 0%, #f4f3f0 55%, #ebe9e5 100%);
   box-shadow:
     inset 0 calc(var(--mb-cm) * 1.3) calc(var(--mb-cm) * 1.5) calc(var(--mb-cm) * -.7) rgba(0, 0, 0, .40),
     inset calc(var(--mb-cm) * .7) 0 calc(var(--mb-cm) * 1.1) calc(var(--mb-cm) * -.6) rgba(0, 0, 0, .18),
@@ -286,16 +290,16 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background-size: 360% auto;
-  background-position: 30% 50%;
+  background-size: cover;
+  background-position: center;
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .10), inset 0 -3px 6px rgba(0, 0, 0, .10);
   outline: 1px solid transparent;
   outline-offset: 3px;
   transition: outline-color .15s ease;
 }
-#root .mb .mb__swatch[data-frame="White"] { background-image: url("mb-frame-white-h.webp"); background-color: #ebe9e4; }
-#root .mb .mb__swatch[data-frame="Wood"]  { background-image: url("mb-frame-oak-h.webp");   background-color: #c5a684; }
-#root .mb .mb__swatch[data-frame="Black"] { background-image: url("mb-frame-black-h.webp"); background-color: #1e1d1b; }
+#root .mb .mb__swatch[data-frame="White"] { background-image: url("mb-swatch-white.webp"); background-color: #ecebe6; }
+#root .mb .mb__swatch[data-frame="Wood"]  { background-image: url("mb-swatch-oak.webp");   background-color: #d1b294; }
+#root .mb .mb__swatch[data-frame="Black"] { background-image: url("mb-swatch-black.webp"); background-color: #1e1d1b; }
 #root .mb .mb__swatch:hover { outline-color: var(--mb-line); }
 #root .mb .mb__swatch[aria-checked="true"] { outline-color: var(--mb-ink); }
 
@@ -417,7 +421,20 @@
 }
 .mb .mb__status.is-error { color: var(--alert_error, #b3261e); }
 .mb .mb__submit { margin: 0; }
-#root .mb .mb__submit button.is-blocked { opacity: .5; }
+/* Always solid black, whatever the theme's button settings resolve to. */
+#root .mb .mb__submit button {
+  --theme_bg_btn: #000;
+  --theme_bg_btn_dark: #191919;
+  --theme_btn_text: #fff;
+  --buy_btn_bg: #000;
+  --buy_btn_bg_dark: #191919;
+  --buy_btn_fg: #fff;
+  background-color: #000;
+  color: #fff;
+  opacity: 1;
+}
+#root .mb .mb__submit button::before { background-color: #000; border-color: #000; }
+#root .mb .mb__submit button:hover::before { background-color: #191919; border-color: #191919; }
 
 .mb .mb__details {
   margin-top: 28px;
