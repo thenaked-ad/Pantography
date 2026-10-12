@@ -7,10 +7,10 @@ if (!customElements.get('miniatures-builder')) {
      photographs of the 9 and the 60: the miniatures sit as a centred group with these
      gaps, and the wide margin to the frame is whatever is left over. */
   const MOULDING_CM = 3.0;
-  const MINI_W_CM = 5.65;
-  const MINI_H_CM = 6.65;
-  const GAP_X_CM = 2.4;
-  const GAP_Y_CM = 2.05;
+  const MINI_W_CM = 5.95;
+  const MINI_H_CM = 7.0;
+  const GAP_X_CM = 2.5;
+  const GAP_Y_CM = 2.15;
   const FRAME_ORDER = ['White', 'Black', 'Wood'];
   const COLOUR_ORDER = ['Blue', 'Teal', 'Green', 'Yellow', 'Orange', 'Red', 'Pink', 'Purple', 'Grey'];
   const MODE_LABELS = {
