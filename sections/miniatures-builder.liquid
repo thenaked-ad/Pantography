@@ -77,12 +77,17 @@
   data-show-positions="{{ section.settings.show_positions }}"
   data-allow-duplicates="{{ section.settings.allow_duplicates }}"
 >
+  <p class="mb__font-probe" data-mb-font-probe aria-hidden="true">Aa</p>
   <script type="application/json" data-mb-sizes>{{ sizes_json | strip_newlines }}</script>
 
   <div class="mb__layout">
     <div class="mb__stage">
       <div class="mb__frame-wrap">
         <div class="mb__frame" data-mb-frame data-frame="White">
+          <span class="mb__bar mb__bar--t" aria-hidden="true"></span>
+          <span class="mb__bar mb__bar--r" aria-hidden="true"></span>
+          <span class="mb__bar mb__bar--b" aria-hidden="true"></span>
+          <span class="mb__bar mb__bar--l" aria-hidden="true"></span>
           <div class="mb__mount">
             <div class="mb__grid" data-mb-grid></div>
           </div>
@@ -160,7 +165,7 @@
         <div data-mb-properties></div>
         <p class="mb__status" data-mb-status aria-live="polite"></p>
         <p class="link-btn wide mb__submit">
-          <button type="submit" class="overlay-buy_button" data-mb-submit>{{ 'product.form.add_to_cart' | t }}</button>
+          <button type="submit" class="overlay-buy_button plain" data-mb-submit>{{ 'product.form.add_to_cart' | t }}</button>
         </p>
       {%- endform -%}
 

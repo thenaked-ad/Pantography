@@ -3,6 +3,11 @@
 if (!customElements.get('miniatures-builder')) {
   const STORAGE_KEY = 'pantography-miniatures-v1';
   const MAX_POSITIONS = 60;
+  /* Physical sizes in cm, so every frame is drawn to scale: moulding face width
+     and the size of one miniature. The art itself is about 1.18 tall to 1 wide. */
+  const MOULDING_CM = 2.4;
+  const MINI_W_CM = 7.4;
+  const MINI_H_CM = 8.7;
   const FRAME_ORDER = ['White', 'Black', 'Wood'];
   const COLOUR_ORDER = ['Blue', 'Teal', 'Green', 'Yellow', 'Orange', 'Red', 'Pink', 'Purple', 'Grey'];
   const MODE_LABELS = {
@@ -44,6 +49,13 @@ if (!customElements.get('miniatures-builder')) {
         this.el[name.replace(/-([a-z])/g, (m, c) => c.toUpperCase())] = this.querySelector(`[data-mb-${name}]`);
       });
       this.form = this.el.variant.form;
+
+      /* The site's fonts come from a font app that styles p, li, a and headings.
+         Buttons, inputs and spans miss out, so copy the font from a probe paragraph. */
+      const probe = this.querySelector('[data-mb-font-probe]');
+      const copyFont = () => this.style.setProperty('--mb-font', getComputedStyle(probe).fontFamily);
+      copyFont();
+      window.addEventListener('load', copyFont, { once: true });
 
       this.state = this.restore();
       this.bind();
@@ -424,9 +436,17 @@ if (!customElements.get('miniatures-builder')) {
       const { mode, selected } = this.state;
       const grid = this.el.grid;
 
-      this.el.frame.style.setProperty('--mb-ratio', `${size.w} / ${size.h}`);
+      const innerW = size.w - 2 * MOULDING_CM;
+      const innerH = size.h - 2 * MOULDING_CM;
+      const frame = this.el.frame.style;
+      frame.setProperty('--mb-w', size.w);
+      frame.setProperty('--mb-h', size.h);
+      frame.setProperty('--mb-cm', `calc(100cqw / ${size.w})`);
+      frame.setProperty('--mb-t', `calc(100cqw * ${MOULDING_CM / size.w})`);
       grid.style.setProperty('--mb-cols', size.cols);
       grid.style.setProperty('--mb-rows', size.rows);
+      grid.style.setProperty('--mb-cw', `${(MINI_W_CM / innerW) * 100}%`);
+      grid.style.setProperty('--mb-ch', `${(MINI_H_CM / innerH) * 100}%`);
       grid.dataset.count = size.count;
 
       while (grid.childElementCount > size.count) grid.lastElementChild.remove();
