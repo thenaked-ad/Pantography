@@ -41,7 +41,7 @@ if (!customElements.get('miniatures-builder')) {
 
       this.el = {};
       [
-        'frame', 'grid', 'stage-note', 'clear-cell', 'clear-all', 'title', 'price', 'dims',
+        'frame', 'grid', 'stage-note', 'clear-all', 'title', 'price', 'dims',
         'sizes-list', 'frames', 'frame-name', 'studio-fill', 'generate', 'notes',
         'shortlist-wrap', 'shortlist', 'shortlist-count', 'variant', 'properties', 'status',
         'submit', 'picker', 'picker-title', 'search', 'colours', 'picker-status', 'cards'
@@ -118,14 +118,17 @@ if (!customElements.get('miniatures-builder')) {
       });
 
       this.el.grid.addEventListener('click', (event) => {
+        const remove = event.target.closest('[data-remove]');
+        if (remove) {
+          /* Empty the position and keep it selected, so the next artwork chosen fills it. */
+          const i = Number(remove.dataset.remove);
+          this.state.positions[i] = null;
+          this.state.selected = i;
+          this.changed();
+          return;
+        }
         const cell = event.target.closest('[data-index]');
         if (cell) this.selectCell(Number(cell.dataset.index));
-      });
-
-      this.el.clearCell.addEventListener('click', () => {
-        if (this.state.selected === null) return;
-        this.state.positions[this.state.selected] = null;
-        this.changed();
       });
 
       this.el.clearAll.addEventListener('click', () => {
@@ -449,20 +452,27 @@ if (!customElements.get('miniatures-builder')) {
       grid.style.setProperty('--mb-ch', `${(MINI_H_CM / innerH) * 100}%`);
       grid.dataset.count = size.count;
 
+      /* Each position is a slot holding the stamp button and, beside it rather than
+         inside it (buttons cannot nest), a small remove button on its top right corner. */
       while (grid.childElementCount > size.count) grid.lastElementChild.remove();
       while (grid.childElementCount < size.count) {
-        const cell = document.createElement('button');
-        cell.type = 'button';
-        cell.className = 'mb__cell';
-        cell.dataset.index = grid.childElementCount;
-        cell.innerHTML = '<span class="mb__cell-num"></span><img alt="" draggable="false" hidden>';
-        grid.append(cell);
+        const i = grid.childElementCount;
+        const slot = document.createElement('div');
+        slot.className = 'mb__slot';
+        slot.innerHTML = `<button type="button" class="mb__cell" data-index="${i}"><span class="mb__cell-num"></span><img alt="" draggable="false" hidden></button>`
+          + `<button type="button" class="mb__remove" data-remove="${i}" hidden><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 3l6 6M9 3l-6 6"/></svg></button>`;
+        grid.append(slot);
       }
 
-      Array.from(grid.children).forEach((cell, i) => {
+      Array.from(grid.children).forEach((slot, i) => {
+        const cell = slot.querySelector('.mb__cell');
+        const remove = slot.querySelector('.mb__remove');
         const handle = mode === 'studio' ? null : this.state.positions[i];
         const item = handle ? this.byHandle.get(handle) : null;
         const img = cell.querySelector('img');
+        slot.classList.toggle('is-selected', selected === i);
+        remove.hidden = !handle;
+        remove.setAttribute('aria-label', `Remove ${item ? titleCase(item.t) : 'artwork'} from position ${i + 1}`);
         cell.querySelector('.mb__cell-num').textContent = i + 1;
         cell.classList.toggle('is-filled', Boolean(handle));
         cell.classList.toggle('is-selected', selected === i);
@@ -483,6 +493,8 @@ if (!customElements.get('miniatures-builder')) {
       let note = '';
       if (mode === 'studio') {
         note = `The studio will compose all ${size.count} artworks for you.`;
+      } else if (selected !== null && this.state.positions[selected]) {
+        note = `Position ${selected + 1} selected. Choose a new artwork below, or tap the cross to remove it.`;
       } else if (filled === size.count) {
         note = 'Your frame is complete. Select any position to change it, or drag to swap.';
       } else if (selected !== null) {
@@ -491,7 +503,6 @@ if (!customElements.get('miniatures-builder')) {
         note = `${filled} of ${size.count} positions filled.`;
       }
       this.el.stageNote.textContent = note;
-      this.el.clearCell.hidden = selected === null || !this.state.positions[selected] || mode === 'studio';
       this.el.clearAll.hidden = filled === 0 || mode === 'studio';
     }
 

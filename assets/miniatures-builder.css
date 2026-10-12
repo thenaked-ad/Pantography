@@ -171,9 +171,16 @@
   align-content: space-evenly;
 }
 
+.mb .mb__slot {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+}
 #root .mb .mb__cell {
   position: relative;
   display: flex;
+  width: 100%;
+  height: 100%;
   align-items: center;
   justify-content: center;
   min-width: 0;
@@ -199,6 +206,39 @@
     drop-shadow(calc(var(--mb-cm) * .06) calc(var(--mb-cm) * .12) calc(var(--mb-cm) * .08) rgba(40, 30, 20, .42))
     drop-shadow(calc(var(--mb-cm) * .35) calc(var(--mb-cm) * .75) calc(var(--mb-cm) * .6) rgba(40, 30, 20, .30));
 }
+/* Remove: a small round cross on the stamp's top right corner. Shown on the
+   selected stamp, and on hover where there is a mouse. */
+#root .mb .mb__remove {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(18px, calc(var(--mb-cm) * 2.2), 26px);
+  height: clamp(18px, calc(var(--mb-cm) * 2.2), 26px);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--mb-ink);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
+  transform: translate(40%, -40%) scale(.6);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .15s ease, transform .15s ease;
+}
+#root .mb .mb__remove svg { width: 42%; height: 42%; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
+#root .mb .mb__slot.is-selected .mb__remove,
+#root .mb .mb__remove:focus-visible {
+  opacity: 1;
+  transform: translate(40%, -40%) scale(1);
+  pointer-events: auto;
+}
+@media (hover: hover) {
+  #root .mb .mb__slot:hover .mb__remove { opacity: 1; transform: translate(40%, -40%) scale(1); pointer-events: auto; }
+  #root .mb .mb__remove:hover { background: var(--mb-ink); color: #fff; }
+}
+.mb[data-mode="studio"] .mb__remove { display: none !important; }
 .mb .mb__cell-num {
   font-size: max(9px, calc(var(--mb-cm) * .9));
   line-height: 1;
