@@ -89,15 +89,22 @@
     6px 22px 40px -6px rgba(30, 22, 12, .30);
 }
 
-/* Four mitred bars. Each carries its own bar from the studio photo of a whole
-   oak frame, stretched along its length, so the grain never repeats. */
+/* Four mitred bars, each with its own high-definition texture stitched from the
+   studio photographs (see Claude outputs/miniatures-harness/textures), so the
+   grain never repeats and no two sides match. */
 .mb .mb__bar {
   position: absolute;
   z-index: 2;
   background-repeat: no-repeat;
-  background-size: 100% 100%;
+  background-position: center;
   pointer-events: none;
 }
+/* Textures are 6000 x 160px (37.5 : 1). Show them at their natural proportions,
+   only stretching along the grain when a bar is longer than that (the 60). */
+.mb .mb__bar--t,
+.mb .mb__bar--b { background-size: max(100%, calc(var(--mb-t) * 37.5)) 100%; }
+.mb .mb__bar--l,
+.mb .mb__bar--r { background-size: 100% max(100%, calc(var(--mb-t) * 37.5)); }
 .mb .mb__bar--t,
 .mb .mb__bar--b { left: 0; right: 0; height: var(--mb-t); }
 .mb .mb__bar--l,
