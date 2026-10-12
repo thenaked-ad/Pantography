@@ -14,7 +14,7 @@
   display: block;
   max-width: 1320px;
   margin: 0 auto;
-  padding: 24px 16px 56px;
+  padding: 8px 16px 56px;   /* top matches where a normal product page starts */
   color: var(--mb-ink);
   font-family: var(--mb-font, inherit);
   letter-spacing: var(--mb-track);
