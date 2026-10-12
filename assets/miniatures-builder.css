@@ -269,23 +269,26 @@
 
 /* ---------- panel */
 .mb .mb__head { margin-bottom: 6px; }
+/* Same as the product page title: the theme's h3 size (26px, 20px under 760px),
+   0.18em tracking, and the theme's 21px rhythm between title, price and the next line. */
 .mb .mb__head .mb__title {
-  margin: 0 0 10px;
-  font-size: 20px;
+  margin: 0 0 var(--main_mr, 21px);
+  font-size: var(--main_h3, 26px);
   line-height: 1.1;
   font-weight: 400;
-  letter-spacing: 3.6px;
+  letter-spacing: .18em;
   text-transform: uppercase;
 }
 .mb .mb__head .mb__price {
-  margin: 0;
+  margin: 0 0 var(--main_mr, 21px);
   font-family: var(--main_ff, inherit);
   font-size: 14px;
+  line-height: 23.8px;
   font-weight: 300;
   letter-spacing: var(--mb-track);
 }
 .mb .mb__head .mb__dims {
-  margin: 4px 0 0;
+  margin: 0;
   font-size: 12px;
   color: var(--mb-muted);
 }
