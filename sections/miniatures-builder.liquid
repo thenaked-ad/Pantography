@@ -12,6 +12,26 @@
 {%- endcomment -%}
 
 {{ 'miniatures-builder.css' | asset_url | stylesheet_tag }}
+{%- comment -%}
+  Frame and swatch images go through asset_url so each URL carries a ?v= that changes
+  when the file does. Plain url()s in the CSS file would stay cached for a year.
+{%- endcomment -%}
+<style>
+  {%- assign finishes = 'Wood:oak,White:white,Black:black' | split: ',' -%}
+  {%- for pair in finishes -%}
+    {%- assign frame = pair | split: ':' | first -%}
+    {%- assign file = pair | split: ':' | last -%}
+    miniatures-builder[data-section-id="{{ section.id }}"] .mb__frame[data-frame="{{ frame }}"] {
+      --mb-tex-t: url({{ 'mb-frame-' | append: file | append: '-t.webp' | asset_url }});
+      --mb-tex-b: url({{ 'mb-frame-' | append: file | append: '-b.webp' | asset_url }});
+      --mb-tex-l: url({{ 'mb-frame-' | append: file | append: '-l.webp' | asset_url }});
+      --mb-tex-r: url({{ 'mb-frame-' | append: file | append: '-r.webp' | asset_url }});
+    }
+    miniatures-builder[data-section-id="{{ section.id }}"] .mb__swatch[data-frame="{{ frame }}"] {
+      --mb-swatch: url({{ 'mb-swatch-' | append: file | append: '.webp' | asset_url }});
+    }
+  {%- endfor -%}
+</style>
 <script src="{{ 'miniatures-builder.js' | asset_url }}" defer></script>
 
 {%- liquid

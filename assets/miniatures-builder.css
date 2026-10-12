@@ -132,21 +132,12 @@
 .mb [data-frame] .mb__bar--l { background-image: linear-gradient(to right, rgba(255,255,255,.03), rgba(0,0,0,0) 60%, rgba(0,0,0,.18) calc(100% - 1px)), var(--mb-tex-l); }
 .mb [data-frame] .mb__bar--r { background-image: linear-gradient(to left, rgba(0,0,0,.05), rgba(0,0,0,0) 60%, rgba(0,0,0,.14) calc(100% - 1px)), var(--mb-tex-r); }
 
-.mb .mb__frame[data-frame="Wood"] {
-  --mb-tex-t: url("mb-frame-oak-t.webp"); --mb-tex-b: url("mb-frame-oak-b.webp");
-  --mb-tex-l: url("mb-frame-oak-l.webp"); --mb-tex-r: url("mb-frame-oak-r.webp");
-  background: #d1b294;
-}
-.mb .mb__frame[data-frame="White"] {
-  --mb-tex-t: url("mb-frame-white-t.webp"); --mb-tex-b: url("mb-frame-white-b.webp");
-  --mb-tex-l: url("mb-frame-white-l.webp"); --mb-tex-r: url("mb-frame-white-r.webp");
-  background: #ecebe6;
-}
-.mb .mb__frame[data-frame="Black"] {
-  --mb-tex-t: url("mb-frame-black-t.webp"); --mb-tex-b: url("mb-frame-black-b.webp");
-  --mb-tex-l: url("mb-frame-black-l.webp"); --mb-tex-r: url("mb-frame-black-r.webp");
-  background: #1e1d1b;
-}
+/* The texture URLs (--mb-tex-*) are set in the section with asset_url, so each
+   carries a ?v= that changes whenever the image does. A plain url() here would be
+   cached by browsers for a year under the same name. */
+.mb .mb__frame[data-frame="Wood"]  { background: #d1b294; }
+.mb .mb__frame[data-frame="White"] { background: #ecebe6; }
+.mb .mb__frame[data-frame="Black"] { background: #1e1d1b; }
 
 /* The mount sits back inside the box frame, so the moulding throws a shadow
    onto its top and left edges. */
@@ -304,9 +295,10 @@
   outline-offset: 3px;
   transition: outline-color .15s ease;
 }
-#root .mb .mb__swatch[data-frame="White"] { background-image: url("mb-swatch-white.webp"); background-color: #ecebe6; }
-#root .mb .mb__swatch[data-frame="Wood"]  { background-image: url("mb-swatch-oak.webp");   background-color: #d1b294; }
-#root .mb .mb__swatch[data-frame="Black"] { background-image: url("mb-swatch-black.webp"); background-color: #1e1d1b; }
+#root .mb .mb__swatch[data-frame="White"] { background-color: #ecebe6; }
+#root .mb .mb__swatch[data-frame="Wood"]  { background-color: #d1b294; }
+#root .mb .mb__swatch[data-frame="Black"] { background-color: #1e1d1b; }
+#root .mb .mb__swatch { background-image: var(--mb-swatch); }
 #root .mb .mb__swatch:hover { outline-color: var(--mb-line); }
 #root .mb .mb__swatch[aria-checked="true"] { outline-color: var(--mb-ink); }
 
