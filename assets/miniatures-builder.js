@@ -3,11 +3,14 @@
 if (!customElements.get('miniatures-builder')) {
   const STORAGE_KEY = 'pantography-miniatures-v1';
   const MAX_POSITIONS = 60;
-  /* Physical sizes in cm, so every frame is drawn to scale: moulding face width
-     and the size of one miniature. The art itself is about 1.18 tall to 1 wide. */
-  const MOULDING_CM = 2.4;
-  const MINI_W_CM = 7.4;
-  const MINI_H_CM = 8.7;
+  /* Physical sizes in cm, so every frame is drawn to scale. Measured from the studio
+     photographs of the 9 and the 60: the miniatures sit as a centred group with these
+     gaps, and the wide margin to the frame is whatever is left over. */
+  const MOULDING_CM = 3.0;
+  const MINI_W_CM = 5.65;
+  const MINI_H_CM = 6.65;
+  const GAP_X_CM = 2.4;
+  const GAP_Y_CM = 2.05;
   const FRAME_ORDER = ['White', 'Black', 'Wood'];
   const COLOUR_ORDER = ['Blue', 'Teal', 'Green', 'Yellow', 'Orange', 'Red', 'Pink', 'Purple', 'Grey'];
   const MODE_LABELS = {
@@ -450,6 +453,8 @@ if (!customElements.get('miniatures-builder')) {
       grid.style.setProperty('--mb-rows', size.rows);
       grid.style.setProperty('--mb-cw', `${(MINI_W_CM / innerW) * 100}%`);
       grid.style.setProperty('--mb-ch', `${(MINI_H_CM / innerH) * 100}%`);
+      grid.style.setProperty('--mb-gx', `${(GAP_X_CM / innerW) * 100}%`);
+      grid.style.setProperty('--mb-gy', `${(GAP_Y_CM / innerH) * 100}%`);
       grid.dataset.count = size.count;
 
       /* Each position is a slot holding the stamp button and, beside it rather than

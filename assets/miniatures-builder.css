@@ -171,8 +171,10 @@
   display: grid;
   grid-template-columns: repeat(var(--mb-cols, 3), var(--mb-cw, 20%));
   grid-template-rows: repeat(var(--mb-rows, 3), var(--mb-ch, 20%));
-  justify-content: space-evenly;
-  align-content: space-evenly;
+  column-gap: var(--mb-gx, 6%);
+  row-gap: var(--mb-gy, 4%);
+  justify-content: center;
+  align-content: center;
 }
 
 .mb .mb__slot {
