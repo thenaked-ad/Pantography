@@ -14,7 +14,7 @@
   display: block;
   max-width: 1320px;
   margin: 0 auto;
-  padding: 8px 16px 56px;   /* top matches where a normal product page starts */
+  padding: 2px 16px 56px;   /* top matches where a normal product page starts */
   color: var(--mb-ink);
   font-family: var(--mb-font, inherit);
   letter-spacing: var(--mb-track);
@@ -58,6 +58,10 @@
 
 /* ---------- layout */
 .mb .mb__layout { display: grid; gap: 28px; }
+/* On desktop the theme's own gutter is enough; match the product page's edges. */
+@media (min-width: 990px) {
+  .mb { padding-left: 6px; padding-right: 6px; }
+}
 @media (min-width: 990px) {
   .mb .mb__layout {
     grid-template-columns: minmax(0, 1.3fr) minmax(340px, 1fr);
