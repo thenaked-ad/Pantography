@@ -139,7 +139,23 @@
 /* The texture URLs (--mb-tex-*) are set in the section with asset_url, so each
    carries a ?v= that changes whenever the image does. A plain url() here would be
    cached by browsers for a year under the same name. */
-.mb .mb__frame[data-frame="Wood"]  { background: #d1b294; }
+/* Wood is the studio's own frame image (the one in every product mockup), drawn as a
+   border image: its real mitred corners are kept and only the straight runs stretch.
+   Slices are the bar widths in that image (1718 x 1828px): top, right, bottom, left. */
+.mb .mb__frame[data-frame="Wood"] { background: transparent; }
+.mb .mb__frame[data-frame="Wood"] .mb__bar { display: none; }
+.mb .mb__frame[data-frame="Wood"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  border: var(--mb-t) solid transparent;
+  border-image-source: var(--mb-wood-studio);
+  border-image-slice: 72 72 74 73;
+  border-image-width: 1;
+  border-image-repeat: stretch;
+}
 .mb .mb__frame[data-frame="White"] { background: #ecebe6; }
 .mb .mb__frame[data-frame="Black"] { background: #1e1d1b; }
 
@@ -158,14 +174,17 @@
     inset 0 calc(var(--mb-cm) * -.4) calc(var(--mb-cm) * .8) calc(var(--mb-cm) * -.6) rgba(0, 0, 0, .04),
     inset 0 0 0 1px rgba(0, 0, 0, .05);
 }
-/* faint reflection on the glass */
+/* reflection on the glass */
 .mb .mb__mount::after {
   content: "";
   position: absolute;
   inset: 0;
   z-index: 3;
   pointer-events: none;
-  background: linear-gradient(118deg, rgba(255,255,255,0) 35%, rgba(255,255,255,.16) 47%, rgba(255,255,255,0) 60%);
+  /* the studio's glass reflection layer, placed as in their mockups: the right three
+     quarters of the opening, full height */
+  background: var(--mb-glass) no-repeat right top / 74.7% 100%;
+  opacity: .5;                 /* at full strength it fades the stamps beneath it */
 }
 .mb .mb__grid {
   position: absolute;
