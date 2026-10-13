@@ -89,8 +89,8 @@
   /* shadow cast on the wall: a tight contact shadow and a long soft one */
   box-shadow:
     0 1px 2px rgba(0, 0, 0, .18),
-    2px 6px 10px rgba(30, 22, 12, .16),
-    6px 22px 40px -6px rgba(30, 22, 12, .30);
+    -3px 6px 10px rgba(30, 22, 12, .16),
+    -10px 22px 40px -6px rgba(30, 22, 12, .30);
 }
 
 /* Four mitred bars, each with its own high-definition texture stitched from the
@@ -143,51 +143,19 @@
 .mb .mb__frame[data-frame="White"] { background: #ecebe6; }
 .mb .mb__frame[data-frame="Black"] { background: #1e1d1b; }
 
-/* Inside the box frame: four walls running back from the frame, and the back panel
-   the miniatures float on. Lit from above, so the top wall is in shade, the bottom
-   wall catches the light, and the frame throws a soft shadow onto the back panel. */
+/* The back of the box frame. No inside walls show, as in the studio photographs: the
+   depth comes from the shadow the frame casts onto the back. Light comes from the top
+   right, so the top and right bars throw the deepest shadow, the left edge stays light. */
 .mb .mb__mount {
-  --mb-d: calc(var(--mb-cm) * 1.1);             /* how much of each wall shows */
   position: absolute;
   inset: var(--mb-t);
   z-index: 1;
-  overflow: hidden;
-  background: #e6e3dd;
-}
-.mb .mb__wall {
-  position: absolute;
-  z-index: 1;
-  pointer-events: none;
-}
-.mb .mb__wall--t {
-  top: 0; left: 0; right: 0; height: var(--mb-d);
-  clip-path: polygon(0 0, 100% 0, calc(100% - var(--mb-d)) 100%, var(--mb-d) 100%);
-  background: linear-gradient(to bottom, #c9c5bd, #dedad3);
-}
-.mb .mb__wall--b {
-  bottom: 0; left: 0; right: 0; height: var(--mb-d);
-  clip-path: polygon(var(--mb-d) 0, calc(100% - var(--mb-d)) 0, 100% 100%, 0 100%);
-  background: linear-gradient(to top, #f6f4f0, #eeebe6);
-}
-.mb .mb__wall--l {
-  top: 0; bottom: 0; left: 0; width: var(--mb-d);
-  clip-path: polygon(0 0, 100% var(--mb-d), 100% calc(100% - var(--mb-d)), 0 100%);
-  background: linear-gradient(to right, #d8d4cd, #e6e3dd);
-}
-.mb .mb__wall--r {
-  top: 0; bottom: 0; right: 0; width: var(--mb-d);
-  clip-path: polygon(0 var(--mb-d), 100% 0, 100% 100%, 0 calc(100% - var(--mb-d)));
-  background: linear-gradient(to left, #dfdbd4, #ebe8e3);
-}
-.mb .mb__back {
-  position: absolute;
-  inset: var(--mb-d);
-  z-index: 0;
   background: radial-gradient(140% 110% at 75% 0%, #fbfaf8 0%, #f5f4f1 55%, #eeece8 100%);
   box-shadow:
-    inset 0 calc(var(--mb-cm) * 1.6) calc(var(--mb-cm) * 1.8) calc(var(--mb-cm) * -.8) rgba(0, 0, 0, .34),
-    inset calc(var(--mb-cm) * .9) 0 calc(var(--mb-cm) * 1.3) calc(var(--mb-cm) * -.7) rgba(0, 0, 0, .14),
-    inset calc(var(--mb-cm) * -.5) 0 calc(var(--mb-cm) * 1) calc(var(--mb-cm) * -.6) rgba(0, 0, 0, .06),
+    inset 0 calc(var(--mb-cm) * 2.0) calc(var(--mb-cm) * 2.2) calc(var(--mb-cm) * -1.0) rgba(0, 0, 0, .36),
+    inset calc(var(--mb-cm) * -1.6) 0 calc(var(--mb-cm) * 2.0) calc(var(--mb-cm) * -.9) rgba(0, 0, 0, .28),
+    inset calc(var(--mb-cm) * .4) 0 calc(var(--mb-cm) * .8) calc(var(--mb-cm) * -.6) rgba(0, 0, 0, .05),
+    inset 0 calc(var(--mb-cm) * -.4) calc(var(--mb-cm) * .8) calc(var(--mb-cm) * -.6) rgba(0, 0, 0, .04),
     inset 0 0 0 1px rgba(0, 0, 0, .05);
 }
 /* faint reflection on the glass */
@@ -238,16 +206,16 @@
   outline: 1px solid var(--mb-ink);
   outline-offset: calc(var(--mb-cm) * .35);
 }
-/* Each miniature floats off the mount: a crisp contact shadow plus a softer
-   one falling down and to the right, as in the studio photographs. */
+/* Each miniature floats off the back: a crisp contact shadow plus a softer one
+   falling down and to the left, as in the studio photographs (light from top right). */
 .mb .mb__cell img {
   width: 100%;
   height: 100%;
   object-fit: contain;
   pointer-events: none;
   filter:
-    drop-shadow(calc(var(--mb-cm) * .06) calc(var(--mb-cm) * .12) calc(var(--mb-cm) * .1) rgba(40, 30, 20, .40))
-    drop-shadow(calc(var(--mb-cm) * .45) calc(var(--mb-cm) * .95) calc(var(--mb-cm) * .9) rgba(40, 30, 20, .34));
+    drop-shadow(calc(var(--mb-cm) * -.08) calc(var(--mb-cm) * .12) calc(var(--mb-cm) * .1) rgba(40, 30, 20, .45))
+    drop-shadow(calc(var(--mb-cm) * -.6) calc(var(--mb-cm) * .9) calc(var(--mb-cm) * .75) rgba(40, 30, 20, .42));
 }
 /* Drag to swap */
 #root .mb .mb__cell.is-filled { cursor: grab; -webkit-touch-callout: none; }
@@ -264,7 +232,7 @@
   z-index: 10000;
   object-fit: contain;
   pointer-events: none;
-  filter: drop-shadow(2px 6px 8px rgba(40, 30, 20, .35));
+  filter: drop-shadow(-4px 7px 8px rgba(40, 30, 20, .38));
 }
 /* Remove: a small round cross on the stamp's top right corner. Shown on the
    selected stamp, and on hover where there is a mouse. */
@@ -612,7 +580,7 @@
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-  filter: drop-shadow(1px 2px 1.5px rgba(40, 30, 20, .30)) drop-shadow(4px 8px 9px rgba(40, 30, 20, .22));
+  filter: drop-shadow(-1px 2px 1.5px rgba(40, 30, 20, .32)) drop-shadow(-5px 8px 8px rgba(40, 30, 20, .26));
 }
 .mb .mb__card-name {
   margin-top: 8px;

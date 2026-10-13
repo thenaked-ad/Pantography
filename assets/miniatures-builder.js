@@ -154,9 +154,13 @@ if (!customElements.get('miniatures-builder')) {
 
       this.el.generate.addEventListener('click', () => this.generate());
 
-      /* The theme turns this into its own dropdown on desktop and fires change on the select. */
+      /* The theme turns this into its own dropdown on desktop. Its option links fire
+         change before the dropdown writes the new value into the select, so read the
+         value once the click has finished, or it lags one choice behind. */
       if (this.el.frameSelect) {
-        this.el.frameSelect.addEventListener('change', () => this.setFrame(this.el.frameSelect.value));
+        this.el.frameSelect.addEventListener('change', () => {
+          setTimeout(() => this.setFrame(this.el.frameSelect.value), 0);
+        });
       }
 
       this.el.categories.addEventListener('click', (event) => {
