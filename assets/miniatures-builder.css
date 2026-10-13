@@ -129,12 +129,12 @@
   right: 0;
   clip-path: polygon(0 var(--mb-t), 100% 0, 100% 100%, 0 calc(100% - var(--mb-t)));
 }
-/* Gentle light from the top left, and a thin dark line on each bar's inner
-   edge where it meets the glass. The photo already carries most of the light. */
-.mb [data-frame] .mb__bar--t { background-image: linear-gradient(to bottom, rgba(255,255,255,.06), rgba(255,255,255,0) 60%, rgba(0,0,0,.20) calc(100% - 1px)), var(--mb-tex-t); }
-.mb [data-frame] .mb__bar--b { background-image: linear-gradient(to top, rgba(0,0,0,.06), rgba(0,0,0,0) 60%, rgba(0,0,0,.14) calc(100% - 1px)), var(--mb-tex-b); }
-.mb [data-frame] .mb__bar--l { background-image: linear-gradient(to right, rgba(255,255,255,.03), rgba(0,0,0,0) 60%, rgba(0,0,0,.18) calc(100% - 1px)), var(--mb-tex-l); }
-.mb [data-frame] .mb__bar--r { background-image: linear-gradient(to left, rgba(0,0,0,.05), rgba(0,0,0,0) 60%, rgba(0,0,0,.14) calc(100% - 1px)), var(--mb-tex-r); }
+/* A flat front face, like the studio's frames: no shading across the bar, just a
+   crisp line on the inner edge where the face meets the inside of the box. */
+.mb [data-frame] .mb__bar--t { background-image: linear-gradient(to bottom, transparent calc(100% - 1px), rgba(0,0,0,.16) calc(100% - 1px)), var(--mb-tex-t); }
+.mb [data-frame] .mb__bar--b { background-image: linear-gradient(to top, transparent calc(100% - 1px), rgba(0,0,0,.10) calc(100% - 1px)), var(--mb-tex-b); }
+.mb [data-frame] .mb__bar--l { background-image: linear-gradient(to right, transparent calc(100% - 1px), rgba(0,0,0,.14) calc(100% - 1px)), var(--mb-tex-l); }
+.mb [data-frame] .mb__bar--r { background-image: linear-gradient(to left, transparent calc(100% - 1px), rgba(0,0,0,.10) calc(100% - 1px)), var(--mb-tex-r); }
 
 /* The texture URLs (--mb-tex-*) are set in the section with asset_url, so each
    carries a ?v= that changes whenever the image does. A plain url() here would be
@@ -143,32 +143,69 @@
 .mb .mb__frame[data-frame="White"] { background: #ecebe6; }
 .mb .mb__frame[data-frame="Black"] { background: #1e1d1b; }
 
-/* The mount sits back inside the box frame, so the moulding throws a shadow
-   onto its top and left edges. */
+/* Inside the box frame: four walls running back from the frame, and the back panel
+   the miniatures float on. Lit from above, so the top wall is in shade, the bottom
+   wall catches the light, and the frame throws a soft shadow onto the back panel. */
 .mb .mb__mount {
+  --mb-d: calc(var(--mb-cm) * 1.1);             /* how much of each wall shows */
   position: absolute;
   inset: var(--mb-t);
   z-index: 1;
-  background:
-    radial-gradient(140% 110% at 75% 0%, #fbfaf8 0%, #f4f3f0 55%, #ebe9e5 100%);
+  overflow: hidden;
+  background: #e6e3dd;
+}
+.mb .mb__wall {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+}
+.mb .mb__wall--t {
+  top: 0; left: 0; right: 0; height: var(--mb-d);
+  clip-path: polygon(0 0, 100% 0, calc(100% - var(--mb-d)) 100%, var(--mb-d) 100%);
+  background: linear-gradient(to bottom, #c9c5bd, #dedad3);
+}
+.mb .mb__wall--b {
+  bottom: 0; left: 0; right: 0; height: var(--mb-d);
+  clip-path: polygon(var(--mb-d) 0, calc(100% - var(--mb-d)) 0, 100% 100%, 0 100%);
+  background: linear-gradient(to top, #f6f4f0, #eeebe6);
+}
+.mb .mb__wall--l {
+  top: 0; bottom: 0; left: 0; width: var(--mb-d);
+  clip-path: polygon(0 0, 100% var(--mb-d), 100% calc(100% - var(--mb-d)), 0 100%);
+  background: linear-gradient(to right, #d8d4cd, #e6e3dd);
+}
+.mb .mb__wall--r {
+  top: 0; bottom: 0; right: 0; width: var(--mb-d);
+  clip-path: polygon(0 var(--mb-d), 100% 0, 100% 100%, 0 calc(100% - var(--mb-d)));
+  background: linear-gradient(to left, #dfdbd4, #ebe8e3);
+}
+.mb .mb__back {
+  position: absolute;
+  inset: var(--mb-d);
+  z-index: 0;
+  background: radial-gradient(140% 110% at 75% 0%, #fbfaf8 0%, #f5f4f1 55%, #eeece8 100%);
   box-shadow:
-    inset 0 calc(var(--mb-cm) * 1.3) calc(var(--mb-cm) * 1.5) calc(var(--mb-cm) * -.7) rgba(0, 0, 0, .40),
-    inset calc(var(--mb-cm) * .7) 0 calc(var(--mb-cm) * 1.1) calc(var(--mb-cm) * -.6) rgba(0, 0, 0, .18),
-    inset calc(var(--mb-cm) * -.4) calc(var(--mb-cm) * -.3) calc(var(--mb-cm) * .9) calc(var(--mb-cm) * -.5) rgba(0, 0, 0, .08),
-    inset 0 0 0 1px rgba(0, 0, 0, .06);
+    inset 0 calc(var(--mb-cm) * 1.6) calc(var(--mb-cm) * 1.8) calc(var(--mb-cm) * -.8) rgba(0, 0, 0, .34),
+    inset calc(var(--mb-cm) * .9) 0 calc(var(--mb-cm) * 1.3) calc(var(--mb-cm) * -.7) rgba(0, 0, 0, .14),
+    inset calc(var(--mb-cm) * -.5) 0 calc(var(--mb-cm) * 1) calc(var(--mb-cm) * -.6) rgba(0, 0, 0, .06),
+    inset 0 0 0 1px rgba(0, 0, 0, .05);
 }
 /* faint reflection on the glass */
 .mb .mb__mount::after {
   content: "";
   position: absolute;
   inset: 0;
+  z-index: 3;
   pointer-events: none;
   background: linear-gradient(118deg, rgba(255,255,255,0) 35%, rgba(255,255,255,.16) 47%, rgba(255,255,255,0) 60%);
 }
 .mb .mb__grid {
   position: absolute;
   inset: 0;
+  z-index: 2;
   display: grid;
+  user-select: none;
+  -webkit-user-select: none;
   grid-template-columns: repeat(var(--mb-cols, 3), var(--mb-cw, 20%));
   grid-template-rows: repeat(var(--mb-rows, 3), var(--mb-ch, 20%));
   column-gap: var(--mb-gx, 6%);
@@ -209,8 +246,25 @@
   object-fit: contain;
   pointer-events: none;
   filter:
-    drop-shadow(calc(var(--mb-cm) * .06) calc(var(--mb-cm) * .12) calc(var(--mb-cm) * .08) rgba(40, 30, 20, .42))
-    drop-shadow(calc(var(--mb-cm) * .35) calc(var(--mb-cm) * .75) calc(var(--mb-cm) * .6) rgba(40, 30, 20, .30));
+    drop-shadow(calc(var(--mb-cm) * .06) calc(var(--mb-cm) * .12) calc(var(--mb-cm) * .1) rgba(40, 30, 20, .40))
+    drop-shadow(calc(var(--mb-cm) * .45) calc(var(--mb-cm) * .95) calc(var(--mb-cm) * .9) rgba(40, 30, 20, .34));
+}
+/* Drag to swap */
+#root .mb .mb__cell.is-filled { cursor: grab; -webkit-touch-callout: none; }
+.mb.is-dragging, .mb.is-dragging * { cursor: grabbing !important; }
+.mb .mb__slot.is-dragging .mb__cell img { opacity: .2; }
+#root .mb .mb__slot.is-drop-target .mb__cell {
+  outline: 1px solid var(--mb-ink);
+  outline-offset: calc(var(--mb-cm) * .35);
+}
+.mb__ghost {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 10000;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(2px 6px 8px rgba(40, 30, 20, .35));
 }
 /* Remove: a small round cross on the stamp's top right corner. Shown on the
    selected stamp, and on hover where there is a mouse. */
@@ -331,25 +385,30 @@
 #root .mb .mb__pill:hover,
 #root .mb .mb__pill[aria-checked="true"] { border-color: var(--mb-ink); }
 
-/* Swatches are close-ups of the actual frames. */
-.mb .mb__swatches { display: flex; gap: 14px; }
-#root .mb .mb__swatch {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background-size: cover;
-  background-position: center;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .10), inset 0 -3px 6px rgba(0, 0, 0, .10);
-  outline: 1px solid transparent;
-  outline-offset: 3px;
-  transition: outline-color .15s ease;
+/* Frame Colour dropdown. On desktop the theme replaces it with its own dropdown,
+   as on every product page; these styles cover the native one on mobile. */
+.mb .mb__select { margin: 0; }
+.mb .mb__select label {
+  display: block;
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 22px;
+  letter-spacing: var(--mb-track);
 }
-#root .mb .mb__swatch[data-frame="White"] { background-color: #ecebe6; }
-#root .mb .mb__swatch[data-frame="Wood"]  { background-color: #d1b294; }
-#root .mb .mb__swatch[data-frame="Black"] { background-color: #1e1d1b; }
-#root .mb .mb__swatch { background-image: var(--mb-swatch); }
-#root .mb .mb__swatch:hover { outline-color: var(--mb-line); }
-#root .mb .mb__swatch[aria-checked="true"] { outline-color: var(--mb-ink); }
+.mb .mb__select select {
+  width: 100%;
+  height: var(--mb-box);
+  padding: 0 55px 0 24px;
+  border: 1px solid var(--mb-line);
+  border-radius: 0;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23191919' stroke-width='1.6'/%3E%3C/svg%3E") no-repeat right 22px center / 12px 8px;
+  color: var(--mb-ink);
+  font-family: var(--mb-font, inherit);
+  font-size: 12px;
+  letter-spacing: var(--mb-track);
+  -webkit-appearance: none;
+  appearance: none;
+}
 
 .mb .mb__modes { display: grid; grid-template-columns: minmax(0, 1fr); width: 100%; gap: 8px; }
 #root .mb .mb__mode {
@@ -443,22 +502,6 @@
   font-size: 14px;
   color: var(--mb-muted);
 }
-.mb .mb__dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .12);
-}
-.mb .mb__dot[data-colour="Blue"] { background: #2f5fa8; }
-.mb .mb__dot[data-colour="Teal"] { background: #2a8a8a; }
-.mb .mb__dot[data-colour="Green"] { background: #4f8a3c; }
-.mb .mb__dot[data-colour="Yellow"] { background: #e3c13b; }
-.mb .mb__dot[data-colour="Orange"] { background: #e07a2e; }
-.mb .mb__dot[data-colour="Red"] { background: #c23b32; }
-.mb .mb__dot[data-colour="Pink"] { background: #e08aa6; }
-.mb .mb__dot[data-colour="Purple"] { background: #7a4f9a; }
-.mb .mb__dot[data-colour="Grey"] { background: #8a8780; }
-
 .mb .mb__form { margin-top: 24px; }
 .mb .mb__status {
   min-height: 1.6em;
@@ -563,13 +606,13 @@
   justify-content: center;
   aspect-ratio: 1 / 1;
   padding: 14%;
-  background: radial-gradient(140% 110% at 80% 0%, #f6f4f0 0%, #efece7 60%, #e9e6e0 100%);
+  background: #fff;
 }
 .mb .mb__card-art img {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-  filter: drop-shadow(1px 2px 1.5px rgba(40, 30, 20, .32)) drop-shadow(3px 6px 6px rgba(40, 30, 20, .16));
+  filter: drop-shadow(1px 2px 1.5px rgba(40, 30, 20, .30)) drop-shadow(4px 8px 9px rgba(40, 30, 20, .22));
 }
 .mb .mb__card-name {
   margin-top: 8px;

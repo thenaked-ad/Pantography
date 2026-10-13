@@ -13,7 +13,7 @@
 
 {{ 'miniatures-builder.css' | asset_url | stylesheet_tag }}
 {%- comment -%}
-  Frame and swatch images go through asset_url so each URL carries a ?v= that changes
+  Frame images go through asset_url so each URL carries a ?v= that changes
   when the file does. Plain url()s in the CSS file would stay cached for a year.
 {%- endcomment -%}
 <style>
@@ -26,9 +26,6 @@
       --mb-tex-b: url({{ 'mb-frame-' | append: file | append: '-b.webp' | asset_url }});
       --mb-tex-l: url({{ 'mb-frame-' | append: file | append: '-l.webp' | asset_url }});
       --mb-tex-r: url({{ 'mb-frame-' | append: file | append: '-r.webp' | asset_url }});
-    }
-    miniatures-builder[data-section-id="{{ section.id }}"] .mb__swatch[data-frame="{{ frame }}"] {
-      --mb-swatch: url({{ 'mb-swatch-' | append: file | append: '.webp' | asset_url }});
     }
   {%- endfor -%}
 </style>
@@ -44,6 +41,12 @@
     assign sizes_collection = collections['miniatures']
   endif
   assign form_id = 'miniatures-form-' | append: section.id
+  for option in product.options_with_values
+    if option.name == 'Frame Colour'
+      assign frame_option = option
+    endif
+  endfor
+  assign categories = section.settings.categories | default: 'A - Z:a-z, UNITED STATES:north-america, THE QUEEN:the-queen, NEW RELEASES:new-releases, MOST POPULAR:most-popular' | split: ','
 -%}
 
 {%- capture sizes_json -%}
@@ -109,6 +112,12 @@
           <span class="mb__bar mb__bar--b" aria-hidden="true"></span>
           <span class="mb__bar mb__bar--l" aria-hidden="true"></span>
           <div class="mb__mount">
+            {%- comment -%} The inside of the box frame: four walls and the back panel the miniatures float on. {%- endcomment -%}
+            <span class="mb__wall mb__wall--t" aria-hidden="true"></span>
+            <span class="mb__wall mb__wall--r" aria-hidden="true"></span>
+            <span class="mb__wall mb__wall--b" aria-hidden="true"></span>
+            <span class="mb__wall mb__wall--l" aria-hidden="true"></span>
+            <div class="mb__back" aria-hidden="true"></div>
             <div class="mb__grid" data-mb-grid></div>
           </div>
         </div>
@@ -131,10 +140,23 @@
         <div class="mb__pills" data-mb-sizes-list role="radiogroup"></div>
       </fieldset>
 
-      <fieldset class="mb__group">
-        <legend class="mb__label">Frame <span data-mb-frame-name></span></legend>
-        <div class="mb__swatches" data-mb-frames role="radiogroup"></div>
-      </fieldset>
+      {%- comment -%}
+        Same markup as the product page's option dropdowns, so the theme gives it the same
+        custom dropdown on desktop (semanticSelectAsync picks up select[id]) and a native
+        one on mobile.
+      {%- endcomment -%}
+      {%- if frame_option -%}
+        <div class="mb__group">
+          <p class="no-js-hidden mb__select">
+            <label for="mb-frame-{{ section.id }}">Frame Colour</label>
+            <select id="mb-frame-{{ section.id }}" data-mb-frame-select>
+              {%- for value in frame_option.values -%}
+                <option value="{{ value | escape }}"{% if value == frame_option.selected_value %} selected{% endif %}>{{ value }}</option>
+              {%- endfor -%}
+            </select>
+          </p>
+        </div>
+      {%- endif -%}
 
       <fieldset class="mb__group">
         <legend class="mb__label">How would you like to fill it?</legend>
@@ -168,9 +190,9 @@
         </div>
       </div>
       <div class="mb__mode-help" data-mb-help="studio">
-        <p>The studio will compose your frame. Star any artworks you would like included and add a note if you have places in mind.</p>
-        <label class="mb__label" for="mb-notes-{{ section.id }}">Notes for the studio (optional)</label>
-        <textarea id="mb-notes-{{ section.id }}" class="mb__notes" rows="3" maxlength="500" data-mb-notes placeholder="For example: places we have lived, mostly blues and greens"></textarea>
+        <p>The studio will compose your frame. Write any artworks you would like to have included in the frame, and we will get back to you with the layout.</p>
+        <label class="mb__label" for="mb-notes-{{ section.id }}">Notes for the studio</label>
+        <textarea id="mb-notes-{{ section.id }}" class="mb__notes" rows="3" maxlength="500" data-mb-notes placeholder="For example: Hong Kong I, Japan, Italy I"></textarea>
       </div>
 
       <div class="mb__shortlist" data-mb-shortlist-wrap hidden>
@@ -205,7 +227,17 @@
           <span class="mb__visually-hidden">Search artworks</span>
           <input type="search" placeholder="Search" autocomplete="off" data-mb-search>
         </label>
-        <div class="mb__chips mb__chips--filters" data-mb-colours></div>
+        <div class="mb__chips mb__chips--filters" data-mb-categories>
+          {%- for category in categories -%}
+            {%- assign label = category | split: ':' | first | strip -%}
+            {%- assign handle = category | split: ':' | last | strip -%}
+            {%- assign category_collection = collections[handle] -%}
+            {%- if category_collection.url != blank -%}
+              <button type="button" class="mb__chip{% if forloop.first %} is-on{% endif %}" data-category="{{ handle }}" data-url="{{ category_collection.url }}" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}">{{ label }}</button>
+            {%- endif -%}
+          {%- endfor -%}
+          <button type="button" class="mb__chip" data-starred aria-pressed="false">Starred</button>
+        </div>
       </div>
     </div>
     <p class="mb__picker-status" data-mb-picker-status>Loading the artworks</p>
@@ -230,6 +262,13 @@
       "id": "sizes_collection",
       "label": "Frame sizes",
       "info": "Defaults to the Miniatures collection. Products must be titled with their count, e.g. 12 Miniatures."
+    },
+    {
+      "type": "text",
+      "id": "categories",
+      "label": "Artwork categories",
+      "default": "A - Z:a-z, UNITED STATES:north-america, THE QUEEN:the-queen, NEW RELEASES:new-releases, MOST POPULAR:most-popular",
+      "info": "Label:collection-handle, separated by commas. The first shows every artwork A to Z; the others show that collection's artworks in its own order."
     },
     {
       "type": "checkbox",

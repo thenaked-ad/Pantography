@@ -11,8 +11,6 @@ if (!customElements.get('miniatures-builder')) {
   const MINI_H_CM = 7.0;
   const GAP_X_CM = 2.5;
   const GAP_Y_CM = 2.15;
-  const FRAME_ORDER = ['White', 'Black', 'Wood'];
-  const COLOUR_ORDER = ['Blue', 'Teal', 'Green', 'Yellow', 'Orange', 'Red', 'Pink', 'Purple', 'Grey'];
   const MODE_LABELS = {
     pick: 'Chosen by me',
     arrange: 'Arranged from my shortlist',
@@ -40,14 +38,15 @@ if (!customElements.get('miniatures-builder')) {
       this.showPositions = this.dataset.showPositions !== 'false';
       this.catalogue = [];
       this.byHandle = new Map();
-      this.filter = { text: '', colour: '', starred: false };
+      this.filter = { text: '', category: '', starred: false };   // '' = the first category, everything A to Z
+      this.categoryOrder = new Map();                                // collection handle -> artwork handles in its order
 
       this.el = {};
       [
         'frame', 'grid', 'stage-note', 'clear-all', 'title', 'price', 'dims',
-        'sizes-list', 'frames', 'frame-name', 'studio-fill', 'generate', 'notes',
+        'sizes-list', 'frame-select', 'studio-fill', 'generate', 'notes',
         'shortlist-wrap', 'shortlist', 'shortlist-count', 'variant', 'properties', 'status',
-        'submit', 'picker', 'picker-title', 'search', 'colours', 'picker-status', 'cards'
+        'submit', 'picker', 'picker-title', 'search', 'categories', 'picker-status', 'cards'
       ].forEach((name) => {
         this.el[name.replace(/-([a-z])/g, (m, c) => c.toUpperCase())] = this.querySelector(`[data-mb-${name}]`);
       });
@@ -81,7 +80,8 @@ if (!customElements.get('miniatures-builder')) {
       while (positions.length < MAX_POSITIONS) positions.push(null);
       return {
         sizeId: size.id,
-        frame: saved.frame || 'White',
+        /* Frame colour starts from the dropdown, like any product page, not from a past visit. */
+        frame: this.el.frameSelect ? this.el.frameSelect.value : 'White',
         mode: MODE_LABELS[saved.mode] ? saved.mode : 'pick',
         positions,
         shortlist: Array.isArray(saved.shortlist) ? saved.shortlist : [],
@@ -92,9 +92,9 @@ if (!customElements.get('miniatures-builder')) {
     }
 
     save() {
-      const { frame, mode, positions, shortlist, notes, studioFill } = this.state;
+      const { mode, positions, shortlist, notes, studioFill } = this.state;
       try {
-        window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ frame, mode, positions, shortlist, notes, studioFill }));
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ mode, positions, shortlist, notes, studioFill }));
       } catch (error) {
         /* private browsing or storage blocked: the builder still works, it just forgets */
       }
@@ -121,6 +121,7 @@ if (!customElements.get('miniatures-builder')) {
       });
 
       this.el.grid.addEventListener('click', (event) => {
+        if (this.suppressClick) return;
         const remove = event.target.closest('[data-remove]');
         if (remove) {
           /* Empty the position and keep it selected, so the next artwork chosen fills it. */
@@ -153,6 +154,22 @@ if (!customElements.get('miniatures-builder')) {
 
       this.el.generate.addEventListener('click', () => this.generate());
 
+      /* The theme turns this into its own dropdown on desktop and fires change on the select. */
+      if (this.el.frameSelect) {
+        this.el.frameSelect.addEventListener('change', () => this.setFrame(this.el.frameSelect.value));
+      }
+
+      this.el.categories.addEventListener('click', (event) => {
+        const chip = event.target.closest('button');
+        if (!chip) return;
+        if (chip.hasAttribute('data-starred')) {
+          this.filter.starred = !this.filter.starred;
+          this.applyFilter();
+        } else {
+          this.setCategory(chip);
+        }
+      });
+
       this.el.search.addEventListener('input', () => {
         this.filter.text = normalize(this.el.search.value);
         this.applyFilter();
@@ -173,26 +190,7 @@ if (!customElements.get('miniatures-builder')) {
         if (remove) this.toggleShortlist(remove.dataset.unstar);
       });
 
-      this.el.grid.addEventListener('dragstart', (event) => {
-        const cell = event.target.closest('[data-index]');
-        if (!cell || this.state.mode === 'studio') return;
-        event.dataTransfer.setData('text/plain', cell.dataset.index);
-        event.dataTransfer.effectAllowed = 'move';
-      });
-      this.el.grid.addEventListener('dragover', (event) => {
-        if (event.target.closest('[data-index]')) event.preventDefault();
-      });
-      this.el.grid.addEventListener('drop', (event) => {
-        const cell = event.target.closest('[data-index]');
-        const from = Number(event.dataTransfer.getData('text/plain'));
-        if (!cell || Number.isNaN(from)) return;
-        event.preventDefault();
-        const to = Number(cell.dataset.index);
-        const positions = this.state.positions;
-        [positions[from], positions[to]] = [positions[to], positions[from]];
-        this.state.selected = null;
-        this.changed();
-      });
+      this.bindDrag();
 
       /* Runs before the theme's own ajax cart handler, which is bound on the form. */
       this.onSubmitCapture = (event) => {
@@ -238,6 +236,120 @@ if (!customElements.get('miniatures-builder')) {
     setFrame(frame) {
       this.state.frame = frame;
       this.changed();
+    }
+
+    /* Drag a stamp onto another position to swap them. Built on pointer events rather
+       than HTML drag and drop, which buttons do not support reliably. A mouse drags as
+       soon as it moves; a finger has to press and hold first, so the page still scrolls. */
+    bindDrag() {
+      /* Registered up front so the browser knows touches on the frame may be claimed. */
+      this.el.grid.addEventListener('touchmove', (event) => {
+        if (this.dragging) event.preventDefault();
+      }, { passive: false });
+
+      this.el.grid.addEventListener('pointerdown', (down) => {
+        if (down.button !== 0 || this.state.mode === 'studio') return;
+        const cell = down.target.closest('.mb__cell');
+        if (!cell) return;
+        const from = Number(cell.dataset.index);
+        if (!this.state.positions[from]) return;
+
+        const touch = down.pointerType === 'touch';
+        const slot = cell.closest('.mb__slot');
+        let x = down.clientX;
+        let y = down.clientY;
+        let ghost = null;
+        let target = null;
+        let timer = null;
+
+        const place = () => {
+          const w = ghost.offsetWidth;
+          const h = ghost.offsetHeight;
+          ghost.style.transform = `translate(${x - w / 2}px, ${y - h / 2}px) scale(1.08)`;
+          const over = document.elementFromPoint(x, y);
+          const next = over && over.closest('.mb__slot');
+          const valid = next && this.el.grid.contains(next) && next !== slot ? next : null;
+          if (valid !== target) {
+            if (target) target.classList.remove('is-drop-target');
+            target = valid;
+            if (target) target.classList.add('is-drop-target');
+          }
+        };
+        const begin = () => {
+          this.dragging = true;
+          const box = cell.getBoundingClientRect();
+          ghost = cell.querySelector('img').cloneNode();
+          ghost.className = 'mb__ghost';
+          ghost.style.width = `${box.width}px`;
+          ghost.style.height = `${box.height}px`;
+          document.body.append(ghost);
+          slot.classList.add('is-dragging');
+          this.classList.add('is-dragging');
+          place();
+        };
+        const end = (swap) => {
+          clearTimeout(timer);
+          window.removeEventListener('pointermove', move);
+          window.removeEventListener('pointerup', up);
+          window.removeEventListener('pointercancel', cancel);
+          const dragged = this.dragging;
+          if (dragged) {
+            if (swap && target) {
+              const to = Number(target.querySelector('.mb__cell').dataset.index);
+              const positions = this.state.positions;
+              [positions[from], positions[to]] = [positions[to], positions[from]];
+              this.state.selected = null;
+            }
+            /* the click that follows the drag should not select a stamp */
+            this.suppressClick = true;
+            setTimeout(() => { this.suppressClick = false; }, 0);
+          }
+          this.dragging = false;
+          if (ghost) ghost.remove();
+          slot.classList.remove('is-dragging');
+          if (target) target.classList.remove('is-drop-target');
+          this.classList.remove('is-dragging');
+          if (dragged && swap) this.changed();
+        };
+        const move = (event) => {
+          if (event.pointerId !== down.pointerId) return;
+          x = event.clientX;
+          y = event.clientY;
+          if (!this.dragging) {
+            const moved = Math.hypot(x - down.clientX, y - down.clientY);
+            if (touch && moved > 8) end(false);          // a scroll, not a press and hold
+            else if (!touch && moved > 6) begin();
+            return;
+          }
+          place();
+        };
+        const up = (event) => { if (event.pointerId === down.pointerId) end(true); };
+        const cancel = (event) => { if (event.pointerId === down.pointerId) end(false); };
+
+        if (touch) timer = setTimeout(begin, 350);
+        window.addEventListener('pointermove', move);
+        window.addEventListener('pointerup', up);
+        window.addEventListener('pointercancel', cancel);
+      });
+    }
+
+    async setCategory(chip) {
+      const chips = Array.from(this.el.categories.querySelectorAll('[data-category]'));
+      const handle = chip === chips[0] ? '' : chip.dataset.category;
+      this.filter.category = handle;
+      if (handle && !this.categoryOrder.has(handle)) {
+        this.applyFilter();
+        this.el.pickerStatus.textContent = 'Loading';
+        try {
+          const items = await this.fetchFeed(chip.dataset.url);
+          this.categoryOrder.set(handle, items.map((item) => item.h));
+        } catch (error) {
+          console.error('Miniatures builder:', error);
+          this.categoryOrder.set(handle, []);
+        }
+        if (this.filter.category !== handle) return;   // they picked another category meanwhile
+      }
+      this.applyFilter();
     }
 
     selectCell(index) {
@@ -394,32 +506,9 @@ if (!customElements.get('miniatures-builder')) {
     }
 
     renderFrames() {
-      const frames = this.size.variants
-        .map((v) => v.frame)
-        .sort((a, b) => FRAME_ORDER.indexOf(a) - FRAME_ORDER.indexOf(b));
-      if (!frames.includes(this.state.frame)) this.state.frame = this.variant.frame;
-
-      const wrap = this.el.frames;
-      if (wrap.dataset.built !== frames.join('|')) {
-        wrap.replaceChildren();
-        frames.forEach((frame) => {
-          const button = document.createElement('button');
-          button.type = 'button';
-          button.className = 'mb__swatch';
-          button.setAttribute('role', 'radio');
-          button.dataset.frameOption = frame;
-          button.dataset.frame = frame;
-          button.setAttribute('aria-label', frame);
-          button.title = frame;
-          button.addEventListener('click', () => this.setFrame(frame));
-          wrap.append(button);
-        });
-        wrap.dataset.built = frames.join('|');
-      }
-      wrap.querySelectorAll('[data-frame-option]').forEach((button) => {
-        button.setAttribute('aria-checked', String(button.dataset.frameOption === this.state.frame));
-      });
-      this.el.frameName.textContent = this.state.frame;
+      if (!this.size.variants.some((v) => v.frame === this.state.frame)) this.state.frame = this.variant.frame;
+      const select = this.el.frameSelect;
+      if (select && select.value !== this.state.frame) select.value = this.state.frame;
       this.el.frame.dataset.frame = this.state.frame;
     }
 
@@ -481,7 +570,6 @@ if (!customElements.get('miniatures-builder')) {
         cell.querySelector('.mb__cell-num').textContent = i + 1;
         cell.classList.toggle('is-filled', Boolean(handle));
         cell.classList.toggle('is-selected', selected === i);
-        cell.draggable = Boolean(handle) && mode !== 'studio';
         if (item) {
           if (img.getAttribute('src') !== item.a) img.src = item.a;
           img.hidden = false;
@@ -617,8 +705,9 @@ if (!customElements.get('miniatures-builder')) {
 
     /* ------------------------------------------------------------ catalogue */
 
-    async loadCatalogue() {
-      const base = this.dataset.feedUrl;
+    /* Every artwork with miniature art in a collection, in the collection's own order,
+       via the collection.miniart alternate view. */
+    async fetchFeed(base) {
       const pageUrl = (page) => {
         const url = new URL(base, window.location.origin);
         url.searchParams.set('view', 'miniart');
@@ -632,20 +721,24 @@ if (!customElements.get('miniatures-builder')) {
         return response.json();
       });
 
-      try {
-        /* Two pages cover today's catalogue; ask for both at once, then any others in one wave. */
-        const first = await Promise.all([get(1), get(2)]);
-        const total = Number(first[0].pages) || 1;
-        const rest = [];
-        for (let page = 3; page <= total; page += 1) rest.push(get(page));
-        const pages = first.slice(0, total).concat(await Promise.all(rest));
+      /* Two pages cover today's catalogue; ask for both at once, then any others in one wave. */
+      const first = await Promise.all([get(1), get(2)]);
+      const total = Number(first[0].pages) || 1;
+      const rest = [];
+      for (let page = 3; page <= total; page += 1) rest.push(get(page));
+      const pages = first.slice(0, total).concat(await Promise.all(rest));
+      return pages.flatMap((page) => page.items || []);
+    }
 
-        pages.forEach((page) => (page.items || []).forEach((item) => {
+    async loadCatalogue() {
+      try {
+        const items = await this.fetchFeed(this.dataset.feedUrl);
+        items.forEach((item) => {
           if (this.byHandle.has(item.h)) return;
           item.n = normalize(`${item.t} ${item.s || ''}`);
           this.byHandle.set(item.h, item);
           this.catalogue.push(item);
-        }));
+        });
         this.catalogue.sort((a, b) => a.t.localeCompare(b.t));
 
         /* Picks saved from an earlier visit may no longer exist. */
@@ -654,44 +747,12 @@ if (!customElements.get('miniatures-builder')) {
         if (this.state.mode === 'pick' && this.state.selected === null) this.state.selected = this.nextEmpty(-1);
 
         this.renderCards();
-        this.renderColours();
+        this.applyFilter();
         this.changed();
       } catch (error) {
         console.error('Miniatures builder:', error);
         this.el.pickerStatus.textContent = 'The artworks could not be loaded. Please refresh the page.';
       }
-    }
-
-    renderColours() {
-      const present = new Set();
-      this.catalogue.forEach((item) => (item.c || []).forEach((c) => present.add(c)));
-      const colours = COLOUR_ORDER.filter((c) => present.has(c));
-      const make = (label, key, value) => {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'mb__chip';
-        button.dataset[key] = value;
-        if (key === 'colour' && value) {
-          const dot = document.createElement('i');
-          dot.className = 'mb__dot';
-          dot.dataset.colour = value;
-          button.append(dot);
-        }
-        button.append(document.createTextNode(label));
-        return button;
-      };
-      const chips = [make('All', 'colour', '')]
-        .concat(colours.map((c) => make(c, 'colour', c)))
-        .concat([make('Starred', 'starred', '1')]);
-      this.el.colours.replaceChildren(...chips);
-      this.el.colours.addEventListener('click', (event) => {
-        const chip = event.target.closest('button');
-        if (!chip) return;
-        if (chip.dataset.starred) this.filter.starred = !this.filter.starred;
-        else this.filter.colour = chip.dataset.colour;
-        this.applyFilter();
-      });
-      this.applyFilter();
     }
 
     renderCards() {
@@ -755,21 +816,40 @@ if (!customElements.get('miniatures-builder')) {
     }
 
     applyFilter() {
-      const { text, colour, starred } = this.filter;
+      const { text, category, starred } = this.filter;
+      const chips = Array.from(this.el.categories.querySelectorAll('[data-category]'));
+      chips.forEach((chip, i) => {
+        const on = category ? chip.dataset.category === category : i === 0;
+        chip.classList.toggle('is-on', on);
+        chip.setAttribute('aria-pressed', String(on));
+      });
+      const starChip = this.el.categories.querySelector('[data-starred]');
+      starChip.classList.toggle('is-on', starred);
+      starChip.setAttribute('aria-pressed', String(starred));
+      if (!this.cards) return;
+
+      /* A category shows its own artworks in its own order (Most Popular stays most popular first). */
+      const order = category ? this.categoryOrder.get(category) : null;
+      if (category && !order) return;                  // still loading
+      const members = order ? new Set(order) : null;
+      const key = category || '';
+      if (this.cardOrderKey !== key) {
+        const list = order ? order.filter((h) => this.cards.has(h)) : this.catalogue.map((item) => item.h);
+        const inList = new Set(list);
+        const rest = this.catalogue.map((item) => item.h).filter((h) => !inList.has(h));
+        this.el.cards.append(...list.concat(rest).map((h) => this.cards.get(h).li));
+        this.cardOrderKey = key;
+      }
+
       const terms = text.split(/\s+/).filter(Boolean);
       const shortlist = new Set(this.state.shortlist);
       let shown = 0;
       this.catalogue.forEach((item) => {
-        const visible = (!colour || (item.c || []).includes(colour))
+        const visible = (!members || members.has(item.h))
           && (!starred || shortlist.has(item.h))
           && terms.every((term) => item.n.includes(term));
         this.cards.get(item.h).li.hidden = !visible;
         if (visible) shown += 1;
-      });
-      this.el.colours.querySelectorAll('button').forEach((chip) => {
-        const on = chip.dataset.starred ? starred : chip.dataset.colour === colour;
-        chip.classList.toggle('is-on', on);
-        chip.setAttribute('aria-pressed', String(on));
       });
       this.el.pickerStatus.textContent = shown
         ? `${shown} ${shown === 1 ? 'artwork' : 'artworks'}`
