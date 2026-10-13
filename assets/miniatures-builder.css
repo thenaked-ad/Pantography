@@ -103,12 +103,12 @@
   background-position: center;
   pointer-events: none;
 }
-/* Textures are 6000 x 160px (37.5 : 1). Show them at their natural proportions,
-   only stretching along the grain when a bar is longer than that (the 60). */
+/* Show each texture at its natural proportions (length : thickness, 37.5 : 1 for the
+   painted finishes), only stretching along the grain when a bar is longer than that. */
 .mb .mb__bar--t,
-.mb .mb__bar--b { background-size: max(100%, calc(var(--mb-t) * 37.5)) 100%; }
+.mb .mb__bar--b { background-size: max(100%, calc(var(--mb-t) * var(--mb-tex-ratio, 37.5))) 100%; }
 .mb .mb__bar--l,
-.mb .mb__bar--r { background-size: 100% max(100%, calc(var(--mb-t) * 37.5)); }
+.mb .mb__bar--r { background-size: 100% max(100%, calc(var(--mb-t) * var(--mb-tex-ratio, 37.5))); }
 .mb .mb__bar--t,
 .mb .mb__bar--b { left: 0; right: 0; height: var(--mb-t); }
 .mb .mb__bar--l,
@@ -139,23 +139,10 @@
 /* The texture URLs (--mb-tex-*) are set in the section with asset_url, so each
    carries a ?v= that changes whenever the image does. A plain url() here would be
    cached by browsers for a year under the same name. */
-/* Wood is the studio's own frame image (the one in every product mockup), drawn as a
-   border image: its real mitred corners are kept and only the straight runs stretch.
-   Slices are the bar widths in that image (1718 x 1828px): top, right, bottom, left. */
-.mb .mb__frame[data-frame="Wood"] { background: transparent; }
-.mb .mb__frame[data-frame="Wood"] .mb__bar { display: none; }
-.mb .mb__frame[data-frame="Wood"]::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-  border: var(--mb-t) solid transparent;
-  border-image-source: var(--mb-wood-studio);
-  border-image-slice: 72 72 74 73;
-  border-image-width: 1;
-  border-image-repeat: stretch;
-}
+/* Wood bars are cut from the studio's own frame image (Wood Frame.png, see
+   miniatures-harness/textures/studio/make_wood.py): only the solid wood of each side,
+   so no white cut-out fringe. They are shorter for their thickness (about 26 : 1). */
+.mb .mb__frame[data-frame="Wood"] { background: #d4b48f; --mb-tex-ratio: 25.8; }
 .mb .mb__frame[data-frame="White"] { background: #ecebe6; }
 .mb .mb__frame[data-frame="Black"] { background: #1e1d1b; }
 
