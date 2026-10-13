@@ -139,10 +139,23 @@
 /* The texture URLs (--mb-tex-*) are set in the section with asset_url, so each
    carries a ?v= that changes whenever the image does. A plain url() here would be
    cached by browsers for a year under the same name. */
-/* Wood bars are cut from the studio's own frame image (Wood Frame.png, see
-   miniatures-harness/textures/studio/make_wood.py): only the solid wood of each side,
-   so no white cut-out fringe. They are shorter for their thickness (about 26 : 1). */
-.mb .mb__frame[data-frame="Wood"] { background: #d4b48f; --mb-tex-ratio: 25.8; }
+/* Wood is the studio's own frame (Frame New.png, 1723 x 1833px), drawn whole as a border
+   image so its real mitred corners and inner edge are kept; only the straight runs
+   stretch. Slices are its bar widths: top, right, bottom, left. */
+.mb .mb__frame[data-frame="Wood"] { background: transparent; }
+.mb .mb__frame[data-frame="Wood"] .mb__bar { display: none; }
+.mb .mb__frame[data-frame="Wood"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  border: var(--mb-t) solid transparent;
+  border-image-source: var(--mb-wood-studio);
+  border-image-slice: 64 65 63 66;
+  border-image-width: 1;
+  border-image-repeat: stretch;
+}
 .mb .mb__frame[data-frame="White"] { background: #ecebe6; }
 .mb .mb__frame[data-frame="Black"] { background: #1e1d1b; }
 

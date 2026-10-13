@@ -17,7 +17,7 @@
   when the file does. Plain url()s in the CSS file would stay cached for a year.
 {%- endcomment -%}
 <style>
-  {%- assign finishes = 'Wood:oak,White:white,Black:black' | split: ',' -%}
+  {%- assign finishes = 'White:white,Black:black' | split: ',' -%}
   {%- for pair in finishes -%}
     {%- assign frame = pair | split: ':' | first -%}
     {%- assign file = pair | split: ':' | last -%}
@@ -28,8 +28,9 @@
       --mb-tex-r: url({{ 'mb-frame-' | append: file | append: '-r.webp' | asset_url }});
     }
   {%- endfor -%}
-  {%- comment -%} The studio's glass layer, from the product mockups. {%- endcomment -%}
+  {%- comment -%} The studio's own wood frame and glass layer, from the product mockups. {%- endcomment -%}
   miniatures-builder[data-section-id="{{ section.id }}"] {
+    --mb-wood-studio: url({{ 'mb-frame-wood-studio.webp' | asset_url }});
     --mb-glass: url({{ 'mb-glass-studio.webp' | asset_url }});
   }
 </style>
