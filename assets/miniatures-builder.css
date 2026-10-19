@@ -1,0 +1,644 @@
+/* Miniatures builder. Scoped under #root .mb because the theme styles every
+   button globally (with ::before backgrounds) at id specificity.
+   Type follows the product page: brand font, 13px labels, 2.2px tracking,
+   regular weight, sentence case, 1px #ececec boxes 55px tall. */
+
+.mb {
+  --mb-ink: #191919;
+  --mb-muted: #767676;
+  --mb-line: #ececec;
+  --mb-soft: #fafafa;
+  --mb-star: #c8962e;
+  --mb-track: 2.2px;
+  --mb-box: 55px;
+  display: block;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 2px 16px 56px;   /* top matches where a normal product page starts */
+  color: var(--mb-ink);
+  font-family: var(--mb-font, inherit);
+  letter-spacing: var(--mb-track);
+}
+.mb .mb__font-probe {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+/* ---------- reset theme buttons inside the builder (not the add to cart) */
+/* :where keeps this at 1-1-0 so the component rules below (1-2-0) win. */
+#root .mb :where(button:not(.overlay-buy_button)) {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  font-family: var(--mb-font, inherit);
+  font-weight: 400;
+  letter-spacing: var(--mb-track);
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+#root .mb :where(button:not(.overlay-buy_button))::before,
+#root .mb :where(button:not(.overlay-buy_button))::after {
+  content: none !important;
+  display: none !important;
+}
+#root .mb :where(button:not(.overlay-buy_button)):focus-visible {
+  outline: 1px solid var(--mb-ink);
+  outline-offset: 2px;
+}
+#root .mb button[disabled] { opacity: .4; cursor: not-allowed; }
+.mb [hidden] { display: none !important; }
+.mb__visually-hidden {
+  position: absolute !important; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+/* ---------- layout */
+.mb .mb__layout { display: grid; gap: 28px; }
+/* On desktop the theme's own gutter is enough; match the product page's edges. */
+@media (min-width: 990px) {
+  .mb { padding-left: 6px; padding-right: 6px; }
+}
+@media (min-width: 990px) {
+  .mb .mb__layout {
+    grid-template-columns: minmax(0, 1.3fr) minmax(340px, 1fr);
+    gap: 64px;
+    align-items: start;
+  }
+  .mb .mb__stage { position: sticky; top: 24px; }
+}
+
+/* ---------- the framed piece, drawn to scale (see MOULDING_CM / MINI_*_CM in the JS) */
+.mb .mb__frame-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 7% 6%;
+  background:
+    radial-gradient(120% 90% at 70% 10%, #f7f6f3 0%, #eceae6 60%, #e4e1dc 100%);
+}
+.mb .mb__frame {
+  --mb-w: 44;
+  --mb-h: 47;
+  container-type: inline-size;
+  position: relative;
+  width: min(100%, calc(64vh * var(--mb-w) / var(--mb-h)));
+  aspect-ratio: var(--mb-w) / var(--mb-h);
+  /* shadow cast on the wall: a tight contact shadow and a long soft one */
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, .18),
+    -3px 6px 10px rgba(30, 22, 12, .16),
+    -10px 22px 40px -6px rgba(30, 22, 12, .30);
+}
+
+/* Four mitred bars, each with its own high-definition texture stitched from the
+   studio photographs (see Claude outputs/miniatures-harness/textures), so the
+   grain never repeats and no two sides match. */
+.mb .mb__bar {
+  position: absolute;
+  z-index: 2;
+  background-repeat: no-repeat;
+  background-position: center;
+  pointer-events: none;
+}
+/* Show each texture at its natural proportions (length : thickness, 37.5 : 1 for the
+   painted finishes), only stretching along the grain when a bar is longer than that. */
+.mb .mb__bar--t,
+.mb .mb__bar--b { background-size: max(100%, calc(var(--mb-t) * var(--mb-tex-ratio, 37.5))) 100%; }
+.mb .mb__bar--l,
+.mb .mb__bar--r { background-size: 100% max(100%, calc(var(--mb-t) * var(--mb-tex-ratio, 37.5))); }
+.mb .mb__bar--t,
+.mb .mb__bar--b { left: 0; right: 0; height: var(--mb-t); }
+.mb .mb__bar--l,
+.mb .mb__bar--r { top: 0; bottom: 0; width: var(--mb-t); }
+.mb .mb__bar--t {
+  top: 0;
+  clip-path: polygon(0 0, 100% 0, calc(100% - var(--mb-t)) 100%, var(--mb-t) 100%);
+}
+.mb .mb__bar--b {
+  bottom: 0;
+  clip-path: polygon(var(--mb-t) 0, calc(100% - var(--mb-t)) 0, 100% 100%, 0 100%);
+}
+.mb .mb__bar--l {
+  left: 0;
+  clip-path: polygon(0 0, 100% var(--mb-t), 100% calc(100% - var(--mb-t)), 0 100%);
+}
+.mb .mb__bar--r {
+  right: 0;
+  clip-path: polygon(0 var(--mb-t), 100% 0, 100% 100%, 0 calc(100% - var(--mb-t)));
+}
+/* A flat front face, like the studio's frames: no shading across the bar, just a
+   crisp line on the inner edge where the face meets the inside of the box. */
+.mb [data-frame] .mb__bar--t { background-image: linear-gradient(to bottom, transparent calc(100% - 1px), rgba(0,0,0,.16) calc(100% - 1px)), var(--mb-tex-t); }
+.mb [data-frame] .mb__bar--b { background-image: linear-gradient(to top, transparent calc(100% - 1px), rgba(0,0,0,.10) calc(100% - 1px)), var(--mb-tex-b); }
+.mb [data-frame] .mb__bar--l { background-image: linear-gradient(to right, transparent calc(100% - 1px), rgba(0,0,0,.14) calc(100% - 1px)), var(--mb-tex-l); }
+.mb [data-frame] .mb__bar--r { background-image: linear-gradient(to left, transparent calc(100% - 1px), rgba(0,0,0,.10) calc(100% - 1px)), var(--mb-tex-r); }
+
+/* The texture URLs (--mb-tex-*) are set in the section with asset_url, so each
+   carries a ?v= that changes whenever the image does. A plain url() here would be
+   cached by browsers for a year under the same name. */
+/* Wood is the studio's frame (Natural Oak Wooden Picture Frame.png, enlarged 2x and
+   sharpened by miniatures-harness/textures/studio/make_wood_frame.py), drawn whole as a
+   border image so its real mitred corners and inner edge are kept; only the straight
+   runs stretch. Slices are its bar widths: top, right, bottom, left. */
+.mb .mb__frame[data-frame="Wood"] { background: transparent; }
+.mb .mb__frame[data-frame="Wood"] .mb__bar { display: none; }
+.mb .mb__frame[data-frame="Wood"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  border: var(--mb-t) solid transparent;
+  border-image-source: var(--mb-wood-studio);
+  border-image-slice: 104 112 108 112;
+  border-image-width: 1;
+  border-image-repeat: stretch;
+}
+.mb .mb__frame[data-frame="White"] { background: #ecebe6; }
+.mb .mb__frame[data-frame="Black"] { background: #1e1d1b; }
+
+/* The back of the box frame. No inside walls show, as in the studio photographs: the
+   depth comes from the deep shadow inside the frame. Light comes from the top right, as
+   in the studio's photos: the top bar shades the back and the right-hand wall faces
+   away from the light, so the shadow is deepest along the top and right; the left
+   stays light. */
+.mb .mb__mount {
+  position: absolute;
+  /* tucked 3px under the frame: the frame image's inner edge is slightly see-through,
+     and over the wall it showed as a pale line against the shadow */
+  inset: calc(var(--mb-t) - 3px);
+  z-index: 1;
+  background: radial-gradient(140% 110% at 75% 0%, #fbf9f4 0%, #f5f2eb 55%, #eee9e1 100%);
+  box-shadow:
+    inset 0 calc(var(--mb-cm) * 3.0) calc(var(--mb-cm) * 3.4) calc(var(--mb-cm) * -1.4) rgba(40, 30, 15, .38),
+    inset calc(var(--mb-cm) * -3.0) 0 calc(var(--mb-cm) * 3.6) calc(var(--mb-cm) * -1.3) rgba(40, 30, 15, .36),
+    inset calc(var(--mb-cm) * .8) 0 calc(var(--mb-cm) * 1.4) calc(var(--mb-cm) * -.8) rgba(40, 30, 15, .07),
+    inset 0 calc(var(--mb-cm) * -1.0) calc(var(--mb-cm) * 1.8) calc(var(--mb-cm) * -1.0) rgba(40, 30, 15, .06),
+    inset 0 0 0 1px rgba(0, 0, 0, .05);
+}
+/* reflection on the glass */
+.mb .mb__mount::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  /* the studio's glass reflection layer, placed as in their mockups: the right three
+     quarters of the opening, full height */
+  background: var(--mb-glass) no-repeat right top / 74.7% 100%;
+  opacity: .5;                 /* at full strength it fades the stamps beneath it */
+  /* fade the glass in from its left edge so it leaves no visible step in the shadow */
+  -webkit-mask-image: linear-gradient(to right, transparent 25.3%, #000 45%);
+  mask-image: linear-gradient(to right, transparent 25.3%, #000 45%);
+}
+.mb .mb__grid {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  user-select: none;
+  -webkit-user-select: none;
+  grid-template-columns: repeat(var(--mb-cols, 3), var(--mb-cw, 20%));
+  grid-template-rows: repeat(var(--mb-rows, 3), var(--mb-ch, 20%));
+  column-gap: var(--mb-gx, 6%);
+  row-gap: var(--mb-gy, 4%);
+  justify-content: center;
+  align-content: center;
+}
+
+.mb .mb__slot {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+}
+#root .mb .mb__cell {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  outline: 1px dashed rgba(25, 25, 25, .22);
+  outline-offset: 0;
+  transition: outline-color .15s ease;
+}
+#root .mb .mb__cell.is-filled { outline-color: transparent; }
+#root .mb .mb__cell:hover { outline: 1px solid rgba(25, 25, 25, .45); }
+#root .mb .mb__cell.is-selected {
+  outline: 1px solid var(--mb-ink);
+  outline-offset: calc(var(--mb-cm) * .35);
+}
+/* Each miniature floats off the back: a crisp contact shadow plus a softer one
+   falling down and to the left, as in the studio photographs (light from top right). */
+.mb .mb__cell img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  filter:
+    drop-shadow(calc(var(--mb-cm) * -.03) calc(var(--mb-cm) * .05) calc(var(--mb-cm) * .06) rgba(35, 25, 15, .16))
+    drop-shadow(calc(var(--mb-cm) * -.7) calc(var(--mb-cm) * 1.0) calc(var(--mb-cm) * .42) rgba(35, 25, 15, .30))
+    drop-shadow(calc(var(--mb-cm) * -1.05) calc(var(--mb-cm) * 1.5) calc(var(--mb-cm) * 1.0) rgba(35, 25, 15, .10));
+}
+/* Drag to swap */
+#root .mb .mb__cell.is-filled { cursor: grab; -webkit-touch-callout: none; }
+.mb.is-dragging, .mb.is-dragging * { cursor: grabbing !important; }
+.mb .mb__slot.is-dragging .mb__cell img { opacity: .2; }
+#root .mb .mb__slot.is-drop-target .mb__cell {
+  outline: 1px solid var(--mb-ink);
+  outline-offset: calc(var(--mb-cm) * .35);
+}
+.mb__ghost {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 10000;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(-4px 7px 8px rgba(40, 30, 20, .38));
+}
+/* Remove: a small round cross on the stamp's top right corner. Shown on the
+   selected stamp, and on hover where there is a mouse. */
+#root .mb .mb__remove {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(18px, calc(var(--mb-cm) * 2.2), 26px);
+  height: clamp(18px, calc(var(--mb-cm) * 2.2), 26px);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--mb-ink);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
+  transform: translate(40%, -40%) scale(.6);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .15s ease, transform .15s ease;
+}
+#root .mb .mb__remove svg { width: 42%; height: 42%; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
+#root .mb .mb__slot.is-selected .mb__remove,
+#root .mb .mb__remove:focus-visible {
+  opacity: 1;
+  transform: translate(40%, -40%) scale(1);
+  pointer-events: auto;
+}
+@media (hover: hover) {
+  #root .mb .mb__slot:hover .mb__remove { opacity: 1; transform: translate(40%, -40%) scale(1); pointer-events: auto; }
+  #root .mb .mb__remove:hover { background: var(--mb-ink); color: #fff; }
+}
+.mb[data-mode="studio"] .mb__remove { display: none !important; }
+.mb .mb__cell-num {
+  font-size: max(9px, calc(var(--mb-cm) * .9));
+  line-height: 1;
+  letter-spacing: 0;
+  color: rgba(25, 25, 25, .38);
+}
+.mb .mb__cell.is-filled .mb__cell-num { display: none; }
+.mb[data-mode="studio"] .mb__cell { cursor: default; }
+
+.mb .mb__stage-note {
+  margin: 16px 0 0;
+  font-size: 12px;
+  line-height: 1.7;
+  text-align: center;
+  color: var(--mb-muted);
+}
+.mb .mb__stage-tools { display: flex; justify-content: center; gap: 24px; margin-top: 4px; }
+#root .mb .mb__link {
+  font-size: 12px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  color: var(--mb-muted);
+}
+
+/* ---------- panel */
+.mb .mb__head { margin-bottom: 6px; }
+/* Same as the product page title: the theme's h3 size (26px, 20px under 760px),
+   0.18em tracking, and the theme's 21px rhythm between title, price and the next line. */
+.mb .mb__head .mb__title {
+  margin: 0 0 var(--main_mr, 21px);
+  font-size: var(--main_h3, 26px);
+  line-height: 1.1;
+  font-weight: 400;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+.mb .mb__head .mb__price {
+  margin: 0 0 var(--main_mr, 21px);
+  font-family: var(--main_ff, inherit);
+  font-size: 14px;
+  line-height: 23.8px;
+  font-weight: 300;
+  letter-spacing: var(--mb-track);
+}
+.mb .mb__head .mb__dims {
+  margin: 0;
+  font-size: 12px;
+  color: var(--mb-muted);
+}
+.mb .mb__group { margin: 24px 0 0; padding: 0; border: 0; min-width: 0; }
+.mb .mb__label {
+  display: block;
+  margin: 0 0 10px;
+  padding: 0;
+  font-family: var(--mb-font, inherit);
+  font-size: 13px;
+  line-height: 22px;
+  font-weight: 400;
+  letter-spacing: var(--mb-track);
+  text-transform: none;
+  color: var(--mb-ink);
+}
+.mb .mb__label span { color: var(--mb-muted); }
+
+.mb .mb__pills {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+#root .mb .mb__pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  height: var(--mb-box);
+  border: 1px solid var(--mb-line);
+  background: #fff;
+  text-align: center;
+  transition: border-color .15s ease;
+}
+#root .mb .mb__pill strong { font-size: 13px; line-height: 1.2; font-weight: 400; }
+#root .mb .mb__pill span { font-size: 10px; line-height: 1.2; color: var(--mb-muted); letter-spacing: 1px; }
+#root .mb .mb__pill:hover,
+#root .mb .mb__pill[aria-checked="true"] { border-color: var(--mb-ink); }
+
+/* Frame Colour dropdown. On desktop the theme replaces it with its own dropdown,
+   as on every product page; these styles cover the native one on mobile. */
+.mb .mb__select { margin: 0; }
+.mb .mb__select label {
+  display: block;
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 22px;
+  letter-spacing: var(--mb-track);
+}
+.mb .mb__select select {
+  width: 100%;
+  height: var(--mb-box);
+  padding: 0 55px 0 24px;
+  border: 1px solid var(--mb-line);
+  border-radius: 0;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23191919' stroke-width='1.6'/%3E%3C/svg%3E") no-repeat right 22px center / 12px 8px;
+  color: var(--mb-ink);
+  font-family: var(--mb-font, inherit);
+  font-size: 12px;
+  letter-spacing: var(--mb-track);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.mb .mb__modes { display: grid; grid-template-columns: minmax(0, 1fr); width: 100%; gap: 8px; }
+#root .mb .mb__mode {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  min-height: var(--mb-box);
+  padding: 10px 24px;
+  border: 1px solid var(--mb-line);
+  background: #fff;
+  transition: border-color .15s ease;
+}
+#root .mb .mb__mode strong { display: block; font-size: 12px; line-height: 1.6; font-weight: 400; }
+#root .mb .mb__mode span { display: block; font-size: 11px; line-height: 1.6; color: var(--mb-muted); }
+#root .mb .mb__mode:hover,
+#root .mb .mb__mode[aria-selected="true"] { border-color: var(--mb-ink); }
+
+.mb .mb__mode-help {
+  margin-top: 12px;
+  padding: 16px 24px;
+  border: 1px solid var(--mb-line);
+  background: var(--mb-soft);
+}
+.mb .mb__mode-help p {
+  margin: 0 0 12px;
+  font-size: 12px;
+  line-height: 1.8;
+  letter-spacing: var(--mb-track);
+}
+.mb .mb__mode-help p:last-child { margin-bottom: 0; }
+.mb .mb__check { display: flex; gap: 12px; align-items: flex-start; cursor: pointer; font-size: 12px; line-height: 1.8; }
+.mb .mb__check input { margin-top: 5px; flex: none; accent-color: var(--mb-ink); }
+.mb .mb__notes {
+  width: 100%;
+  min-height: 90px;
+  padding: 14px 18px;
+  border: 1px solid var(--mb-line);
+  border-radius: 0;
+  background: #fff;
+  font-family: var(--mb-font, inherit);
+  font-size: 12px;
+  letter-spacing: var(--mb-track);
+  box-sizing: border-box;
+}
+#root .mb .mb__secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--mb-box);
+  padding: 0 28px;
+  border: 1px solid var(--mb-ink);
+  background: #fff;
+  font-size: 12px;
+  font-weight: 300;
+  letter-spacing: 1.96px;
+  text-transform: uppercase;
+  transition: background .15s ease, color .15s ease;
+}
+#root .mb .mb__secondary:hover:not([disabled]) { background: var(--mb-ink); color: #fff; }
+
+.mb .mb__shortlist { margin-top: 20px; }
+.mb .mb__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mb .mb__chips li { margin: 0; padding: 0; }
+.mb .mb__chips li::before { display: none; }
+#root .mb .mb__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid var(--mb-line);
+  background: #fff;
+  font-size: 11px;
+  line-height: 1;
+  white-space: nowrap;
+  transition: border-color .15s ease;
+}
+#root .mb .mb__chip:hover { border-color: var(--mb-ink); }
+#root .mb .mb__chip.is-on { border-color: var(--mb-ink); }
+#root .mb .mb__shortlist .mb__chip.is-on::after {
+  content: "\00d7" !important;
+  display: inline !important;
+  font-size: 14px;
+  color: var(--mb-muted);
+}
+.mb .mb__form { margin-top: 24px; }
+.mb .mb__status {
+  min-height: 1.6em;
+  margin: 0 0 10px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--mb-muted);
+}
+.mb .mb__status.is-error { color: var(--alert_error, #b3261e); }
+.mb .mb__submit { margin: 0; }
+/* Always solid black, whatever the theme's button settings resolve to. */
+#root .mb .mb__submit button {
+  --theme_bg_btn: #000;
+  --theme_bg_btn_dark: #191919;
+  --theme_btn_text: #fff;
+  --buy_btn_bg: #000;
+  --buy_btn_bg_dark: #191919;
+  --buy_btn_fg: #fff;
+  background-color: #000;
+  color: #fff;
+  opacity: 1;
+}
+#root .mb .mb__submit button::before { background-color: #000; border-color: #000; }
+#root .mb .mb__submit button:hover::before { background-color: #191919; border-color: #191919; }
+
+.mb .mb__details {
+  margin-top: 28px;
+  border-top: 1px solid var(--mb-line);
+  padding-top: 16px;
+  font-size: 12px;
+}
+.mb .mb__details summary { cursor: pointer; font-size: 13px; }
+.mb .mb__rte { margin-top: 10px; }
+
+/* ---------- artwork picker */
+.mb .mb__picker {
+  margin-top: 56px;
+  padding-top: 36px;
+  border-top: 1px solid var(--mb-line);
+  scroll-margin-top: 16px;
+}
+.mb .mb__picker-head { display: grid; gap: 16px; }
+@media (min-width: 990px) {
+  .mb .mb__picker-head { grid-template-columns: auto 1fr; align-items: center; gap: 32px; }
+  .mb .mb__filters { justify-self: end; }
+}
+.mb .mb__picker-head .mb__picker-title {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.3;
+  font-weight: 400;
+  letter-spacing: 3.6px;
+  text-transform: uppercase;
+}
+.mb .mb__filters { display: grid; gap: 10px; min-width: 0; }
+@media (min-width: 990px) {
+  .mb .mb__filters { grid-template-columns: 300px auto; align-items: center; }
+}
+.mb .mb__search input {
+  width: 100%;
+  height: var(--mb-box);
+  padding: 0 24px;
+  border: 1px solid var(--mb-line);
+  border-radius: 0;
+  background: #fff;
+  font-family: var(--mb-font, inherit);
+  font-size: 12px;
+  letter-spacing: var(--mb-track);
+  box-sizing: border-box;
+}
+.mb .mb__chips--filters { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+.mb .mb__chips--filters::-webkit-scrollbar { display: none; }
+.mb .mb__picker-status { margin: 16px 0; font-size: 12px; color: var(--mb-muted); }
+
+.mb .mb__cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+@media (min-width: 600px) { .mb .mb__cards { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (min-width: 990px) { .mb .mb__cards { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; } }
+@media (min-width: 1200px) { .mb .mb__cards { grid-template-columns: repeat(8, minmax(0, 1fr)); } }
+.mb .mb__card-wrap { position: relative; margin: 0; padding: 0; }
+.mb .mb__card-wrap::before { display: none; }
+
+#root .mb .mb__card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 6px 6px 8px;
+  border: 1px solid transparent;
+  text-align: center;
+  transition: border-color .15s ease;
+}
+#root .mb .mb__card:hover { border-color: var(--mb-line); }
+.mb .mb__card-art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1 / 1;
+  padding: 14%;
+  background: #fff;
+}
+.mb .mb__card-art img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(-1px 2px 1.5px rgba(40, 30, 20, .32)) drop-shadow(-5px 8px 8px rgba(40, 30, 20, .26));
+}
+.mb .mb__card-name {
+  margin-top: 8px;
+  font-size: 10px;
+  line-height: 1.4;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+}
+.mb .mb__card-used { min-height: 1.4em; font-size: 10px; letter-spacing: 1px; color: var(--mb-muted); }
+.mb .is-used .mb__card-art { box-shadow: inset 0 0 0 1px var(--mb-ink); }
+
+#root .mb .mb__star {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .94);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .12);
+}
+.mb .mb__star svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: var(--mb-ink);
+  stroke-width: 1.3;
+  stroke-linejoin: round;
+}
+.mb .mb__star[aria-pressed="true"] svg { fill: var(--mb-star); stroke: var(--mb-star); }

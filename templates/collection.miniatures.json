@@ -1,1 +1,395 @@
-{"sections":{"breadcrumbs":{"type":"breadcrumbs","disabled":true,"settings":{"hide_mobile":false,"back_button":false}},"section_custom_html_X8KqAE":{"type":"section-custom-html","disabled":true,"settings":{"custom_html":"<center>\n<h5>IMPORTANT INFORMATION<\/h5>\n<p>Print runs are limited to 100, 75, 10 and available in 3 sizes.  If you looking for a stamp from a specific country, please get in touch. Due to all works being made to order, we do not accept refunds, only exchanges. In which case, we ask the customer pays for the return delivery. Turnaround time for the artwork is currently two weeks. Free collection from our studio in Battersea is available at checkout. Please note that collection can take up to two weeks.<\/p>\n<\/center>","spacing_desktop":50,"spacing_mobile":30,"fix_zindex":0}},"section_custom_html_fUGQwj":{"type":"section-custom-html","disabled":true,"custom_css":[],"settings":{"custom_html":"<div class=\"sticky-search-wrapper\">\n<form id=\"collection-search-form\" action=\"\/search\" method=\"get\">\n    <div class=\"search-container\">\n        <input type=\"text\" id=\"collection-search-input\" name=\"q\" placeholder=\"Search\" autocomplete=\"off\">\n        <span id=\"search-icon\">🔍<\/span> <!-- Just the icon, no button -->\n    <\/div>\n    <div id=\"predictive-results\"><\/div>\n<\/form>\n<\/div>","spacing_desktop":0,"spacing_mobile":40,"fix_zindex":25}},"965cc171-3bf5-4f7c-b5de-dcced37badd4":{"type":"section-collection-list","disabled":true,"custom_css":["{overflow: visible !important;}","picture {display: none;}"],"settings":{"collections":["a-z","north-america","europe","africa","the-queen","most-popular"],"custom_image_ratio":100,"show_in_circle":false,"fill_images":false,"layout":"grid","number_of_items":6,"show_below":true,"show_arrow":false,"color_palette":"white","image_overlay_opacity":0,"text_alignment":"center","background_color_palette":"scheme-1","background_overlay_opacity":100,"background_position":"left","background_width":100,"background_height":100,"background_color_section":false,"title":"","title_underline_style":"none","show_link":true,"link_text":"","link_url":"","button_style":"primary plain","collection_title_position":"center","show_collection_titles":true,"collection_title_size":"h5","mobile_layout":"grid","number_of_items_mobile":"w100-mobile","background_width_mobile":100,"background_height_mobile":100,"spacing_desktop":-20,"spacing_mobile":30,"fix_zindex":0}},"main-collection":{"type":"main-collection","blocks":{"title":{"type":"title","disabled":true,"settings":{"text_alignment":"center","title_size":"h3","title":""}},"sorting":{"type":"sorting","disabled":true,"settings":{}},"product_grid":{"type":"product_grid","settings":{}},"423fb7f6-2c97-4420-8211-d45378349d2a":{"type":"description","disabled":true,"settings":{"text_alignment":"center","enable_read_more":false,"text":""}}},"block_order":["title","sorting","product_grid","423fb7f6-2c97-4420-8211-d45378349d2a"],"custom_css":["h3 {font-size: 14px !important;}","p {font-size: 14px !important;}"],"settings":{"pagination_qty":48,"pagination_type":"button","show_amount_of_products_in_collection":true,"products_per_row":3,"secondary_products_per_row":4,"fill_images":false,"fill_not_first":false,"images_padding":0,"images_vertical_position":0,"show_collection_image":false,"enable_filters":false,"enable_menu":false,"enable_collections":false,"filters_layout":"drawer","enable_filters_checkboxes":true,"filter_menu":"main-menu","collections_menu":[],"main_menu_items_clickable":true,"filter_sticky":false,"filters_show_more_limit":5,"enable_custom_filters_font_size":true,"filters_font_size":"14px","image_swatches_size":"xs","image_swatches_fill_images":true,"image_swatches_show_in_circle":true,"fix_zindex":1}},"650e297b-0ed0-4910-ba6b-8988aee2591c":{"type":"section-spacer","settings":{"height":50,"height_mobile":20}}},"order":["breadcrumbs","section_custom_html_X8KqAE","section_custom_html_fUGQwj","965cc171-3bf5-4f7c-b5de-dcced37badd4","main-collection","650e297b-0ed0-4910-ba6b-8988aee2591c"]}
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "breadcrumbs": {
+      "type": "breadcrumbs",
+      "disabled": true,
+      "settings": {
+        "hide_mobile": false,
+        "back_button": false
+      }
+    },
+    "section_custom_html_X8KqAE": {
+      "type": "section-custom-html",
+      "disabled": true,
+      "settings": {
+        "custom_html": "<center>\n<h5>IMPORTANT INFORMATION</h5>\n<p>Print runs are limited to 100, 75, 10 and available in 3 sizes.  If you looking for a stamp from a specific country, please get in touch. Due to all works being made to order, we do not accept refunds, only exchanges. In which case, we ask the customer pays for the return delivery. Turnaround time for the artwork is currently two weeks. Free collection from our studio in Battersea is available at checkout. Please note that collection can take up to two weeks.</p>\n</center>",
+        "spacing_desktop": 50,
+        "spacing_mobile": 30,
+        "fix_zindex": 0
+      }
+    },
+    "section_custom_html_fUGQwj": {
+      "type": "section-custom-html",
+      "disabled": true,
+      "custom_css": [],
+      "settings": {
+        "custom_html": "<div class=\"sticky-search-wrapper\">\n<form id=\"collection-search-form\" action=\"/search\" method=\"get\">\n    <div class=\"search-container\">\n        <input type=\"text\" id=\"collection-search-input\" name=\"q\" placeholder=\"Search\" autocomplete=\"off\">\n        <span id=\"search-icon\">🔍</span> <!-- Just the icon, no button -->\n    </div>\n    <div id=\"predictive-results\"></div>\n</form>\n</div>",
+        "spacing_desktop": 0,
+        "spacing_mobile": 40,
+        "fix_zindex": 25
+      }
+    },
+    "965cc171-3bf5-4f7c-b5de-dcced37badd4": {
+      "type": "section-collection-list",
+      "disabled": true,
+      "custom_css": [
+        "{overflow: visible !important;}",
+        "picture {display: none;}"
+      ],
+      "settings": {
+        "collections": [
+          "a-z",
+          "north-america",
+          "europe",
+          "africa",
+          "the-queen",
+          "most-popular"
+        ],
+        "custom_image_ratio": 100,
+        "show_in_circle": false,
+        "fill_images": false,
+        "layout": "grid",
+        "number_of_items": 6,
+        "show_below": true,
+        "show_arrow": false,
+        "color_palette": "white",
+        "image_overlay_opacity": 0,
+        "text_alignment": "center",
+        "background_color_palette": "scheme-1",
+        "background_overlay_opacity": 100,
+        "background_position": "left",
+        "background_width": 100,
+        "background_height": 100,
+        "background_color_section": false,
+        "title": "",
+        "title_underline_style": "none",
+        "show_link": true,
+        "link_text": "",
+        "link_url": "",
+        "button_style": "primary plain",
+        "collection_title_position": "center",
+        "show_collection_titles": true,
+        "collection_title_size": "h5",
+        "mobile_layout": "grid",
+        "number_of_items_mobile": "w100-mobile",
+        "background_width_mobile": 100,
+        "background_height_mobile": 100,
+        "spacing_desktop": -20,
+        "spacing_mobile": 30,
+        "fix_zindex": 0
+      }
+    },
+    "miniatures_hero": {
+      "type": "section-slideshow",
+      "blocks": {
+        "slide": {
+          "type": "slide",
+          "settings": {
+            "video": "shopify://files/videos/Screen Recording 2025-07-17 at 22.14.59.mov",
+            "show_play_button": false,
+            "video_mute": true,
+            "layout": "background",
+            "image_width": 60,
+            "overlay_opacity": 0,
+            "color_palette": "",
+            "background_overlay_opacity": 100,
+            "text_position": "center",
+            "max_width": 600,
+            "title": "",
+            "title_underline_style": "none",
+            "text": "",
+            "enable_custom_font_styling": false,
+            "font_size": "16px",
+            "show_first_link": false,
+            "first_link_text": "Build your own",
+            "first_link_url": "/products/9-miniatures?view=miniatures",
+            "first_button_style": "primary plain",
+            "show_second_link": false,
+            "second_link_text": "Button",
+            "second_link_url": "/",
+            "second_button_style": "secondary plain"
+          }
+        }
+      },
+      "block_order": [
+        "slide"
+      ],
+      "settings": {
+        "width": "boxed",
+        "height": "16/9",
+        "enable_custom_height": false,
+        "custom_height": 300,
+        "autoplay": false,
+        "autoplay_seconds": 3,
+        "enable_controls": false,
+        "height_mobile": "16/9",
+        "spacing_desktop": 50,
+        "spacing_mobile": 30,
+        "fix_zindex": 0
+      }
+    },
+    "miniatures_build": {
+      "type": "section-image-with-text",
+      "blocks": {
+        "title": {
+          "type": "title",
+          "settings": {
+            "title": "<h3>BUILD YOUR OWN</h3>",
+            "title_underline_style": "none"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Choose from 9, 12, 20, 35 or 60 miniatures and a frame colour, then pick every artwork yourself, star a few favourites for us to arrange, or leave the composition to the studio. See your frame take shape before you order.</p>",
+            "font": "secondary",
+            "enable_custom_text_styling": false,
+            "font_size": "16px"
+          }
+        },
+        "buttons": {
+          "type": "buttons",
+          "settings": {
+            "show_first_link": true,
+            "first_link_text": "Build your own",
+            "first_link_url": "/products/9-miniatures?view=miniatures",
+            "first_button_style": "primary plain",
+            "show_second_link": false,
+            "second_link_text": "Button",
+            "second_link_url": "/",
+            "second_button_style": "secondary plain"
+          }
+        }
+      },
+      "block_order": [
+        "title",
+        "text",
+        "buttons"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/60.jpg",
+        "fill_image": true,
+        "overlay_opacity_img": 0,
+        "enable_controls": false,
+        "video_mute": true,
+        "width": "boxed",
+        "height": "size-m",
+        "enable_custom_height": false,
+        "custom_height": 250,
+        "color_palette": "white",
+        "overlay_opacity": 0,
+        "layout": "image-left",
+        "text_position": "text-start",
+        "background_color_palette": "scheme-1",
+        "background_overlay_opacity": 0,
+        "background_position": "left",
+        "background_width": 0,
+        "background_height": 0,
+        "background_width_mobile": 0,
+        "background_height_mobile": 0,
+        "spacing_desktop": -20,
+        "spacing_mobile": 0,
+        "fix_zindex": 0
+      }
+    },
+    "miniatures_depth": {
+      "type": "section-image-with-text",
+      "blocks": {
+        "title": {
+          "type": "title",
+          "settings": {
+            "title": "<h3>FLOAT MOUNTED</h3>",
+            "title_underline_style": "none"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Each miniature is milled from archival mount board and floated within the depth of the frame, so it casts its own shadow. Printed and framed in the studio to order.</p>",
+            "font": "secondary",
+            "enable_custom_text_styling": false,
+            "font_size": "16px"
+          }
+        }
+      },
+      "block_order": [
+        "title",
+        "text"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/Screenshot_2026-10-19_at_15.22.52.png",
+        "fill_image": true,
+        "overlay_opacity_img": 0,
+        "enable_controls": false,
+        "video_mute": true,
+        "width": "boxed",
+        "height": "size-m",
+        "enable_custom_height": false,
+        "custom_height": 250,
+        "color_palette": "white",
+        "overlay_opacity": 0,
+        "layout": "image-right",
+        "text_position": "text-start",
+        "background_color_palette": "scheme-1",
+        "background_overlay_opacity": 0,
+        "background_position": "left",
+        "background_width": 0,
+        "background_height": 0,
+        "background_width_mobile": 0,
+        "background_height_mobile": 0,
+        "spacing_desktop": -20,
+        "spacing_mobile": 0,
+        "fix_zindex": 0
+      }
+    },
+    "miniatures_frames": {
+      "type": "section-image-with-text",
+      "blocks": {
+        "title": {
+          "type": "title",
+          "settings": {
+            "title": "<h3>THE FRAMES</h3>",
+            "title_underline_style": "none"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Every miniature is housed in one of the studio’s bespoke box frames, made by hand in England. Choose a white, black or natural oak finish.</p>",
+            "font": "secondary",
+            "enable_custom_text_styling": false,
+            "font_size": "16px"
+          }
+        }
+      },
+      "block_order": [
+        "title",
+        "text"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/unnamed_5027ce2f-4c8d-47e1-a3e8-9147c99a93ed.jpg",
+        "fill_image": true,
+        "overlay_opacity_img": 0,
+        "enable_controls": false,
+        "video_mute": true,
+        "width": "boxed",
+        "height": "size-m",
+        "enable_custom_height": false,
+        "custom_height": 250,
+        "color_palette": "white",
+        "overlay_opacity": 0,
+        "layout": "image-left",
+        "text_position": "text-start",
+        "background_color_palette": "scheme-1",
+        "background_overlay_opacity": 0,
+        "background_position": "left",
+        "background_width": 0,
+        "background_height": 0,
+        "background_width_mobile": 0,
+        "background_height_mobile": 0,
+        "spacing_desktop": 0,
+        "spacing_mobile": 0,
+        "fix_zindex": 0
+      }
+    },
+    "main-collection": {
+      "type": "main-collection",
+      "blocks": {
+        "title": {
+          "type": "title",
+          "disabled": true,
+          "settings": {
+            "text_alignment": "center",
+            "title_size": "h3",
+            "title": ""
+          }
+        },
+        "sorting": {
+          "type": "sorting",
+          "disabled": true,
+          "settings": {}
+        },
+        "product_grid": {
+          "type": "product_grid",
+          "settings": {}
+        },
+        "423fb7f6-2c97-4420-8211-d45378349d2a": {
+          "type": "description",
+          "disabled": true,
+          "settings": {
+            "text_alignment": "center",
+            "enable_read_more": false,
+            "text": ""
+          }
+        }
+      },
+      "block_order": [
+        "title",
+        "sorting",
+        "product_grid",
+        "423fb7f6-2c97-4420-8211-d45378349d2a"
+      ],
+      "disabled": true,
+      "custom_css": [
+        "h3 {font-size: 14px !important;}",
+        "p {font-size: 14px !important;}"
+      ],
+      "settings": {
+        "pagination_qty": 48,
+        "pagination_type": "button",
+        "show_amount_of_products_in_collection": true,
+        "products_per_row": 3,
+        "secondary_products_per_row": 4,
+        "fill_images": false,
+        "fill_not_first": false,
+        "images_padding": 0,
+        "images_vertical_position": 0,
+        "show_collection_image": false,
+        "enable_filters": false,
+        "enable_menu": false,
+        "enable_collections": false,
+        "filters_layout": "drawer",
+        "enable_filters_checkboxes": true,
+        "filter_menu": "main-menu",
+        "collections_menu": [],
+        "main_menu_items_clickable": true,
+        "filter_sticky": false,
+        "filters_show_more_limit": 5,
+        "enable_custom_filters_font_size": true,
+        "filters_font_size": "14px",
+        "image_swatches_size": "xs",
+        "image_swatches_fill_images": true,
+        "image_swatches_show_in_circle": true,
+        "fix_zindex": 1
+      }
+    },
+    "650e297b-0ed0-4910-ba6b-8988aee2591c": {
+      "type": "section-spacer",
+      "settings": {
+        "height": 50,
+        "height_mobile": 20
+      }
+    }
+  },
+  "order": [
+    "breadcrumbs",
+    "section_custom_html_X8KqAE",
+    "section_custom_html_fUGQwj",
+    "965cc171-3bf5-4f7c-b5de-dcced37badd4",
+    "miniatures_hero",
+    "miniatures_build",
+    "miniatures_depth",
+    "miniatures_frames",
+    "main-collection",
+    "650e297b-0ed0-4910-ba6b-8988aee2591c"
+  ]
+}
