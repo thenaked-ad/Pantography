@@ -214,7 +214,7 @@
         "text": {
           "type": "text",
           "settings": {
-            "text": "",
+            "text": "<p>Each individual artwork is stuck by hand and float mounted in the frame.&nbsp;</p>",
             "font": "secondary",
             "enable_custom_text_styling": false,
             "font_size": "16px"
