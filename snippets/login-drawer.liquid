@@ -1,4 +1,30 @@
 {%- assign login_form_classes = 'm6pn f8vl' %}
+{%- if routes.account_login_url contains 'customer_authentication' -%}
+	{%- comment -%}
+		New customer accounts sign in with an emailed code, not a password. Same drawer and
+		styling as before; the email is handed to Shopify's sign-in page (login_hint), which
+		sends the code. The same page creates an account for new emails.
+	{%- endcomment -%}
+	<form action="/customer_authentication/login" method="get" class="{{ login_form_classes }}" id="login" aria-hidden="true">
+		<input type="hidden" name="locale" value="{{ request.locale.iso_code }}">
+		<input type="hidden" name="region_country" value="{{ localization.country.iso_code }}">
+		<fieldset>
+			<legend class="hidden">{{ 'customer.login.title' | t }}</legend>
+			<header>
+				<{{ settings.drawers_font_size_heading }}>{{ 'customer.login.title' | t }}</{{ settings.drawers_font_size_heading }}>
+				<p>{{ 'customer.login.subtitle' | t }}</p>
+			</header>
+			<p>
+				<label for="drawer_login_email">{{ 'customer.login.email' | t }}<span class="overlay-theme">*</span></label>
+				<input type="email" id="drawer_login_email" name="login_hint" placeholder="{{ 'customer.login.email' | t }}" autocomplete="email" required>
+			</p>
+			<p class="link-btn wide">
+				<button type="submit"{% if settings.button_style == 'inv' %} class="inv"{% endif %}>{{ 'customer.login.submit' | t }}</button>
+				<a href="{{ routes.account_login_url }}" class="inline">{{ 'customer.login.create_account_button' | t }}&nbsp;<i aria-hidden="true" class="icon-arrow-right"></i></a>
+			</p>
+		</fieldset>
+	</form>
+{%- else -%}
 {%- form 'customer_login', class: login_form_classes, id: 'login', aria-hidden: 'true' -%}
 	{%- if form.errors -%}
 		{%- for error in form.errors -%}
@@ -32,3 +58,4 @@
 		</p>
 	</fieldset>
 {%- endform -%}
+{%- endif -%}
