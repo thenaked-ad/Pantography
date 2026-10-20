@@ -549,7 +549,7 @@ ul.text-center, ol.text-center, .text-center ul, .text-center ol { list-style-po
 #nav-user > ul > li > a img { overflow: hidden; max-width: none !important; flex-shrink: 0; }
 #nav-user > ul > li.lang { min-width: 40px; }
 #nav-user > ul > li.lang > a img { width: var(--size_24_f) !important; max-width: var(--size_24_f) !important; }
-#nav-user > ul > li > a i, #root .search-compact-cont > a i { display: block; height: var(--height); font-size: calc(var(--main_fz) * 1.25); line-height: var(--height); }
+#nav-user > ul > li > a i, #nav-user > ul > li > shopify-account i, #root .search-compact-cont > a i { display: block; height: var(--height); font-size: calc(var(--main_fz) * 1.25); line-height: var(--height); }
 /*#nav-user i.icon-youtube:before { font-size: .7em; }*/
 #nav-user i.icon-twitter:before { font-size: .9em; }
 #nav-user > ul > li > a i span { display: block; position: absolute; left: var(--l1ra); right: var(--lar1); top: calc(var(--height) - var(--size) * 1.22); width: var(--size); height: var(--size); margin-left: calc(0px - var(--size) * 0.56); border-radius: 99px; background: var(--top_main_link_bg); color: var(--top_main_link_text); font-family: var(--main_ff); font-style: normal; font-size: calc(var(--main_fz) * 0.6875); line-height: var(--size); text-align: center; --size: calc(var(--main_fz) * 0.6875 * 1.63636363636); }
@@ -3073,7 +3073,7 @@ h1 .icon-check, h2 .icon-check, h3 .icon-check, h4 .icon-check, h5 .icon-check, 
 	#nav-top-outer { --dist: 0px; }
 	#nav-user > ul > li { position: static; }
 	#nav-top .l4us.slider-mobile:not(.s4wi) { opacity: 0; }
-	#nav-user > ul > li > a i, #root .search-compact-cont > a i { font-size: clamp(22px, calc(var(--main_fz) * 1.25), 28px); }
+	#nav-user > ul > li > a i, #nav-user > ul > li > shopify-account i, #root .search-compact-cont > a i { font-size: clamp(22px, calc(var(--main_fz) * 1.25), 28px); }
 	#nav-top .l4us a.swiper-button-nav { display: block; }
 	#nav-top .l4us .swiper-slide a.swiper-button-prev, #nav-top .l4us .swiper-slide a.swiper-button-next { display: none; }
 	.shopify-section-footer { padding-top: var(--footer_padding_top); }
