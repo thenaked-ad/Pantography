@@ -96,7 +96,7 @@
           "flat-prints-most-popular",
           "skiing-f"
         ],
-        "custom_image_ratio": 100,
+        "custom_image_ratio": 90,
         "show_in_circle": false,
         "fill_images": false,
         "layout": "grid",
