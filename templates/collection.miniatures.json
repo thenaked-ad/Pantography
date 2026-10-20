@@ -150,7 +150,7 @@
         "text": {
           "type": "text",
           "settings": {
-            "text": "<p>Choose from 9, 12, 20, 35 or 60 miniatures and a frame colour, then pick every artwork yourself, star a few favourites for us to arrange, or leave the composition to the studio. See your frame take shape before you order.</p>",
+            "text": "<p>Choose from 9, 12, 20, 35 or 60 miniatures. then pick the artworks of your choice, star your favourites or leave the composition to the us. Preview your layout before you order.</p>",
             "font": "secondary",
             "enable_custom_text_styling": false,
             "font_size": "16px"
