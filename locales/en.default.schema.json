@@ -4903,6 +4903,10 @@
           },
           "enable_account_dropdown": {
             "label": "Enable account drawer/dropdown"
+          },
+          "enable_account_component": {
+            "label": "Enable customer account component",
+            "info": "Not applicable for Legacy customer accounts (to be deprecated soon). [Learn more](https://help.shopify.com/en/manual/customers/customer-accounts/customize-customer-accounts/account-component)"
           }
         },
         "mobile": {

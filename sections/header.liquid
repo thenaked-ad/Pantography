@@ -674,7 +674,25 @@
             </li>
           {%- endif -%}
           {%- if shop.customer_accounts_enabled and section.settings.enable_online_store -%}
-            {%- if customer -%}
+            {%- if section.settings.enable_account_component -%}
+              <li class="user">
+                <shopify-account menu="customer-account-main-menu">
+                  <div slot="signed-out-avatar">
+                    {%- if section.settings.custom_icon_account -%}
+                      <i aria-hidden="true" class="icon-custom">
+                        {{
+                          section.settings.custom_icon_account
+                          | image_url: width: section.settings.header_icon_width
+                          | image_tag: widths: '128, 256, 512'
+                        }}
+                      </i>
+                    {%- else -%}
+                      <i aria-hidden="true" class="icon-user"></i>
+                    {%- endif -%}
+                  </div>
+                </shopify-account>
+              </li>
+            {%- elsif customer -%}
               <li class="user sub">
                 <a
                   href="{{ routes.account_url }}"
@@ -1689,6 +1707,13 @@
       "type": "checkbox",
       "id": "enable_account_dropdown",
       "label": "t:static_sections.header.settings.online_store.enable_account_dropdown.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_account_component",
+      "label": "t:static_sections.header.settings.online_store.enable_account_component.label",
+      "info": "t:static_sections.header.settings.online_store.enable_account_component.info",
       "default": true
     },
     {

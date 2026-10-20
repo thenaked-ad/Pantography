@@ -554,6 +554,8 @@ ul.text-center, ol.text-center, .text-center ul, .text-center ol { list-style-po
 #nav-user i.icon-twitter:before { font-size: .9em; }
 #nav-user > ul > li > a i span { display: block; position: absolute; left: var(--l1ra); right: var(--lar1); top: calc(var(--height) - var(--size) * 1.22); width: var(--size); height: var(--size); margin-left: calc(0px - var(--size) * 0.56); border-radius: 99px; background: var(--top_main_link_bg); color: var(--top_main_link_text); font-family: var(--main_ff); font-style: normal; font-size: calc(var(--main_fz) * 0.6875); line-height: var(--size); text-align: center; --size: calc(var(--main_fz) * 0.6875 * 1.63636363636); }
 #nav-user > ul > li > a > * + * { padding-left: 12px; }
+shopify-account { --shopify-account-avatar-size: calc(var(--main_fz) * 1.25); --shopify-account-signed-in-avatar-size: calc(var(--main_fz) * 1.25); }
+@media only screen and (max-width: 760px) { shopify-account { --shopify-account-avatar-size: clamp(22px, calc(var(--main_fz) * 1.25), 28px); --shopify-account-signed-in-avatar-size: clamp(22px, calc(var(--main_fz) * 1.25), 28px); } }
 /*#root #header .link-day { background: var(--top_main_fg);  }
     #root #header .link-day .spacer:before, #root #header .link-day .spacer:after { color: var(--top_main_bg);  }
     #root #header .link-day:after { background: var(--top_main_bg); }*/

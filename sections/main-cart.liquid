@@ -42,7 +42,7 @@
             </div>
             <div>
               <p class="link-btn">
-              <button type="submit" class="overlay-{{ checkout_button_color }} {{ checkout_button_style }}" name="checkout">
+              <button type="submit" class="overlay-{{ checkout_button_color }} {{ checkout_button_style }}" name="checkout" form="{{ form_id }}">
                 <span class="processing">{{ 'cart.button_processing' | t }}</span>
                 <span class="processed">{{ 'cart.button_proceed' | t }}</span>
                 <span>{{ 'cart.checkout' | t }}</span>
@@ -213,7 +213,7 @@
               <label for="check_{{ section.id }}">{{ section.settings.terms_text | remove: '</p>' | remove: '<p>' }}</label>
             </p>
           {% endif %}
-          <form class="f8vl" data-hold="0" action="{{ routes.cart_url }}" method="post">
+          <form class="f8vl" data-hold="0" action="{{ routes.cart_url }}" method="post" id="{{ form_id }}">
             <input type="hidden" name="attributes[collection_grid_view]" value="">
             <input type="hidden" name="attributes[collection_img_view]" value="">
             <input type="hidden" name="checkout" value="Checkout">
