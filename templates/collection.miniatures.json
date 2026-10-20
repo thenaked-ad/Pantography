@@ -214,7 +214,7 @@
         "text": {
           "type": "text",
           "settings": {
-            "text": "<p>Each miniature is milled from archival mount board and floated within the depth of the frame, so it casts its own shadow. Printed and framed in the studio to order.</p>",
+            "text": "",
             "font": "secondary",
             "enable_custom_text_styling": false,
             "font_size": "16px"
