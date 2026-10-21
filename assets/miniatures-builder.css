@@ -189,7 +189,7 @@
   /* the studio's glass reflection layer, placed as in their mockups: the right three
      quarters of the opening, full height */
   background: var(--mb-glass) no-repeat right top / 74.7% 100%;
-  opacity: .5;                 /* at full strength it fades the stamps beneath it */
+  opacity: .075;               /* a faint sheen only: any stronger washes out the stamps' colours */
   /* fade the glass in from its left edge so it leaves no visible step in the shadow */
   -webkit-mask-image: linear-gradient(to right, transparent 25.3%, #000 45%);
   mask-image: linear-gradient(to right, transparent 25.3%, #000 45%);
