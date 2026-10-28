@@ -37,7 +37,7 @@
           <div class="cols cols-mobile mobile-only align-middle">
             <div>
               <p>
-                {% if cart.taxes_included %}{{ 'cart.total_including_tax' | t }}{% else %}{{ 'cart.total_excluding_tax' | t }}{% endif %}: <span class="strong">{{ cart.total_price | money }}</span>
+                {% if localization.country.iso_code == 'US' %}Total, duties included{% elsif cart.taxes_included %}{{ 'cart.total_including_tax' | t }}{% else %}{{ 'cart.total_excluding_tax' | t }}{% endif %}: <span class="strong">{{ cart.total_price | money }}</span>
               </p>
             </div>
             <div>
