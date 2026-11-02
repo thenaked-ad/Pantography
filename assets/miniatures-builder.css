@@ -179,6 +179,18 @@
     inset 0 calc(var(--mb-cm) * -1.0) calc(var(--mb-cm) * 1.8) calc(var(--mb-cm) * -1.0) rgba(40, 30, 15, .06),
     inset 0 0 0 1px rgba(0, 0, 0, .05);
 }
+/* the edition number, pencilled on the mount in the bottom-left corner as on the
+   studio's prints: about 1.45cm tall, 1.4cm in from the left and 1.1cm up */
+.mb .mb__mount::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--mb-cm) * 1.4);
+  bottom: calc(var(--mb-cm) * 1.1);
+  height: calc(var(--mb-cm) * 1.45);
+  aspect-ratio: 210 / 240;
+  background: var(--mb-edition) no-repeat center / contain;
+  pointer-events: none;
+}
 /* reflection on the glass */
 .mb .mb__mount::after {
   content: "";
