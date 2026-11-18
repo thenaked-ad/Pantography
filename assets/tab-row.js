@@ -1,17 +1,24 @@
 /* Collection tabs as one row (section-collection-list "tab_row", styles in
    assets/tab-row.css). When the row is wider than the screen it scrolls sideways:
-   swipe on touch screens, drag with a mouse. The edges fade while there is more
-   to see, and the current tab is brought into view. */
+   swipe on touch screens, drag with a mouse, or tap the arrows. The edges fade
+   and an arrow shows while there is more to see, and the current tab is brought
+   into view. */
 (() => {
   const setup = (row) => {
     if (row.dataset.tabRowReady) return;
     row.dataset.tabRowReady = '';
 
+    const wrap = row.closest('[data-tab-row-wrap]');
     const overflowing = () => row.scrollWidth > row.clientWidth + 1;
     const update = () => {
       const max = row.scrollWidth - row.clientWidth;
-      row.classList.toggle('tab-row--more-left', overflowing() && row.scrollLeft > 2);
-      row.classList.toggle('tab-row--more-right', overflowing() && row.scrollLeft < max - 2);
+      const left = overflowing() && row.scrollLeft > 2;
+      const right = overflowing() && row.scrollLeft < max - 2;
+      [row, wrap].forEach((el) => {
+        if (!el) return;
+        el.classList.toggle('tab-row--more-left', left);
+        el.classList.toggle('tab-row--more-right', right);
+      });
     };
     row.addEventListener('scroll', update, { passive: true });
     new ResizeObserver(update).observe(row);
@@ -59,6 +66,12 @@
       dragged = false;
     }, true);
     row.addEventListener('dragstart', (event) => event.preventDefault());
+
+    if (wrap) {
+      const step = (direction) => row.scrollBy({ left: direction * row.clientWidth * 0.6, behavior: 'smooth' });
+      wrap.querySelector('[data-tab-row-prev]')?.addEventListener('click', () => step(-1));
+      wrap.querySelector('[data-tab-row-next]')?.addEventListener('click', () => step(1));
+    }
 
     update();
   };

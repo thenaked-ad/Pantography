@@ -131,6 +131,7 @@
   {%- if section.settings.tab_row -%}
     {{ 'tab-row.css' | asset_url | stylesheet_tag }}
     <script src="{{ 'tab-row.js' | asset_url }}" defer></script>
+    <div class="tab-row" data-tab-row-wrap>
   {%- endif -%}
   <ul
     class="{% if section.settings.show_below == false %}palette-{{ section.settings.color_palette }} module-color-palette {% endif %}l4cl offset catalog {{ width_class }} {% if slider %}slider{% endif %}{% if section.settings.show_in_circle and section.settings.custom_image_ratio == 100 %} rounded{% endif %} {% if section.settings.mobile_layout == "grid" %} mobile-scroll{% endif %} {{ section.settings.number_of_items_mobile }}"
@@ -189,6 +190,18 @@
         </li>
       {%- endfor -%}
     {%- else %}
+      {%- capture favourites_tab -%}
+        {%- comment -%} Opens the visitor's starred artworks in place of the grid (assets/favourites.js) {%- endcomment -%}
+        <li data-fav-tab-item>
+          <figure aria-hidden="true"></figure>
+          <div>
+            <{{ section.settings.collection_title_size }} class="{% if section.settings.collection_title_position == 'center' %} text-center{% endif %}">
+              <a href="#favourites" data-fav-tab>FAVOURITES<span data-fav-count></span></a>
+            </{{ section.settings.collection_title_size }}>
+          </div>
+        </li>
+      {%- endcapture -%}
+      {%- unless section.settings.show_favourites_tab -%}{%- assign favourites_tab = '' -%}{%- endunless -%}
       {%- for collection in section.settings.collections -%}
         {%- liquid
           capture current
@@ -272,20 +285,22 @@
             </div>
           {% endif %}
         </li>
+        {%- if forloop.first -%}
+          {%- comment -%} FAVOURITES sits second, straight after A - Z {%- endcomment -%}
+          {{ favourites_tab }}
+        {%- endif -%}
       {%- endfor -%}
-      {%- if section.settings.show_favourites_tab -%}
-        {%- comment -%} Opens the visitor's starred artworks in place of the grid (assets/favourites.js) {%- endcomment -%}
-        <li data-fav-tab-item>
-          <figure aria-hidden="true"></figure>
-          <div>
-            <{{ section.settings.collection_title_size }} class="{% if section.settings.collection_title_position == 'center' %} text-center{% endif %}">
-              <a href="#favourites" data-fav-tab>FAVOURITES<span data-fav-count></span></a>
-            </{{ section.settings.collection_title_size }}>
-          </div>
-        </li>
-      {%- endif -%}
     {% endif -%}
   </ul>
+  {%- if section.settings.tab_row -%}
+    <button type="button" class="tab-row__arrow tab-row__arrow--prev" data-tab-row-prev aria-label="Scroll the tabs back" tabindex="-1">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 4l-8 8 8 8"/></svg>
+    </button>
+    <button type="button" class="tab-row__arrow tab-row__arrow--next" data-tab-row-next aria-label="Scroll the tabs on" tabindex="-1">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 4l8 8-8 8"/></svg>
+    </button>
+    </div>
+  {%- endif -%}
   {%- if link and section.settings.text_alignment == 'center' -%}
     {{ link | replace: 'class-x', 'text-center' }}
   {%- elsif link -%}
