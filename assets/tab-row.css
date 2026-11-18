@@ -64,11 +64,17 @@
   #root ul[data-tab-row].is-dragging { cursor: grabbing; user-select: none; }
 }
 
+/* the sections around the row space themselves differently below 1001px;
+   these keep 49px above and 43px below the titles, as on desktop */
+@media (min-width: 768px) and (max-width: 1000px) {
+  #root ul.l4cl[data-tab-row] { padding: 49px 0 54px !important; }
+}
+/* phones: 28px above, 34px down to the grid */
 @media (max-width: 767px) {
   #root ul.l4cl[data-tab-row] {
     justify-content: flex-start !important;
     gap: 0 28px;
-    padding: 44px 0 20px !important;
+    padding: 44px 0 0 !important;
   }
 }
 
