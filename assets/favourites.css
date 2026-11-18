@@ -75,8 +75,6 @@ header:has(> .fav-star--inline) {
 @media (min-width: 760px) {
   ul:has(> li[data-fav-tab-item]) > li { flex-basis: calc(100% / 7); width: calc(100% / 7); }
 }
-/* the collection tabs have an empty image block above their title; line up with the titles */
-li[data-fav-tab-item] { align-self: flex-end; }
 /* wraps like UNITED STATES on narrower screens, so the row never overflows */
 li[data-fav-tab-item] { min-width: 0; }
 
