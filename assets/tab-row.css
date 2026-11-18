@@ -91,10 +91,11 @@
   content: none !important;
   display: none !important;
 }
-#root .tab-row .tab-row__arrow--prev { left: 0; justify-content: flex-start; }
-#root .tab-row .tab-row__arrow--next { right: 0; justify-content: flex-end; }
-#root .tab-row.tab-row--more-left .tab-row__arrow--prev,
-#root .tab-row.tab-row--more-right .tab-row__arrow--next {
+/* !important: the theme pins buttons to left: 0 with !important */
+#root .tab-row button.tab-row__arrow--prev { left: 0 !important; right: auto !important; justify-content: flex-start; }
+#root .tab-row button.tab-row__arrow--next { left: auto !important; right: 0 !important; justify-content: flex-end; }
+#root .tab-row.tab-row--more-left button.tab-row__arrow--prev,
+#root .tab-row.tab-row--more-right button.tab-row__arrow--next {
   opacity: 1;
   visibility: visible;
 }
