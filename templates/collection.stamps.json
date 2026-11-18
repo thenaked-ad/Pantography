@@ -107,6 +107,7 @@
           "most-popular",
           "skiing"
         ],
+        "tab_row": true,
         "show_favourites_tab": true,
         "custom_image_ratio": 90,
         "show_in_circle": false,

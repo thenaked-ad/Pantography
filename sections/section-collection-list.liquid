@@ -128,9 +128,14 @@
       {%- endif -%}
     </header>
   {%- endif -%}
+  {%- if section.settings.tab_row -%}
+    {{ 'tab-row.css' | asset_url | stylesheet_tag }}
+    <script src="{{ 'tab-row.js' | asset_url }}" defer></script>
+  {%- endif -%}
   <ul
     class="{% if section.settings.show_below == false %}palette-{{ section.settings.color_palette }} module-color-palette {% endif %}l4cl offset catalog {{ width_class }} {% if slider %}slider{% endif %}{% if section.settings.show_in_circle and section.settings.custom_image_ratio == 100 %} rounded{% endif %} {% if section.settings.mobile_layout == "grid" %} mobile-scroll{% endif %} {{ section.settings.number_of_items_mobile }}"
     style="--ratio:{{ section.settings.custom_image_ratio | divided_by: 100.0 }}; {% if settings.enable_animations %}--nav_delay: 300;{% endif %}"
+    {% if section.settings.tab_row %}data-tab-row{% endif %}
   >
     {%- if section.settings.collections == blank %}
       {%- for i in (1..section.settings.number_of_items) %}
@@ -321,6 +326,13 @@
       "type": "collection_list",
       "id": "collections",
       "label": "t:sections.collection_list.settings.collections.label"
+    },
+    {
+      "id": "tab_row",
+      "type": "checkbox",
+      "label": "Show as a single row of tabs",
+      "info": "Titles only, never wrapping; the row scrolls sideways when it is wider than the screen.",
+      "default": false
     },
     {
       "id": "show_favourites_tab",

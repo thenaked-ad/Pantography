@@ -1,0 +1,72 @@
+/* Collection tabs as one row that never wraps or splits a word
+   (section-collection-list "tab_row"). When the row is wider than the screen it
+   scrolls sideways (assets/tab-row.js), with the edges fading while there is more.
+   Scoped under #root to beat the section's custom CSS, which is scoped to the
+   section id and uses !important. */
+
+#root ul.l4cl[data-tab-row] {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  justify-content: space-between !important;
+  gap: 0 36px;
+  margin: 0 !important;
+  padding: 6px 0 !important;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+#root ul.l4cl[data-tab-row]::-webkit-scrollbar { display: none; }
+
+#root ul[data-tab-row] > li {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+/* the theme fades tabs in as they scroll into view, which never happens sideways */
+#root ul[data-tab-row] > li[data-sal] {
+  opacity: 1 !important;
+  transform: none !important;
+}
+#root ul[data-tab-row] > li > figure { display: none !important; }
+#root ul[data-tab-row] h5 { margin: 0 !important; }
+#root ul[data-tab-row] a {
+  white-space: nowrap;
+  overflow-wrap: normal;
+  word-break: keep-all;
+  hyphens: none;
+  -webkit-user-drag: none;
+}
+
+#root ul[data-tab-row].tab-row--more-right {
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 48px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 48px), transparent);
+}
+#root ul[data-tab-row].tab-row--more-left {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 48px);
+  mask-image: linear-gradient(to right, transparent, #000 48px);
+}
+#root ul[data-tab-row].tab-row--more-left.tab-row--more-right {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 48px, #000 calc(100% - 48px), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 48px, #000 calc(100% - 48px), transparent);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  #root ul[data-tab-row].tab-row--more-left,
+  #root ul[data-tab-row].tab-row--more-right { cursor: grab; }
+  #root ul[data-tab-row].is-dragging { cursor: grabbing; user-select: none; }
+}
+
+@media (max-width: 767px) {
+  #root ul.l4cl[data-tab-row] {
+    justify-content: flex-start !important;
+    gap: 0 28px;
+  }
+}
+
+/* the mobile "Sort by" dropdown repeats these tabs; the row replaces it */
+body:has(ul[data-tab-row]) .mobile-sort { display: none !important; }

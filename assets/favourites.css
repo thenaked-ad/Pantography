@@ -71,15 +71,20 @@ header:has(> .fav-star--inline) {
 /* cards drawn by the collection search */
 .collection-search__card { position: relative; }
 
-/* the FAVOURITES tab sits in the same row as the collection tabs */
-@media (min-width: 760px) {
-  ul:has(> li[data-fav-tab-item]) > li { flex-basis: calc(100% / 7); width: calc(100% / 7); }
-}
-/* wraps like UNITED STATES on narrower screens, so the row never overflows */
-li[data-fav-tab-item] { min-width: 0; }
+/* the collection grid and its pagination while FAVOURITES is open; #root #collection
+   beats the section's own mobile rule (#section #collection, display: grid !important) */
+[data-fav-hidden],
+#root #collection[data-fav-hidden] { display: none !important; }
 
-/* the collection grid and its pagination while FAVOURITES is open */
-[data-fav-hidden] { display: none !important; }
+/* two across on phones, as the section's custom CSS lays out #collection */
+@media screen and (max-width: 749px) {
+  #root ul[data-fav-grid] {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0 !important;
+    overflow: visible !important;
+  }
+}
 
 .fav-empty {
   margin: 40px 0 80px;
