@@ -22,6 +22,7 @@
 #root ul[data-tab-row] > li {
   flex: 0 0 auto !important;
   width: auto !important;
+  min-width: 0 !important;   /* the theme's mobile slider sets one */
   max-width: none !important;
   margin: 0 !important;
   padding: 0 !important;
