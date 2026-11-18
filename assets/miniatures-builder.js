@@ -2,6 +2,9 @@
    Catalogue: templates/collection.miniart.liquid. */
 if (!customElements.get('miniatures-builder')) {
   const STORAGE_KEY = 'pantography-miniatures-v1';
+  /* Stars are the site-wide favourites list (assets/favourites.js); the shortlist is
+     the part of it that has miniature art. */
+  const favourites = () => window.PantographyFavourites;
   const MAX_POSITIONS = 60;
   /* Physical sizes in cm, so every frame is drawn to scale. Measured from the studio
      photographs of the 9 and the 60: the miniatures sit as a centred group with these
@@ -63,6 +66,7 @@ if (!customElements.get('miniatures-builder')) {
       this.bind();
       this.renderAll();
       this.loadCatalogue();
+      document.addEventListener('pantography:favourites', () => this.syncFavourites());
     }
 
     /* ---------------------------------------------------------------- state */
@@ -84,11 +88,33 @@ if (!customElements.get('miniatures-builder')) {
         frame: this.el.frameSelect ? this.el.frameSelect.value : 'White',
         mode: MODE_LABELS[saved.mode] ? saved.mode : 'pick',
         positions,
-        shortlist: Array.isArray(saved.shortlist) ? saved.shortlist : [],
+        shortlist: this.mergeFavourites(Array.isArray(saved.shortlist) ? saved.shortlist : []),
         notes: typeof saved.notes === 'string' ? saved.notes : '',
         studioFill: Boolean(saved.studioFill),
         selected: null
       };
+    }
+
+    /* Shortlists saved before favourites existed join the favourites list, then the
+       shortlist picks up anything starred elsewhere on the site. */
+    mergeFavourites(shortlist) {
+      const fav = favourites();
+      if (!fav) return shortlist;
+      shortlist.forEach((handle) => fav.set(handle, true, true));
+      return [...new Set([...shortlist, ...fav.list()])];
+    }
+
+    /* A star changed on this page or in another tab. */
+    syncFavourites() {
+      const fav = favourites();
+      if (!fav) return;
+      const starred = fav.list();
+      const keep = this.state.shortlist.filter((h) => starred.includes(h));
+      const added = starred.filter((h) => !keep.includes(h) && (!this.catalogue.length || this.byHandle.has(h)));
+      const next = [...keep, ...added];
+      if (next.join() === this.state.shortlist.join()) return;
+      this.state.shortlist = next;
+      this.changed();
     }
 
     save() {
@@ -401,6 +427,7 @@ if (!customElements.get('miniatures-builder')) {
       const at = list.indexOf(handle);
       if (at === -1) list.push(handle);
       else list.splice(at, 1);
+      if (favourites()) favourites().set(handle, at === -1);
       this.changed();
     }
 

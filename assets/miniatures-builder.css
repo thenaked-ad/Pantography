@@ -8,7 +8,7 @@
   --mb-muted: #767676;
   --mb-line: #ececec;
   --mb-soft: #fafafa;
-  --mb-star: #c8962e;
+  --mb-star: #191919;   /* filled black when starred, as across the site */
   --mb-track: 2.2px;
   --mb-box: 55px;
   display: block;

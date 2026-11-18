@@ -396,6 +396,9 @@
       {% if static_color_picker == false and color_option and layout != 'list-compact' and layout != 'list' %}
         </div>
       {% endif %}
+      {%- if product != blank and product.type == 'Artwork' and product.template_suffix != 'miniatures' and layout != 'list-compact' -%}
+        {%- render 'favourite-star', product: product -%}
+      {%- endif -%}
     </figure>
   {%- endif -%}
   {% if layout == 'list-compact' %}

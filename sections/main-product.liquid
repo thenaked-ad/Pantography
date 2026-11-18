@@ -108,6 +108,9 @@
         <{{ title_block.settings.title_size }} class="{{ title_block.settings.mobile_title_size }}-mobile">
           {{ product_title }}            
         </{{ title_block.settings.title_size }}>
+        {%- if product.type == 'Artwork' and product.template_suffix != 'miniatures' -%}
+          {%- render 'favourite-star', product: product, class: 'fav-star--inline' -%}
+        {%- endif -%}
     </header>
 {%- endcapture -%}
 

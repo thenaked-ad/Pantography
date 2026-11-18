@@ -61,6 +61,8 @@
       <link media="screen" rel="stylesheet" href="{{ 'page-product.css' | asset_url }}" id="product-css">
     {%- endif -%}
     <link media="screen" rel="stylesheet" href="{{ 'screen-settings.css' | asset_url }}" id="custom-css">
+    <link media="screen" rel="stylesheet" href="{{ 'favourites.css' | asset_url }}">
+    <script defer src="{{ 'favourites.js' | asset_url }}"></script>
     {%- if settings.favicon -%}
       <link rel="icon" href="{{ settings.favicon | image_url: width: 32, height: 32 }}" type="image/png">
       <link rel="mask-icon" href="safari-pinned-tab.svg" color="#333333">

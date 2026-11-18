@@ -268,6 +268,16 @@
           {% endif %}
         </li>
       {%- endfor -%}
+      {%- if section.settings.show_favourites_tab -%}
+        {%- comment -%} Opens the visitor's starred artworks in place of the grid (assets/favourites.js) {%- endcomment -%}
+        <li data-fav-tab-item>
+          <div>
+            <{{ section.settings.collection_title_size }} class="{% if section.settings.collection_title_position == 'center' %} text-center{% endif %}">
+              <a href="#favourites" data-fav-tab>FAVOURITES<span data-fav-count></span></a>
+            </{{ section.settings.collection_title_size }}>
+          </div>
+        </li>
+      {%- endif -%}
     {% endif -%}
   </ul>
   {%- if link and section.settings.text_alignment == 'center' -%}
@@ -310,6 +320,13 @@
       "type": "collection_list",
       "id": "collections",
       "label": "t:sections.collection_list.settings.collections.label"
+    },
+    {
+      "id": "show_favourites_tab",
+      "type": "checkbox",
+      "label": "Show FAVOURITES tab",
+      "info": "Adds a tab after the collections showing the artworks a visitor has starred.",
+      "default": false
     },
     {
       "id": "custom_image_ratio",

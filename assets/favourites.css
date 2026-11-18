@@ -1,0 +1,86 @@
+/* Favourites: the star on artwork cards and product pages, and the
+   FAVOURITES tab view. Matches the miniatures builder's star; selected is
+   filled black. Scoped under #root because the theme styles every button
+   globally (with ::before backgrounds) at id specificity. */
+
+#root button.fav-star {
+  all: unset;
+  box-sizing: border-box;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 9;   /* card slider images sit at 6 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .94);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .12);
+  color: #191919;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+#root button.fav-star::before,
+#root button.fav-star::after {
+  content: none !important;
+  display: none !important;
+}
+#root button.fav-star:focus-visible {
+  outline: 1px solid #191919;
+  outline-offset: 2px;
+}
+#root .fav-star svg {
+  display: block;
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.3;
+  stroke-linejoin: round;
+  transition: fill .15s ease;
+}
+#root .fav-star[aria-pressed="true"] svg { fill: currentColor; }
+@media (hover: hover) {
+  #root button.fav-star:hover svg { stroke-width: 1.8; }
+}
+
+/* beside the title on a product page */
+#root button.fav-star--inline {
+  position: relative;
+  top: auto;
+  right: auto;
+  flex: 0 0 auto;
+  margin-top: .1em;
+  box-shadow: none;
+  background: none;
+}
+#root button.fav-star--inline svg { width: 18px; height: 18px; }
+header:has(> .fav-star--inline) {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* cards drawn by the collection search */
+.collection-search__card { position: relative; }
+
+/* the FAVOURITES tab sits in the same row as the collection tabs */
+@media (min-width: 760px) {
+  ul:has(> li[data-fav-tab-item]) > li { flex-basis: calc(100% / 7); width: calc(100% / 7); }
+}
+/* the collection tabs have an empty image block above their title; line up with the titles */
+li[data-fav-tab-item] { align-self: flex-end; }
+li[data-fav-tab-item] h5 a { white-space: nowrap; }
+
+/* the collection grid and its pagination while FAVOURITES is open */
+[data-fav-hidden] { display: none !important; }
+
+.fav-empty {
+  margin: 40px 0 80px;
+  text-align: center;
+  letter-spacing: 2.2px;
+  font-size: 13px;
+}
