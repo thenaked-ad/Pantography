@@ -77,7 +77,8 @@ header:has(> .fav-star--inline) {
 }
 /* the collection tabs have an empty image block above their title; line up with the titles */
 li[data-fav-tab-item] { align-self: flex-end; }
-li[data-fav-tab-item] h5 a { white-space: nowrap; }
+/* wraps like UNITED STATES on narrower screens, so the row never overflows */
+li[data-fav-tab-item] { min-width: 0; }
 
 /* the collection grid and its pagination while FAVOURITES is open */
 [data-fav-hidden] { display: none !important; }
