@@ -5,7 +5,8 @@
    written underneath. */
 if (!customElements.get('wall-builder')) {
   const STORAGE_KEY = 'pantography-wall-v1';
-  const GAP_CM = 6;   /* between frames on the wall */
+  const GAP_CM = 12;  /* between frames on the wall (about 5in) */
+  const GAP_IN = 5;
 
   /* Frame sizes as sold. art = the stamp's width and bar = the moulding's, each as a
      share of the frame's width, measured from the studio's product mockups. */
@@ -404,7 +405,7 @@ if (!customElements.get('wall-builder')) {
       const wallW = cols * size.w + (cols - 1) * GAP_CM;
       const wallH = rows * size.h + (rows - 1) * GAP_CM;
       dims.textContent = n > 1
-        ? `Your wall: about ${wallW}cm x ${wallH}cm, with ${GAP_CM}cm between frames`
+        ? `Your wall: about ${wallW}cm x ${wallH}cm, with ${GAP_CM}cm/${GAP_IN}in between frames`
         : `Frame: ${size.w}cm x ${size.h}cm`;
     }
 
