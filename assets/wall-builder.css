@@ -1,0 +1,476 @@
+/* Wall builder. Scoped under #root .wb because the theme styles every button
+   globally (with ::before backgrounds) at id specificity. Type and boxes follow the
+   miniatures builder and the product page: 13px labels, 2.2px tracking, 1px #ececec
+   boxes 55px tall. Frames reuse the miniatures builder's studio textures. */
+
+.wb {
+  --wb-ink: #191919;
+  --wb-muted: #767676;
+  --wb-line: #ececec;
+  --wb-soft: #fafafa;
+  --wb-track: 2.2px;
+  --wb-box: 55px;
+  display: block;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 2px 16px 56px;
+  color: var(--wb-ink);
+  font-family: var(--wb-font, inherit);
+  letter-spacing: var(--wb-track);
+}
+.wb .wb__font-probe {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+.wb [hidden] { display: none !important; }
+
+/* ---------- reset theme buttons */
+#root .wb :where(button) {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  font-family: var(--wb-font, inherit);
+  font-weight: 400;
+  letter-spacing: var(--wb-track);
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+#root .wb :where(button)::before,
+#root .wb :where(button)::after {
+  content: none !important;
+  display: none !important;
+}
+#root .wb :where(button):focus-visible {
+  outline: 1px solid var(--wb-ink);
+  outline-offset: 2px;
+}
+
+/* ---------- layout */
+.wb .wb__layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px; }
+.wb .wb__stage,
+.wb .wb__panel { min-width: 0; }
+@media (min-width: 990px) {
+  .wb { padding-left: 6px; padding-right: 6px; }
+  .wb .wb__layout {
+    grid-template-columns: minmax(0, 1.45fr) minmax(320px, 1fr);
+    gap: 64px;
+    align-items: start;
+  }
+  .wb .wb__panel { position: sticky; top: 24px; }
+}
+
+/* ---------- the wall */
+.wb .wb__wall {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 28px 12px;
+  background: #fff;
+  transition: height .25s ease;
+}
+.wb .wb__wall.is-empty { min-height: 280px; border: 1px dashed #d8d8d8; }
+.wb .wb__wall-note {
+  max-width: 340px;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.8;
+  text-align: center;
+  color: var(--wb-muted);
+}
+.wb .wb__grid {
+  flex: none;
+  max-width: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+  gap: var(--wb-gap);
+}
+.wb .wb__dims {
+  min-height: 1.6em;
+  margin: 12px 0 0;
+  font-size: 11px;
+  line-height: 1.6;
+  letter-spacing: 1px;
+  text-align: center;
+  color: var(--wb-muted);
+}
+
+/* one framed artwork, drawn to scale (see SIZES in the JS) */
+.wb .wb__frame {
+  position: relative;
+  flex: none;
+  width: var(--wb-fw);
+  height: var(--wb-fh);
+  transition: width .25s ease, height .25s ease, opacity .2s ease;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, .16),
+    -2px 4px 8px rgba(30, 22, 12, .14),
+    -6px 14px 26px -6px rgba(30, 22, 12, .26);
+}
+.wb .wb__frame[data-frame="White"] { background: #ecebe6; }
+.wb .wb__frame[data-frame="Black"] { background: #1e1d1b; }
+.wb .wb__frame.is-unavailable { opacity: .35; }
+
+/* four mitred bars, each with the studio's texture (set in the section) */
+.wb .wb__bar {
+  position: absolute;
+  z-index: 2;
+  background-repeat: no-repeat;
+  background-position: center;
+  pointer-events: none;
+}
+.wb .wb__bar--t,
+.wb .wb__bar--b { left: 0; right: 0; height: var(--wb-t); background-size: max(100%, calc(var(--wb-t) * 37.5)) 100%; }
+.wb .wb__bar--l,
+.wb .wb__bar--r { top: 0; bottom: 0; width: var(--wb-t); background-size: 100% max(100%, calc(var(--wb-t) * 37.5)); }
+.wb .wb__bar--t { top: 0; clip-path: polygon(0 0, 100% 0, calc(100% - var(--wb-t)) 100%, var(--wb-t) 100%); }
+.wb .wb__bar--b { bottom: 0; clip-path: polygon(var(--wb-t) 0, calc(100% - var(--wb-t)) 0, 100% 100%, 0 100%); }
+.wb .wb__bar--l { left: 0; clip-path: polygon(0 0, 100% var(--wb-t), 100% calc(100% - var(--wb-t)), 0 100%); }
+.wb .wb__bar--r { right: 0; clip-path: polygon(0 var(--wb-t), 100% 0, 100% 100%, 0 calc(100% - var(--wb-t))); }
+.wb [data-frame] .wb__bar--t { background-image: linear-gradient(to bottom, transparent calc(100% - 1px), rgba(0,0,0,.16) calc(100% - 1px)), var(--wb-tex-t); }
+.wb [data-frame] .wb__bar--b { background-image: linear-gradient(to top, transparent calc(100% - 1px), rgba(0,0,0,.10) calc(100% - 1px)), var(--wb-tex-b); }
+.wb [data-frame] .wb__bar--l { background-image: linear-gradient(to right, transparent calc(100% - 1px), rgba(0,0,0,.14) calc(100% - 1px)), var(--wb-tex-l); }
+.wb [data-frame] .wb__bar--r { background-image: linear-gradient(to left, transparent calc(100% - 1px), rgba(0,0,0,.10) calc(100% - 1px)), var(--wb-tex-r); }
+
+/* the studio's wood frame, drawn whole as a border image (as in the miniatures builder) */
+.wb .wb__frame[data-frame="Wood"] { background: transparent; }
+.wb .wb__frame[data-frame="Wood"] .wb__bar { display: none; }
+.wb .wb__frame[data-frame="Wood"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  border: var(--wb-t) solid transparent;
+  border-image-source: var(--wb-wood);
+  border-image-slice: 104 112 108 112;
+  border-image-width: 1;
+  border-image-repeat: stretch;
+}
+
+/* Floating: the deep box, shadowed along the top and right (light from the top right),
+   the stamp floating off the back */
+.wb .wb__mount {
+  position: absolute;
+  inset: calc(var(--wb-t) - 1px);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: radial-gradient(140% 110% at 75% 0%, #fbf9f4 0%, #f5f2eb 55%, #eee9e1 100%);
+  box-shadow:
+    inset 0 calc(var(--wb-cm) * 3.0) calc(var(--wb-cm) * 3.4) calc(var(--wb-cm) * -1.4) rgba(40, 30, 15, .34),
+    inset calc(var(--wb-cm) * -3.0) 0 calc(var(--wb-cm) * 3.6) calc(var(--wb-cm) * -1.3) rgba(40, 30, 15, .30),
+    inset 0 0 0 1px rgba(0, 0, 0, .05);
+}
+/* the edition number pencilled bottom left, about 1.45cm tall */
+.wb .wb__mount::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--wb-cm) * 1.4);
+  bottom: calc(var(--wb-cm) * 1.1);
+  height: calc(var(--wb-cm) * 1.45);
+  aspect-ratio: 210 / 240;
+  background: var(--wb-edition) no-repeat center / contain;
+  pointer-events: none;
+}
+/* a faint reflection on the glass */
+.wb .wb__mount::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: var(--wb-glass) no-repeat right top / 74.7% 100%;
+  opacity: .075;
+  -webkit-mask-image: linear-gradient(to right, transparent 25.3%, #000 45%);
+  mask-image: linear-gradient(to right, transparent 25.3%, #000 45%);
+}
+.wb .wb__art {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: var(--wb-art);
+  max-height: 86%;
+  height: auto;
+  object-fit: contain;
+  filter:
+    drop-shadow(calc(var(--wb-cm) * -.05) calc(var(--wb-cm) * .08) calc(var(--wb-cm) * .1) rgba(35, 25, 15, .16))
+    drop-shadow(calc(var(--wb-cm) * -.9) calc(var(--wb-cm) * 1.3) calc(var(--wb-cm) * .7) rgba(35, 25, 15, .26));
+}
+/* no stamp art on file: crop the stamp out of the Flat product photo */
+.wb .wb__art.is-photo {
+  aspect-ratio: 5 / 6;
+  object-fit: cover;
+  object-position: 50% 52%;
+  filter: none;
+}
+
+/* Flat: the print lies flat behind the glass in a slimmer frame, no deep box */
+.wb .wb__frame[data-style="flat"] .wb__mount {
+  background: #fbfaf7;
+  box-shadow:
+    inset 0 calc(var(--wb-cm) * .6) calc(var(--wb-cm) * .8) calc(var(--wb-cm) * -.4) rgba(40, 30, 15, .22),
+    inset calc(var(--wb-cm) * -.5) 0 calc(var(--wb-cm) * .8) calc(var(--wb-cm) * -.4) rgba(40, 30, 15, .16),
+    inset 0 0 0 1px rgba(0, 0, 0, .05);
+}
+.wb .wb__frame[data-style="flat"] .wb__art { filter: none; }
+
+.wb .wb__missing {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--wb-t) + 6px);
+  z-index: 4;
+  transform: translateX(-50%);
+  max-width: 90%;
+  font-size: 9px;
+  line-height: 1.3;
+  letter-spacing: 1px;
+  text-align: center;
+  color: var(--wb-ink);
+}
+.wb .wb__missing:empty { display: none; }
+
+/* ---------- favourites strip */
+.wb .wb__favourites { margin-top: 36px; }
+.wb .wb__label {
+  display: block;
+  margin: 0 0 10px;
+  padding: 0;
+  font-family: var(--wb-font, inherit);
+  font-size: 13px;
+  line-height: 22px;
+  font-weight: 400;
+  letter-spacing: var(--wb-track);
+  text-transform: uppercase;
+  color: var(--wb-ink);
+}
+.wb .wb__favourites .wb__label { text-align: center; }
+.wb .wb__hint {
+  margin: -4px 0 16px;
+  font-size: 11px;
+  line-height: 1.6;
+  letter-spacing: 1px;
+  text-align: center;
+  color: var(--wb-muted);
+}
+.wb .wb__strip {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 18px 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.wb .wb__strip li { margin: 0; padding: 0; }
+.wb .wb__strip li::before { content: none; }
+#root .wb .wb__piece {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 84px;
+  text-align: center;
+}
+.wb .wb__piece-art {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 84px;
+  height: 96px;
+  border: 1px solid transparent;
+  background: var(--wb-soft);
+  transition: border-color .15s ease, opacity .15s ease;
+}
+.wb .wb__piece-img {
+  max-width: 62%;
+  max-height: 80%;
+  object-fit: contain;
+}
+.wb .wb__piece-img.is-photo {
+  width: 70%;
+  max-width: none;
+  aspect-ratio: 5 / 6;
+  object-fit: cover;
+}
+.wb .wb__piece-name {
+  font-size: 9px;
+  line-height: 1.4;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+#root .wb .wb__piece[aria-pressed="true"] .wb__piece-art { border-color: var(--wb-ink); }
+#root .wb .wb__piece[aria-pressed="false"] { opacity: .4; }
+@media (hover: hover) {
+  #root .wb .wb__piece:hover .wb__piece-art { border-color: var(--wb-ink); }
+}
+/* phones: one swipeable row */
+@media (max-width: 749px) {
+  .wb .wb__strip {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    margin: 0 -16px;
+    padding: 0 16px 4px;
+    scrollbar-width: none;
+  }
+  .wb .wb__strip::-webkit-scrollbar { display: none; }
+  .wb .wb__strip li { flex: none; }
+}
+
+/* ---------- panel */
+.wb .wb__head { margin-bottom: 8px; }
+.wb .wb__title {
+  margin: 0 0 var(--main_mr, 21px);
+  font-size: var(--main_h3, 26px);
+  line-height: 1.1;
+  font-weight: 400;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+.wb .wb__intro p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.8;
+  letter-spacing: var(--wb-track);
+  color: var(--wb-muted);
+}
+
+.wb .wb__steps { margin: 0; padding: 0; list-style: none; counter-reset: none; }
+.wb .wb__step {
+  margin: 28px 0 0;
+  padding: 0;
+}
+.wb .wb__step::before { content: none; }
+.wb .wb__num {
+  display: inline-block;
+  min-width: 22px;
+  color: var(--wb-muted);
+}
+.wb .wb__text {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.8;
+  letter-spacing: var(--wb-track);
+}
+.wb .wb__links {
+  display: flex;
+  gap: 24px;
+  margin: 6px 0 0;
+  font-size: 12px;
+  letter-spacing: var(--wb-track);
+}
+.wb .wb__links a {
+  color: var(--wb-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.wb .wb__options { display: grid; gap: 8px; }
+.wb .wb__options--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.wb .wb__options--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.wb .wb__options--stack { grid-template-columns: minmax(0, 1fr); }
+#root .wb .wb__option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: var(--wb-box);
+  padding: 8px 16px;
+  border: 1px solid var(--wb-line);
+  background: #fff;
+  font-size: 12px;
+  line-height: 1.4;
+  text-transform: uppercase;
+  text-align: center;
+  transition: border-color .15s ease;
+}
+#root .wb .wb__option:hover,
+#root .wb .wb__option[aria-checked="true"] { border-color: var(--wb-ink); }
+#root .wb .wb__option--size {
+  justify-content: flex-start;
+  padding: 8px 24px;
+  text-align: left;
+}
+#root .wb .wb__option--size strong { min-width: 84px; font-weight: 400; }
+#root .wb .wb__option--size span { color: var(--wb-muted); text-transform: none; letter-spacing: 1px; }
+#root .wb .wb__option--size em {
+  margin-left: auto;
+  font-style: normal;
+  text-transform: none;
+  letter-spacing: 1px;
+}
+.wb .wb__swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 1px solid rgba(0, 0, 0, .18);
+}
+.wb .wb__swatch--white { background: #ecebe6; }
+.wb .wb__swatch--black { background: #1e1d1b; }
+.wb .wb__swatch--wood { background: linear-gradient(135deg, #c9a274, #a97f52); }
+
+.wb .wb__summary {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--wb-line);
+}
+.wb .wb__count {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.8;
+  letter-spacing: var(--wb-track);
+  color: var(--wb-muted);
+}
+.wb .wb__total {
+  margin: 4px 0 16px;
+  font-family: var(--main_ff, inherit);
+  font-size: 18px;
+  line-height: 1.6;
+  font-weight: 300;
+  letter-spacing: var(--wb-track);
+}
+.wb .wb__count:empty,
+.wb .wb__total:empty { display: none; }
+#root .wb .wb__submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: var(--wb-box);
+  background: var(--wb-ink);
+  color: #fff;
+  font-size: 12px;
+  text-transform: uppercase;
+  transition: opacity .15s ease;
+}
+#root .wb .wb__submit[disabled] { opacity: .35; cursor: not-allowed; }
+.wb .wb__status {
+  margin: 12px 0 0;
+  font-size: 11px;
+  line-height: 1.7;
+  letter-spacing: 1px;
+  color: var(--wb-muted);
+}
+.wb .wb__status:empty { display: none; }
+
+@media (max-width: 759px) {
+  .wb .wb__title { font-size: var(--main_h3, 20px); }
+}
+/* phones: title and intro first, then the wall, then the steps */
+@media (max-width: 989px) {
+  .wb .wb__panel { display: contents; }
+  .wb .wb__head { order: -1; margin-bottom: 0; }
+  .wb .wb__steps .wb__step:first-child { margin-top: 0; }
+}

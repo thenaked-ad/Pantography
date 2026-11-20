@@ -1,0 +1,36 @@
+{% layout none %}
+{%- comment -%}
+  WALL BUILDER catalogue feed: alternate collection view (?view=wallfeed&page=N).
+  One JSON page (up to 250 products) of the collection's artworks, each with its
+  variants as [id, option1, option2, price in pence, available]. Read by
+  assets/wall-builder.js for the Floating and the Flat collections.
+  "a" is the stamp art (assets/mini-<handle>.webp) where the miniatures have it;
+  snippets/miniature-art-index.liquid lists which handles do.
+{%- endcomment -%}
+{%- capture art_index -%}{%- render 'miniature-art-index' -%}{%- endcapture -%}
+{%- paginate collection.products by 250 -%}
+{
+  "items": [
+    {%- assign first = true -%}
+    {%- for product in collection.products -%}
+      {%- assign key = '|' | append: product.handle | append: ':' -%}
+      {%- unless first -%},{%- endunless -%}
+      {%- assign first = false -%}
+      {
+        "h": {{ product.handle | json }},
+        "t": {{ product.title | json }},
+        "u": {{ product.url | json }},
+        "a": {%- if art_index contains key -%}{{ 'mini-' | append: product.handle | append: '.webp' | asset_url | json }}{%- else -%}""{%- endif -%},
+        "i": {%- if product.featured_image -%}{{ product.featured_image | image_url: width: 500 | json }}{%- else -%}""{%- endif -%},
+        "v": [
+          {%- for variant in product.variants -%}
+            [{{ variant.id }}, {{ variant.option1 | json }}, {{ variant.option2 | json }}, {{ variant.price }}, {{ variant.available }}]
+            {%- unless forloop.last -%},{%- endunless -%}
+          {%- endfor -%}
+        ]
+      }
+    {%- endfor -%}
+  ],
+  "pages": {{ paginate.pages }}
+}
+{%- endpaginate -%}

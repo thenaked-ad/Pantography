@@ -1,0 +1,157 @@
+{%- comment -%}
+  WALL BUILDER
+  Turns the visitor's favourites (the hearts, assets/favourites.js) into a wall of
+  framed artworks: choose Floating or Flat, a frame size and a frame colour, see the
+  wall drawn to scale, and add every artwork to the basket in one go.
+
+  Floating and Flat are separate products; the JS pairs them by title. The catalogue
+  comes from the collection.wallfeed alternate view of each collection.
+  Preview: any collection with ?view=wall (templates/collection.wall.json).
+
+  JS lives in assets/wall-builder.js, not {% javascript %}, because this theme's
+  compiled_assets bundle does not regenerate.
+{%- endcomment -%}
+
+{{ 'wall-builder.css' | asset_url | stylesheet_tag }}
+{%- comment -%}
+  The miniatures builder's frame textures, through asset_url so each URL carries a
+  ?v= that changes when the file does.
+{%- endcomment -%}
+<style>
+  {%- assign finishes = 'White:white,Black:black' | split: ',' -%}
+  {%- for pair in finishes -%}
+    {%- assign frame = pair | split: ':' | first -%}
+    {%- assign file = pair | split: ':' | last -%}
+    wall-builder[data-section-id="{{ section.id }}"] .wb__frame[data-frame="{{ frame }}"] {
+      --wb-tex-t: url({{ 'mb-frame-' | append: file | append: '-t.webp' | asset_url }});
+      --wb-tex-b: url({{ 'mb-frame-' | append: file | append: '-b.webp' | asset_url }});
+      --wb-tex-l: url({{ 'mb-frame-' | append: file | append: '-l.webp' | asset_url }});
+      --wb-tex-r: url({{ 'mb-frame-' | append: file | append: '-r.webp' | asset_url }});
+    }
+  {%- endfor -%}
+  wall-builder[data-section-id="{{ section.id }}"] {
+    --wb-wood: url({{ 'mb-frame-wood-studio.webp' | asset_url }});
+    --wb-glass: url({{ 'mb-glass-studio.webp' | asset_url }});
+    --wb-edition: url({{ 'mb-edition-1-1.png' | asset_url }});
+  }
+</style>
+<script src="{{ 'wall-builder.js' | asset_url }}" defer></script>
+
+{%- liquid
+  assign floating = section.settings.floating_collection
+  if floating == blank
+    assign floating = collections['a-z']
+  endif
+  assign flat = section.settings.flat_collection
+  if flat == blank
+    assign flat = collections['flat-prints-a-z']
+  endif
+-%}
+
+<wall-builder
+  class="wb"
+  data-section-id="{{ section.id }}"
+  data-floating-url="{{ floating.url }}"
+  data-flat-url="{{ flat.url }}"
+  data-money-format="{{ shop.money_format | strip_html | escape }}"
+  data-root="{{ routes.root_url }}"
+>
+  <p class="wb__font-probe" data-wb-font-probe aria-hidden="true">Aa</p>
+
+  <div class="wb__layout">
+    <div class="wb__stage">
+      <div class="wb__wall" data-wb-wall aria-live="polite">
+        <p class="wb__wall-note" data-wb-wall-note>Loading your favourites…</p>
+      </div>
+      <p class="wb__dims" data-wb-dims></p>
+
+      <div class="wb__favourites">
+        <h2 class="wb__label">Favourites <span data-wb-fav-count></span></h2>
+        <p class="wb__hint" data-wb-fav-hint>Tap an artwork to take it off the wall, or put it back.</p>
+        <ul class="wb__strip" data-wb-strip></ul>
+      </div>
+    </div>
+
+    <div class="wb__panel">
+      <div class="wb__head">
+        <h1 class="wb__title">{{ section.settings.title }}</h1>
+        {%- if section.settings.intro != blank -%}
+          <div class="wb__intro">{{ section.settings.intro }}</div>
+        {%- endif -%}
+      </div>
+
+      <ol class="wb__steps">
+        <li class="wb__step">
+          <p class="wb__label"><span class="wb__num">1</span>Heart your favourites</p>
+          <p class="wb__text">Tap the heart on any artwork and it appears here.</p>
+          <p class="wb__links">
+            <a href="{{ floating.url }}">Browse Floating</a>
+            <a href="{{ flat.url }}">Browse Flat</a>
+          </p>
+        </li>
+        <li class="wb__step">
+          <p class="wb__label" id="wb-style-{{ section.id }}"><span class="wb__num">2</span>Frame style</p>
+          <div class="wb__options wb__options--2" role="radiogroup" aria-labelledby="wb-style-{{ section.id }}" data-wb-styles>
+            <button type="button" class="wb__option" role="radio" aria-checked="true" data-wb-style="floating">Floating</button>
+            <button type="button" class="wb__option" role="radio" aria-checked="false" data-wb-style="flat">Flat</button>
+          </div>
+        </li>
+        <li class="wb__step">
+          <p class="wb__label" id="wb-size-{{ section.id }}"><span class="wb__num">3</span>Frame size</p>
+          <div class="wb__options wb__options--stack" role="radiogroup" aria-labelledby="wb-size-{{ section.id }}" data-wb-sizes></div>
+        </li>
+        <li class="wb__step">
+          <p class="wb__label" id="wb-colour-{{ section.id }}"><span class="wb__num">4</span>Frame colour</p>
+          <div class="wb__options wb__options--3" role="radiogroup" aria-labelledby="wb-colour-{{ section.id }}" data-wb-colours>
+            {%- assign colours = 'White,Black,Wood' | split: ',' -%}
+            {%- for colour in colours -%}
+              <button type="button" class="wb__option" role="radio" aria-checked="{% if forloop.first %}true{% else %}false{% endif %}" data-wb-colour="{{ colour }}">
+                <i class="wb__swatch wb__swatch--{{ colour | downcase }}" aria-hidden="true"></i>{{ colour }}
+              </button>
+            {%- endfor -%}
+          </div>
+        </li>
+      </ol>
+
+      <div class="wb__summary">
+        <p class="wb__count" data-wb-count></p>
+        <p class="wb__total" data-wb-total></p>
+        <button type="button" class="wb__submit" data-wb-submit disabled>Add all to basket</button>
+        <p class="wb__status" data-wb-status role="status"></p>
+      </div>
+    </div>
+  </div>
+</wall-builder>
+
+{% schema %}
+{
+  "name": "Wall builder",
+  "class": "shopify-section-wall-builder",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Build your wall"
+    },
+    {
+      "type": "richtext",
+      "id": "intro",
+      "label": "Intro",
+      "default": "<p>Your favourite artworks, framed together. Choose a style, size and colour and see your wall come together before you order.</p>"
+    },
+    {
+      "type": "collection",
+      "id": "floating_collection",
+      "label": "Floating artworks",
+      "info": "Defaults to A - Z"
+    },
+    {
+      "type": "collection",
+      "id": "flat_collection",
+      "label": "Flat artworks",
+      "info": "Defaults to Flat Prints A - Z"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,11 @@
+{
+  "sections": {
+    "main": {
+      "type": "wall-builder",
+      "settings": {}
+    }
+  },
+  "order": [
+    "main"
+  ]
+}
