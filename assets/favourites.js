@@ -1,4 +1,4 @@
-/* Favourites: artworks a visitor has starred, saved in this browser as a list
+/* Favourites: artworks a visitor has hearted, saved in this browser as a list
    of product handles (newest first). Hearts come from snippets/favourite-star.liquid
    and the collection search; the miniatures builder shares the same list through
    window.PantographyFavourites. The FAVOURITES tab (section-collection-list) shows
@@ -104,7 +104,7 @@
     const handle = button.dataset.fav;
     const removing = list.includes(handle);
     api.toggle(handle);
-    /* unstarring inside the favourites view takes the card away */
+    /* unhearting inside the favourites view takes the card away */
     const card = removing && button.closest('[data-fav-grid] > li');
     if (card) {
       card.remove();
@@ -149,7 +149,7 @@
     if (view.empty) return;
     view.empty = document.createElement('p');
     view.empty.className = 'fav-empty';
-    view.empty.textContent = 'Nothing saved yet. Tap the star on any artwork to keep it here.';
+    view.empty.textContent = 'Nothing saved yet. Tap the heart on any artwork to keep it here.';
     view.grid.after(view.empty);
   };
 
