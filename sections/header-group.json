@@ -14,6 +14,12 @@
     "announcement": {
       "type": "announcement-bar",
       "blocks": {
+        "text_iTYUyp": {
+          "type": "text",
+          "settings": {
+            "text": "15% OFF - USE CODE 'BLACKFRIDAY15'&nbsp;"
+          }
+        },
         "text_aE7Akm": {
           "type": "text",
           "settings": {
@@ -22,6 +28,7 @@
         }
       },
       "block_order": [
+        "text_iTYUyp",
         "text_aE7Akm"
       ],
       "settings": {
