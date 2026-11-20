@@ -56,6 +56,20 @@
   top: -6px;
   right: 0;
 }
+/* room for the heart either side, so a long title stays centred and never runs under it */
+@media (min-width: 750px) {
+  #root .product-card > div:has(> .fav-star--card) > h3 {
+    padding-left: 34px !important;
+    padding-right: 34px !important;
+  }
+}
+/* phones: cards are too narrow beside the title, so level with the price instead */
+@media (max-width: 749px) {
+  #root button.fav-star--card {
+    top: auto;
+    bottom: -6px;
+  }
+}
 
 /* beside the title on a product page */
 #root button.fav-star--inline {
