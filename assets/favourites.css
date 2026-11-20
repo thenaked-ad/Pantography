@@ -1,5 +1,5 @@
-/* Favourites: the star on artwork cards and product pages, and the
-   FAVOURITES tab view. Matches the miniatures builder's star; selected is
+/* Favourites: the heart on artwork cards and product pages, and the
+   FAVOURITES tab view. Outline at the navigation type's weight; selected is
    filled black. Scoped under #root because the theme styles every button
    globally (with ::before backgrounds) at id specificity. */
 
@@ -48,6 +48,13 @@
 #root .fav-star[aria-pressed="true"] svg { fill: currentColor; }
 @media (hover: hover) {
   #root button.fav-star:hover path { stroke-width: 1px; }
+}
+
+/* on a card: under the image, on the right, level with the title */
+#root .product-card > div:has(> .fav-star--card) { position: relative; }
+#root button.fav-star--card {
+  top: -6px;
+  right: 0;
 }
 
 /* beside the title on a product page */

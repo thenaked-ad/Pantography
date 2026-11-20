@@ -1,15 +1,15 @@
 /* Favourites: artworks a visitor has starred, saved in this browser as a list
-   of product handles (newest first). Stars come from snippets/favourite-star.liquid
+   of product handles (newest first). Hearts come from snippets/favourite-star.liquid
    and the collection search; the miniatures builder shares the same list through
    window.PantographyFavourites. The FAVOURITES tab (section-collection-list) shows
-   the list in place of the collection grid at #favourites. Each star is sent to
+   the list in place of the collection grid at #favourites. Each heart is sent to
    Microsoft Clarity as a custom event. */
 (() => {
   if (window.PantographyFavourites) return;
 
   const KEY = 'pantography-favourites-v1';
   const HASH = '#favourites';
-  const STAR_PATH = 'M12 3.2l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 17l-5.4 2.9 1.1-6.1-4.5-4.2 6.1-.8z';
+  const HEART_PATH = 'M12 20.3s-7.6-4.7-9.4-9.3C1.4 7.8 3.5 4.3 7 4.3c2.1 0 3.6 1.2 5 3 1.4-1.8 2.9-3 5-3 3.5 0 5.6 3.5 4.4 6.7-1.8 4.6-9.4 9.3-9.4 9.3z';
 
   const read = () => {
     try {
@@ -25,7 +25,7 @@
     try {
       window.localStorage.setItem(KEY, JSON.stringify(list));
     } catch (error) {
-      /* private browsing or storage blocked: stars still work until the page closes */
+      /* private browsing or storage blocked: hearts still work until the page closes */
     }
   };
 
@@ -34,10 +34,10 @@
     try {
       window.clarity('event', on ? 'favourite-add' : 'favourite-remove');
       if (on) window.clarity('set', 'favourite', handle);
-    } catch (error) { /* analytics never blocks the star */ }
+    } catch (error) { /* analytics never blocks the heart */ }
   };
 
-  /* ------------------------------------------------------------ the stars */
+  /* ----------------------------------------------------------- the hearts */
 
   const label = (button, on) => {
     const title = button.dataset.favTitle || 'this artwork';
@@ -79,7 +79,7 @@
     toggle(handle) {
       api.set(handle, !list.includes(handle));
     },
-    /* a star for cards built in JavaScript (the collection search) */
+    /* a heart for cards built in JavaScript (the collection search) */
     star(handle, title) {
       const button = document.createElement('button');
       button.type = 'button';
@@ -89,7 +89,7 @@
       const on = list.includes(handle);
       button.setAttribute('aria-pressed', String(on));
       label(button, on);
-      button.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="${STAR_PATH}"/></svg>`;
+      button.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="${HEART_PATH}"/></svg>`;
       return button;
     }
   };

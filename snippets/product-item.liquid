@@ -396,9 +396,6 @@
       {% if static_color_picker == false and color_option and layout != 'list-compact' and layout != 'list' %}
         </div>
       {% endif %}
-      {%- if product != blank and product.type == 'Artwork' and product.template_suffix != 'miniatures' and layout != 'list-compact' -%}
-        {%- render 'favourite-star', product: product -%}
-      {%- endif -%}
     </figure>
   {%- endif -%}
   {% if layout == 'list-compact' %}
@@ -408,6 +405,9 @@
   class="{% if color_palette %}{{ color_palette }} module-color-palette {% endif %}{% unless layout contains 'list' or layout == 'hotspot' %}{% if settings.productcards_text_alignment == 'left' or fixed_text_alignment_left %}text-start{% elsif settings.productcards_text_alignment == 'center' %}text-center{% elsif settings.productcards_text_alignment == 'right' %}text-end{% endif %}{% endunless %}"
 >
   {% endif %}
+  {%- if product != blank and product.type == 'Artwork' and product.template_suffix != 'miniatures' and layout != 'list-compact' -%}
+    {%- render 'favourite-star', product: product, class: 'fav-star--card' -%}
+  {%- endif -%}
   {%- if show_title or show_vendor -%}
   <h3
     class="ff-{{ settings.productcard_title_font }} fw-{{ settings.productcard_title_weight }}{% unless show_vendor %} p0{% endunless %} no-hyph{% if template.name == 'collection' and collection and collection.template_suffix == 'flat-prints' %} flat-print-title{% endif %}"
