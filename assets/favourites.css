@@ -91,6 +91,12 @@ header:has(> .fav-star--inline) {
 
 /* cards drawn by the collection search */
 .collection-search__card { position: relative; }
+/* level with the title (left-aligned there), measured up from the card's foot */
+#root .collection-search__card button.fav-star {
+  top: auto;
+  bottom: 42px;
+}
+#root .collection-search__card .collection-search__product-title { padding-right: 34px; }
 
 /* the collection grid and its pagination while FAVOURITES is open; #root #collection
    beats the section's own mobile rule (#section #collection, display: grid !important) */
