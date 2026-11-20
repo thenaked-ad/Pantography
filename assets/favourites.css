@@ -1,0 +1,121 @@
+/* Favourites: the heart on artwork cards and product pages, and the
+   FAVOURITES tab view. Outline at the navigation type's weight; selected is
+   filled black. Scoped under #root because the theme styles every button
+   globally (with ::before backgrounds) at id specificity. */
+
+#root button.fav-star {
+  all: unset;
+  box-sizing: border-box;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 9;   /* card slider images sit at 6 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .94);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .12);
+  color: #191919;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+#root button.fav-star::before,
+#root button.fav-star::after {
+  content: none !important;
+  display: none !important;
+}
+#root button.fav-star:focus-visible {
+  outline: 1px solid #191919;
+  outline-offset: 2px;
+}
+#root .fav-star svg {
+  display: block;
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linejoin: round;
+  transition: fill .15s ease;
+}
+/* 0.7px at any size: the stroke of the navigation type (brand font, weight 200, 12px) */
+#root .fav-star path {
+  stroke-width: .7px;
+  vector-effect: non-scaling-stroke;
+}
+#root .fav-star[aria-pressed="true"] svg { fill: currentColor; }
+@media (hover: hover) {
+  #root button.fav-star:hover path { stroke-width: 1px; }
+}
+
+/* on a card: under the image, on the right, level with the title */
+#root .product-card > div:has(> .fav-star--card) { position: relative; }
+#root button.fav-star--card {
+  top: -6px;
+  right: 0;
+}
+/* room for the heart either side, so a long title stays centred and never runs under it */
+@media (min-width: 750px) {
+  #root .product-card > div:has(> .fav-star--card) > h3 {
+    padding-left: 34px !important;
+    padding-right: 34px !important;
+  }
+}
+/* phones: cards are too narrow beside the title, so level with the price instead */
+@media (max-width: 749px) {
+  #root button.fav-star--card {
+    top: auto;
+    bottom: -6px;
+  }
+}
+
+/* beside the title on a product page */
+#root button.fav-star--inline {
+  position: relative;
+  top: auto;
+  right: auto;
+  flex: 0 0 auto;
+  margin-top: .1em;
+  box-shadow: none;
+  background: none;
+}
+#root button.fav-star--inline svg { width: 18px; height: 18px; }
+header:has(> .fav-star--inline) {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* cards drawn by the collection search */
+.collection-search__card { position: relative; }
+/* level with the title (left-aligned there), measured up from the card's foot */
+#root .collection-search__card button.fav-star {
+  top: auto;
+  bottom: 42px;
+}
+#root .collection-search__card .collection-search__product-title { padding-right: 34px; }
+
+/* the collection grid and its pagination while FAVOURITES is open; #root #collection
+   beats the section's own mobile rule (#section #collection, display: grid !important) */
+[data-fav-hidden],
+#root #collection[data-fav-hidden] { display: none !important; }
+
+/* two across on phones, as the section's custom CSS lays out #collection */
+@media screen and (max-width: 749px) {
+  #root ul[data-fav-grid] {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0 !important;
+    overflow: visible !important;
+  }
+}
+
+.fav-empty {
+  margin: 40px 0 80px;
+  text-align: center;
+  letter-spacing: 2.2px;
+  font-size: 13px;
+}

@@ -1,0 +1,138 @@
+/* Collection tabs as one row that never wraps or splits a word
+   (section-collection-list "tab_row"). When the row is wider than the screen it
+   scrolls sideways (assets/tab-row.js), with the edges fading and an arrow showing
+   while there is more.
+   Scoped under #root to beat the section's custom CSS, which is scoped to the
+   section id and uses !important. */
+
+/* the gaps above and below the titles: the old layout's, whose empty image
+   blocks (now hidden) sat under the section's -80px custom margin */
+#root .tab-row {
+  --tab-row-pt: 21px;
+  --tab-row-pb: 26px;
+  position: relative;
+}
+
+#root ul.l4cl[data-tab-row] {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  justify-content: space-between !important;
+  gap: 0 36px;
+  margin: 0 !important;
+  padding: var(--tab-row-pt) 0 var(--tab-row-pb) !important;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+#root ul.l4cl[data-tab-row]::-webkit-scrollbar { display: none; }
+
+#root ul[data-tab-row] > li {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 0 !important;   /* the theme's mobile slider sets one */
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+/* the theme fades tabs in as they scroll into view, which never happens sideways */
+#root ul[data-tab-row] > li[data-sal] {
+  opacity: 1 !important;
+  transform: none !important;
+}
+#root ul[data-tab-row] > li > figure { display: none !important; }
+#root ul[data-tab-row] h5 { margin: 0 !important; }
+#root ul[data-tab-row] a {
+  white-space: nowrap;
+  overflow-wrap: normal;
+  word-break: keep-all;
+  hyphens: none;
+  -webkit-user-drag: none;
+}
+
+#root ul[data-tab-row].tab-row--more-right {
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 48px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 48px), transparent);
+}
+#root ul[data-tab-row].tab-row--more-left {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 48px);
+  mask-image: linear-gradient(to right, transparent, #000 48px);
+}
+#root ul[data-tab-row].tab-row--more-left.tab-row--more-right {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 48px, #000 calc(100% - 48px), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 48px, #000 calc(100% - 48px), transparent);
+}
+
+/* arrows over the faded edges, centred on the titles (15px tall) */
+#root .tab-row button.tab-row__arrow {
+  all: unset;
+  box-sizing: border-box;
+  position: absolute;
+  top: calc(var(--tab-row-pt) + 7.5px);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin-top: -14px;
+  background: #fff;
+  color: #191919;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .2s ease, visibility .2s;
+  -webkit-tap-highlight-color: transparent;
+}
+#root .tab-row button.tab-row__arrow::before,
+#root .tab-row button.tab-row__arrow::after {
+  content: none !important;
+  display: none !important;
+}
+/* !important: the theme pins buttons to left: 0 with !important */
+#root .tab-row button.tab-row__arrow--prev { left: 0 !important; right: auto !important; justify-content: flex-start; }
+#root .tab-row button.tab-row__arrow--next { left: auto !important; right: 0 !important; justify-content: flex-end; }
+#root .tab-row.tab-row--more-left button.tab-row__arrow--prev,
+#root .tab-row.tab-row--more-right button.tab-row__arrow--next {
+  opacity: 1;
+  visibility: visible;
+}
+#root .tab-row__arrow svg {
+  display: block;
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+#root .tab-row__arrow path {
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  #root .tab-row button.tab-row__arrow:hover path { stroke-width: 1.5px; }
+  #root ul[data-tab-row].tab-row--more-left,
+  #root ul[data-tab-row].tab-row--more-right { cursor: grab; }
+  #root ul[data-tab-row].is-dragging { cursor: grabbing; user-select: none; }
+}
+
+/* the sections around the row space themselves differently below 1001px;
+   these keep 49px above and 43px below the titles, as on desktop */
+@media (min-width: 768px) and (max-width: 1000px) {
+  #root .tab-row { --tab-row-pt: 49px; --tab-row-pb: 54px; }
+}
+/* phones: 28px above, 34px down to the grid */
+@media (max-width: 767px) {
+  #root .tab-row { --tab-row-pt: 44px; --tab-row-pb: 0px; }
+  #root ul.l4cl[data-tab-row] {
+    justify-content: flex-start !important;
+    gap: 0 28px;
+  }
+}
+
+/* the mobile "Sort by" dropdown repeats these tabs; the row replaces it */
+body:has(ul[data-tab-row]) .mobile-sort { display: none !important; }

@@ -8,7 +8,7 @@
   --mb-muted: #767676;
   --mb-line: #ececec;
   --mb-soft: #fafafa;
-  --mb-star: #c8962e;
+  --mb-star: #191919;   /* filled black when starred, as across the site */
   --mb-track: 2.2px;
   --mb-box: 55px;
   display: block;
@@ -650,7 +650,11 @@
   height: 15px;
   fill: none;
   stroke: var(--mb-ink);
-  stroke-width: 1.3;
   stroke-linejoin: round;
+}
+/* 0.7px, the stroke of the navigation type, as on the site's favourite stars */
+.mb .mb__star path {
+  stroke-width: .7px;
+  vector-effect: non-scaling-stroke;
 }
 .mb .mb__star[aria-pressed="true"] svg { fill: var(--mb-star); stroke: var(--mb-star); }

@@ -288,6 +288,11 @@ if (!customElements.get('collection-product-search')) {
 
       link.append(body);
       article.append(link);
+
+      const handle = (link.pathname.match(/\/products\/([^/]+)/) || [])[1];
+      if (handle && window.PantographyFavourites) {
+        article.append(window.PantographyFavourites.star(decodeURIComponent(handle), product.title));
+      }
       return article;
     }
   }
