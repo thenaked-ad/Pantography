@@ -167,7 +167,7 @@
           </button>
           <button type="button" class="mb__mode" role="tab" data-mb-mode="arrange">
             <strong>Arrange my favourites</strong>
-            <span>Star a few, we lay out the frame</span>
+            <span>Heart a few, we lay out the frame</span>
           </button>
           <button type="button" class="mb__mode" role="tab" data-mb-mode="studio">
             <strong>Leave it to the studio</strong>
@@ -184,7 +184,7 @@
         </label>
       </div>
       <div class="mb__mode-help" data-mb-help="arrange">
-        <p>Star your favourites below, then arrange them across the frame. Artworks repeat if you star fewer than the frame holds.</p>
+        <p>Heart your favourites below, then arrange them across the frame. Artworks repeat if you heart fewer than the frame holds.</p>
         <div class="mb__actions">
           <button type="button" class="mb__secondary" data-mb-generate>Arrange my frame</button>
         </div>
@@ -236,7 +236,7 @@
               <button type="button" class="mb__chip{% if forloop.first %} is-on{% endif %}" data-category="{{ handle }}" data-url="{{ category_collection.url }}" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}">{{ label }}</button>
             {%- endif -%}
           {%- endfor -%}
-          <button type="button" class="mb__chip" data-starred aria-pressed="false">STARRED</button>
+          <button type="button" class="mb__chip" data-starred aria-pressed="false">FAVOURITES</button>
         </div>
       </div>
     </div>

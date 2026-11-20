@@ -2,7 +2,7 @@
    Catalogue: templates/collection.miniart.liquid. */
 if (!customElements.get('miniatures-builder')) {
   const STORAGE_KEY = 'pantography-miniatures-v1';
-  /* Stars are the site-wide favourites list (assets/favourites.js); the shortlist is
+  /* Hearts are the site-wide favourites list (assets/favourites.js); the shortlist is
      the part of it that has miniature art. */
   const favourites = () => window.PantographyFavourites;
   const MAX_POSITIONS = 60;
@@ -436,7 +436,7 @@ if (!customElements.get('miniatures-builder')) {
     generate() {
       const pool = this.state.shortlist.filter((h) => this.byHandle.has(h));
       if (!pool.length) {
-        this.el.status.textContent = 'Star a few artworks first.';
+        this.el.status.textContent = 'Heart a few artworks first.';
         return;
       }
       const { count, cols } = this.size;
@@ -652,8 +652,8 @@ if (!customElements.get('miniatures-builder')) {
       const { mode, selected } = this.state;
       let title = 'Choose an artwork';
       if (selected !== null) title = `Choose an artwork for position ${selected + 1}`;
-      else if (mode === 'arrange') title = 'Star your favourites';
-      else if (mode === 'studio') title = 'Star any you would like included';
+      else if (mode === 'arrange') title = 'Heart your favourites';
+      else if (mode === 'studio') title = 'Heart any you would like included';
       this.el.pickerTitle.textContent = title;
     }
 
@@ -671,7 +671,7 @@ if (!customElements.get('miniatures-builder')) {
       if (mode === 'studio') return '';
       const empty = this.activePositions.filter((h) => !h).length;
       if (!empty || studioFill) return '';
-      if (mode === 'arrange' && empty === this.size.count) return 'Star a few favourites and arrange your frame first.';
+      if (mode === 'arrange' && empty === this.size.count) return 'Heart a few favourites and arrange your frame first.';
       return `${empty} ${empty === 1 ? 'position is' : 'positions are'} still empty. Fill ${empty === 1 ? 'it' : 'them'}, or let the studio fill the rest.`;
     }
 
@@ -820,8 +820,8 @@ if (!customElements.get('miniatures-builder')) {
         star.type = 'button';
         star.className = 'mb__star';
         star.dataset.star = item.h;
-        star.setAttribute('aria-label', `Star ${titleCase(item.t)}`);
-        star.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 17l-5.4 2.9 1.1-6.1-4.5-4.2 6.1-.8z"/></svg>';
+        star.setAttribute('aria-label', `Add ${titleCase(item.t)} to favourites`);
+        star.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3s-7.6-4.7-9.4-9.3C1.4 7.8 3.5 4.3 7 4.3c2.1 0 3.6 1.2 5 3 1.4-1.8 2.9-3 5-3 3.5 0 5.6 3.5 4.4 6.7-1.8 4.6-9.4 9.3-9.4 9.3z"/></svg>';
 
         li.append(card, star);
         fragment.append(li);
@@ -884,7 +884,7 @@ if (!customElements.get('miniatures-builder')) {
       });
       this.el.pickerStatus.textContent = shown
         ? `${shown} ${shown === 1 ? 'artwork' : 'artworks'}`
-        : (starred && !shortlist.size ? 'Nothing starred yet. Tap the star on any artwork.' : 'No artworks match. Try another search.');
+        : (starred && !shortlist.size ? 'No favourites yet. Tap the heart on any artwork.' : 'No artworks match. Try another search.');
     }
   }
 

@@ -652,7 +652,7 @@
   stroke: var(--mb-ink);
   stroke-linejoin: round;
 }
-/* 0.7px, the stroke of the navigation type, as on the site's favourite stars */
+/* 0.7px, the stroke of the navigation type, as on the site's favourite hearts */
 .mb .mb__star path {
   stroke-width: .7px;
   vector-effect: non-scaling-stroke;
