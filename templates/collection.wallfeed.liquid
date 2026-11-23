@@ -2,8 +2,10 @@
 {%- comment -%}
   WALL BUILDER catalogue feed: alternate collection view (?view=wallfeed&page=N).
   One JSON page (up to 250 products) of the collection's artworks, each with its
-  variants as [id, option1, option2, price in pence, available]. Read by
+  variants as [id, option1, option2, price in pence, available, image]. Read by
   assets/wall-builder.js for the Floating and the Flat collections.
+  "f" is the product's main image: on Floating products the studio's front shot of the
+  white frame. On Flat products each variant's image is the front shot in its colour.
   "a" is the stamp art (assets/mini-<handle>.webp) where the miniatures have it;
   snippets/miniature-art-index.liquid lists which handles do.
 {%- endcomment -%}
@@ -22,9 +24,10 @@
         "u": {{ product.url | json }},
         "a": {%- if art_index contains key -%}{{ 'mini-' | append: product.handle | append: '.webp' | asset_url | json }}{%- else -%}""{%- endif -%},
         "i": {%- if product.featured_image -%}{{ product.featured_image | image_url: width: 500 | json }}{%- else -%}""{%- endif -%},
+        "f": {%- if product.featured_image -%}{{ product.featured_image | image_url: width: 800 | json }}{%- else -%}""{%- endif -%},
         "v": [
           {%- for variant in product.variants -%}
-            [{{ variant.id }}, {{ variant.option1 | json }}, {{ variant.option2 | json }}, {{ variant.price }}, {{ variant.available }}]
+            [{{ variant.id }}, {{ variant.option1 | json }}, {{ variant.option2 | json }}, {{ variant.price }}, {{ variant.available }}, {% if variant.featured_image %}{{ variant.featured_image | image_url: width: 800 | json }}{% else %}""{% endif %}]
             {%- unless forloop.last -%},{%- endunless -%}
           {%- endfor -%}
         ]

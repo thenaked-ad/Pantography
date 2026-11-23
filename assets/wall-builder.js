@@ -2,7 +2,10 @@
    Catalogue: templates/collection.wallfeed.liquid, read from the Floating and the
    Flat collections. The artworks are the visitor's favourites (assets/favourites.js).
    The frames fill the space in their true proportions; the wall's real size is
-   written underneath. */
+   written underneath. Each frame is the studio's front shot of that artwork: the Flat
+   product's image in the chosen colour, or the Floating product's main image (a white
+   frame; Black and Wood lay the studio's moulding over it). A drawn frame shows while
+   a photo loads, or if there isn't one. */
 if (!customElements.get('wall-builder')) {
   const STORAGE_KEY = 'pantography-wall-v1';
   const GAP_CM = 12;  /* between frames on the wall (about 5in) */
@@ -142,16 +145,18 @@ if (!customElements.get('wall-builder')) {
         url: item.u,
         art: item.a,
         photo: item.i,
+        front: item.f,
         style,
         key: titleKey(item.t),
-        variants: (item.v || []).map(([id, one, two, price, available]) => {
+        variants: (item.v || []).map(([id, one, two, price, available, image]) => {
           const colourFirst = Boolean(colourOf(one));
           return {
             id,
             size: sizeOf(colourFirst ? two : one),
             colour: colourOf(colourFirst ? one : two),
             price,
-            available
+            available,
+            image
           };
         })
       };
@@ -189,6 +194,21 @@ if (!customElements.get('wall-builder')) {
       if (!product) return null;
       const variant = product.variants.find((v) => v.size === size && v.colour === this.state.colour);
       return variant && variant.available ? variant : null;
+    }
+
+    /* The front shot for the chosen style, size and colour. Flat: the variant's own
+       image (either size, same colour). Floating: the white frame's photo, with a
+       moulding laid over it for Black and Wood. */
+    frontFor(piece) {
+      const product = piece.pair[this.state.style];
+      if (!product) return null;
+      const { colour, size } = this.state;
+      if (this.state.style === 'flat') {
+        const ofColour = (v) => v.colour === colour && v.image;
+        const variant = product.variants.find((v) => ofColour(v) && v.size === size) || product.variants.find(ofColour);
+        return variant ? variant.image : null;
+      }
+      return product.front || null;
     }
 
     /* --------------------------------------------------------- controls */
@@ -343,9 +363,18 @@ if (!customElements.get('wall-builder')) {
           const mount = document.createElement('div');
           mount.className = 'wb__mount';
           mount.append(this.artImage(piece, 'wb__art'));
+          const front = document.createElement('img');
+          front.className = 'wb__front';
+          front.alt = '';
+          front.decoding = 'async';
+          front.addEventListener('load', () => front.classList.add('is-loaded'));
+          front.addEventListener('error', () => front.classList.remove('is-loaded'));
+          const moulding = document.createElement('span');
+          moulding.className = 'wb__moulding';
+          moulding.setAttribute('aria-hidden', 'true');
           const missing = document.createElement('span');
           missing.className = 'wb__missing';
-          frame.append(mount, missing);
+          frame.append(mount, front, moulding, missing);
           frame.setAttribute('role', 'img');
           this.frames.set(piece.key, frame);
         }
@@ -354,6 +383,14 @@ if (!customElements.get('wall-builder')) {
         const why = piece.pair[this.state.style] ? 'Not available in this size' : `Only available ${STYLES[other]}`;
         frame.dataset.frame = this.state.colour;
         frame.dataset.style = this.state.style;
+        const front = frame.querySelector('.wb__front');
+        const src = this.frontFor(piece);
+        if (!src) {
+          front.removeAttribute('src');
+          front.classList.remove('is-loaded');
+        } else if (front.getAttribute('src') !== src) {
+          front.src = src; /* the last photo stays up until this one has loaded */
+        }
         frame.classList.toggle('is-unavailable', !variant);
         frame.querySelector('.wb__missing').textContent = variant ? '' : why;
         frame.setAttribute('aria-label', variant ? piece.name : `${piece.name}, ${why.toLowerCase()}`);

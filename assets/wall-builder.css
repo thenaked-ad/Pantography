@@ -107,6 +107,7 @@
 .wb .wb__frame {
   position: relative;
   flex: none;
+  overflow: hidden;
   width: var(--wb-fw);
   height: var(--wb-fh);
   transition: width .25s ease, height .25s ease, opacity .2s ease;
@@ -239,6 +240,40 @@
   color: var(--wb-ink);
 }
 .wb .wb__missing:empty { display: none; }
+
+/* The studio's front shot, cropped to the frame's outer edge and laid over the drawn
+   frame once it has loaded. In the 971px originals the frame is x 103.5-869.5 and
+   y 63-877 (Floating) or 63.5-880 (Flat); every artwork uses the same shot. */
+.wb .wb__front {
+  position: absolute;
+  z-index: 5;
+  left: -13.512%;
+  top: -7.740%;
+  width: 126.76%;
+  height: 119.29% !important; /* the theme sets img { max-width: 100%; height: auto } !important */
+  max-width: none !important;
+  opacity: 0;
+  pointer-events: none;
+}
+.wb .wb__frame[data-style="flat"] .wb__front {
+  top: -7.777%;
+  height: 118.92% !important;
+}
+.wb .wb__front.is-loaded { opacity: 1; }
+
+/* Floating in Black or Wood: the studio photographs only the white frame face on, so
+   the moulding from the Flat front shots goes over it (assets/wb-moulding-*.webp) */
+.wb .wb__moulding {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: none;
+  background: no-repeat center / 100% 100%;
+  pointer-events: none;
+}
+.wb .wb__frame[data-style="floating"][data-frame="Black"] .wb__front.is-loaded + .wb__moulding { display: block; background-image: var(--wb-moulding-black); }
+.wb .wb__frame[data-style="floating"][data-frame="Wood"] .wb__front.is-loaded + .wb__moulding { display: block; background-image: var(--wb-moulding-wood); }
+.wb .wb__missing { z-index: 7; }
 
 /* ---------- favourites strip */
 .wb .wb__favourites { margin-top: 36px; }
