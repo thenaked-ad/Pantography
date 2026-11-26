@@ -8,20 +8,20 @@
    a photo loads, or if there isn't one. */
 if (!customElements.get('wall-builder')) {
   const STORAGE_KEY = 'pantography-wall-v1';
-  const GAP_CM = 12;  /* between frames on the wall (about 5in) */
-  const GAP_IN = 5;
 
   /* Frame sizes as sold. art = the stamp's width and bar = the moulding's, each as a
-     share of the frame's width, measured from the studio's product mockups. */
+     share of the frame's width, measured from the studio's product mockups.
+     gap = the space between frames on the wall, [cm, inches]: 12cm for Medium, and
+     the same proportion of the frame for the other sizes (rounded). */
   const SIZES = {
     floating: [
-      { key: 'Small', w: 27, h: 28, art: 0.45, bar: 0.052 },
-      { key: 'Medium', w: 53, h: 56, art: 0.54, bar: 0.037 },
-      { key: 'Large', w: 90, h: 95, art: 0.56, bar: 0.033 }
+      { key: 'Small', w: 27, h: 28, art: 0.45, bar: 0.052, gap: [6, 2.5] },
+      { key: 'Medium', w: 53, h: 56, art: 0.54, bar: 0.037, gap: [12, 5] },
+      { key: 'Large', w: 90, h: 95, art: 0.56, bar: 0.033, gap: [20, 8] }
     ],
     flat: [
-      { key: 'Medium', w: 48, h: 52, art: 0.62, bar: 0.03 },
-      { key: 'Large', w: 70, h: 75, art: 0.62, bar: 0.028 }
+      { key: 'Medium', w: 48, h: 52, art: 0.62, bar: 0.03, gap: [12, 5] },
+      { key: 'Large', w: 70, h: 75, art: 0.62, bar: 0.028, gap: [18, 7] }
     ]
   };
   const STYLES = { floating: 'Floating', flat: 'Flat' };
@@ -434,26 +434,27 @@ if (!customElements.get('wall-builder')) {
       const ref = this.reference;
       const refWidth = Math.min(
         300,
-        (width - 2) / (cols + (cols - 1) * GAP_CM / ref.w),
-        maxHeight / (rows * ref.h / ref.w + (rows - 1) * GAP_CM / ref.w)
+        (width - 2) / (cols + (cols - 1) * ref.gap[0] / ref.w),
+        maxHeight / (rows * ref.h / ref.w + (rows - 1) * ref.gap[0] / ref.w)
       );
       const cm = refWidth / ref.w;
       /* the wall keeps the reference's height, so the page doesn't jump between styles */
-      const height = rows * ref.h * cm + (rows - 1) * GAP_CM * cm;
+      const height = rows * ref.h * cm + (rows - 1) * ref.gap[0] * cm;
 
       wall.style.height = `${Math.ceil(height + parseFloat(styles.paddingTop) + parseFloat(styles.paddingBottom))}px`;
       grid.style.setProperty('--wb-cm', `${cm}px`);
       grid.style.setProperty('--wb-fw', `${size.w * cm}px`);
       grid.style.setProperty('--wb-fh', `${size.h * cm}px`);
-      grid.style.setProperty('--wb-gap', `${GAP_CM * cm}px`);
+      const [gapCm, gapIn] = size.gap;
+      grid.style.setProperty('--wb-gap', `${gapCm * cm}px`);
       grid.style.setProperty('--wb-t', `${Math.max(2, size.w * size.bar * cm)}px`);
       grid.style.setProperty('--wb-art', `${size.art * 100}%`);
-      grid.style.width = `${Math.ceil(cols * size.w * cm + (cols - 1) * GAP_CM * cm) + 1}px`;
+      grid.style.width = `${Math.ceil(cols * size.w * cm + (cols - 1) * gapCm * cm) + 1}px`;
 
-      const wallW = cols * size.w + (cols - 1) * GAP_CM;
-      const wallH = rows * size.h + (rows - 1) * GAP_CM;
+      const wallW = cols * size.w + (cols - 1) * gapCm;
+      const wallH = rows * size.h + (rows - 1) * gapCm;
       dims.textContent = n > 1
-        ? `Your wall: about ${wallW}cm x ${wallH}cm, with ${GAP_CM}cm/${GAP_IN}in between frames`
+        ? `Your wall: about ${wallW}cm x ${wallH}cm, with ${gapCm}cm/${gapIn}in between frames`
         : `Frame: ${size.w}cm x ${size.h}cm`;
     }
 
