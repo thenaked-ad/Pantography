@@ -1,29 +1,34 @@
 /* Wall builder. Markup and settings: sections/wall-builder.liquid.
    Catalogue: templates/collection.wallfeed.liquid, read from the Floating and the
    Flat collections. The artworks are the visitor's favourites (assets/favourites.js).
-   The frames fill the space in their true proportions; the wall's real size is
-   written underneath. Each frame is the studio's front shot of that artwork: the Flat
+   Every size and style is drawn the same: one frame shape, one gap, one scale, so
+   nothing on screen moves when the visitor changes options. Only the real
+   measurements written underneath change. Each frame is the studio's front shot of that artwork: the Flat
    product's image in the chosen colour, or the Floating product's main image (a white
    frame; Black and Wood lay the studio's moulding over it). A drawn frame shows while
    a photo loads, or if there isn't one. */
 if (!customElements.get('wall-builder')) {
   const STORAGE_KEY = 'pantography-wall-v1';
 
-  /* Frame sizes as sold. art = the stamp's width and bar = the moulding's, each as a
-     share of the frame's width, measured from the studio's product mockups.
-     gap = the space between frames on the wall, [cm, inches]: 12cm for Medium, and
-     the same proportion of the frame for the other sizes (rounded). */
+  /* Frame sizes as sold (cm) and the space between frames on the wall, [cm, inches]:
+     12cm for Medium and the same proportion of the frame for the other sizes. These
+     are only written out; the drawing never changes (see FRAME). */
   const SIZES = {
     floating: [
-      { key: 'Small', w: 27, h: 28, art: 0.45, bar: 0.052, gap: [6, 2.5] },
-      { key: 'Medium', w: 53, h: 56, art: 0.54, bar: 0.037, gap: [12, 5] },
-      { key: 'Large', w: 90, h: 95, art: 0.56, bar: 0.033, gap: [20, 8] }
+      { key: 'Small', w: 27, h: 28, gap: [6, 2.5] },
+      { key: 'Medium', w: 53, h: 56, gap: [12, 5] },
+      { key: 'Large', w: 90, h: 95, gap: [20, 8] }
     ],
     flat: [
-      { key: 'Medium', w: 48, h: 52, art: 0.62, bar: 0.03, gap: [12, 5] },
-      { key: 'Large', w: 70, h: 75, art: 0.62, bar: 0.028, gap: [18, 7] }
+      { key: 'Medium', w: 48, h: 52, gap: [12, 5] },
+      { key: 'Large', w: 70, h: 75, gap: [18, 7] }
     ]
   };
+  /* The one frame every option is drawn as: the studio front shot's frame shape
+     (766 x 814px), and a gap of 12/53 of the frame's width, as for Medium Floating.
+     art = the stamp's width and bar = the moulding's, as shares of the frame's width,
+     for the drawn frame that shows while a photo loads. */
+  const FRAME = { ratio: 814 / 766, gap: 12 / 53, cmPerWidth: 53, art: { floating: 0.54, flat: 0.62 }, bar: { floating: 0.037, flat: 0.03 } };
   const STYLES = { floating: 'Floating', flat: 'Flat' };
   const COLOURS = ['White', 'Black', 'Wood'];
 
@@ -405,16 +410,7 @@ if (!customElements.get('wall-builder')) {
       if (grid.parentNode !== wall) wall.replaceChildren(grid);
     }
 
-    /* The biggest frame sold in the chosen size, Floating or Flat. The wall is scaled
-       to fit that one, so switching style keeps the same scale and Flat shows as
-       truly smaller (Medium 48x52 against 53x56) instead of being stretched to fill. */
-    get reference() {
-      const key = this.size.key;
-      return Object.values(SIZES).flat().filter((s) => s.key === key)
-        .reduce((big, s) => (s.w * s.h > big.w * big.h ? s : big), this.size);
-    }
-
-    /* sizes every frame to scale for the space the wall has */
+    /* sizes the frames for the space the wall has; the same for every option */
     layout() {
       const { wall, dims } = this.el;
       const grid = wall.querySelector('.wb__grid');
@@ -430,26 +426,28 @@ if (!customElements.get('wall-builder')) {
       const styles = getComputedStyle(wall);
       const width = wall.clientWidth - parseFloat(styles.paddingLeft) - parseFloat(styles.paddingRight);
       const maxHeight = Math.min(window.innerHeight * 0.6, 620, width * 1.1);
-      /* the most the reference frame can be across and still fit, never more than 300px */
-      const ref = this.reference;
-      const refWidth = Math.min(
+      /* the most a frame can be across and still fit, never more than 300px; whole
+         pixels so every option lands on exactly the same layout */
+      const fw = Math.floor(Math.min(
         300,
-        (width - 2) / (cols + (cols - 1) * ref.gap[0] / ref.w),
-        maxHeight / (rows * ref.h / ref.w + (rows - 1) * ref.gap[0] / ref.w)
-      );
-      const cm = refWidth / ref.w;
-      /* the wall keeps the reference's height, so the page doesn't jump between styles */
-      const height = rows * ref.h * cm + (rows - 1) * ref.gap[0] * cm;
+        (width - 2) / (cols + (cols - 1) * FRAME.gap),
+        maxHeight / (rows * FRAME.ratio + (rows - 1) * FRAME.gap)
+      ));
+      const fh = Math.round(fw * FRAME.ratio);
+      const gap = Math.round(fw * FRAME.gap);
+      const height = rows * fh + (rows - 1) * gap;
+      const style = this.state.style;
 
       wall.style.height = `${Math.ceil(height + parseFloat(styles.paddingTop) + parseFloat(styles.paddingBottom))}px`;
-      grid.style.setProperty('--wb-cm', `${cm}px`);
-      grid.style.setProperty('--wb-fw', `${size.w * cm}px`);
-      grid.style.setProperty('--wb-fh', `${size.h * cm}px`);
+      grid.style.setProperty('--wb-cm', `${fw / FRAME.cmPerWidth}px`);
+      grid.style.setProperty('--wb-fw', `${fw}px`);
+      grid.style.setProperty('--wb-fh', `${fh}px`);
+      grid.style.setProperty('--wb-gap', `${gap}px`);
+      grid.style.setProperty('--wb-t', `${Math.max(2, fw * FRAME.bar[style])}px`);
+      grid.style.setProperty('--wb-art', `${FRAME.art[style] * 100}%`);
+      grid.style.width = `${cols * fw + (cols - 1) * gap + 1}px`;
+
       const [gapCm, gapIn] = size.gap;
-      grid.style.setProperty('--wb-gap', `${gapCm * cm}px`);
-      grid.style.setProperty('--wb-t', `${Math.max(2, size.w * size.bar * cm)}px`);
-      grid.style.setProperty('--wb-art', `${size.art * 100}%`);
-      grid.style.width = `${Math.ceil(cols * size.w * cm + (cols - 1) * gapCm * cm) + 1}px`;
 
       const wallW = cols * size.w + (cols - 1) * gapCm;
       const wallH = rows * size.h + (rows - 1) * gapCm;
