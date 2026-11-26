@@ -405,6 +405,15 @@ if (!customElements.get('wall-builder')) {
       if (grid.parentNode !== wall) wall.replaceChildren(grid);
     }
 
+    /* The biggest frame sold in the chosen size, Floating or Flat. The wall is scaled
+       to fit that one, so switching style keeps the same scale and Flat shows as
+       truly smaller (Medium 48x52 against 53x56) instead of being stretched to fill. */
+    get reference() {
+      const key = this.size.key;
+      return Object.values(SIZES).flat().filter((s) => s.key === key)
+        .reduce((big, s) => (s.w * s.h > big.w * big.h ? s : big), this.size);
+    }
+
     /* sizes every frame to scale for the space the wall has */
     layout() {
       const { wall, dims } = this.el;
@@ -421,14 +430,16 @@ if (!customElements.get('wall-builder')) {
       const styles = getComputedStyle(wall);
       const width = wall.clientWidth - parseFloat(styles.paddingLeft) - parseFloat(styles.paddingRight);
       const maxHeight = Math.min(window.innerHeight * 0.6, 620, width * 1.1);
-      /* the most a frame can be across and still fit, never more than 300px */
-      const frameWidth = Math.min(
+      /* the most the reference frame can be across and still fit, never more than 300px */
+      const ref = this.reference;
+      const refWidth = Math.min(
         300,
-        (width - 2) / (cols + (cols - 1) * GAP_CM / size.w),
-        maxHeight / (rows * size.h / size.w + (rows - 1) * GAP_CM / size.w)
+        (width - 2) / (cols + (cols - 1) * GAP_CM / ref.w),
+        maxHeight / (rows * ref.h / ref.w + (rows - 1) * GAP_CM / ref.w)
       );
-      const cm = frameWidth / size.w;
-      const height = rows * size.h * cm + (rows - 1) * GAP_CM * cm;
+      const cm = refWidth / ref.w;
+      /* the wall keeps the reference's height, so the page doesn't jump between styles */
+      const height = rows * ref.h * cm + (rows - 1) * GAP_CM * cm;
 
       wall.style.height = `${Math.ceil(height + parseFloat(styles.paddingTop) + parseFloat(styles.paddingBottom))}px`;
       grid.style.setProperty('--wb-cm', `${cm}px`);

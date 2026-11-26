@@ -110,7 +110,9 @@
   overflow: hidden;
   width: var(--wb-fw);
   height: var(--wb-fh);
-  transition: width .25s ease, height .25s ease, opacity .2s ease;
+  /* no width/height transition: the row width changes at once, so frames still
+     easing to their new size would overflow it and wrap into a column */
+  transition: opacity .2s ease;
   box-shadow:
     0 1px 2px rgba(0, 0, 0, .16),
     -2px 4px 8px rgba(30, 22, 12, .14),
